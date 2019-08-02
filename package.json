@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/abuob/yanice/issues"
   },
-  "homepage": "https://github.com/abuob/yanice#readme"
+  "homepage": "https://github.com/abuob/yanice#readme",
+  "dependencies": {
+    "@types/node": "^12.6.9",
+    "prettier": "^1.18.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.5.3"
+  }
 }
