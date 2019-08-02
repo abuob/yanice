@@ -1,0 +1,19 @@
+{
+  "name": "yanice",
+  "version": "0.0.1",
+  "description": "Yet another incremental command executor",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abuob/yanice.git"
+  },
+  "author": "abuob",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abuob/yanice/issues"
+  },
+  "homepage": "https://github.com/abuob/yanice#readme"
+}
