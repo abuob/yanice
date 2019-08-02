@@ -5,6 +5,14 @@ export class ChangedFiles {
         return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${sha1} ${sha2}`);
     }
 
+    public static uncommittedFiles(): string[] {
+        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only HEAD`);
+    }
+
+    public static filesChangedBetweenWorkingTreeAndGivenBranch(branch: string): string[] {
+        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${branch}`)
+    }
+
     private static getGitDiffNameOnlyOutputAsArrayOfFiles(gitDiffCommand: string): string[] {
         return execSync(gitDiffCommand).toString()
             .split('\n')
