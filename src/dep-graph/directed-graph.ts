@@ -24,6 +24,23 @@ export class DirectedGraphUtil {
         return result;
     }
 
+    public static getNodeAndTransitiveChildrenNames(graph: IDirectedGraph, name: string): string[] {
+        const givenNode = graph.nodes.find(n => n.name === name);
+        if (!givenNode) {
+            return [];
+        }
+        return this.getNodeAndTransitiveChildren(givenNode).map(n => n.name);
+    }
+
+    private static getNodeAndTransitiveChildren(node: IDirectedGraphNode): IDirectedGraphNode[] {
+        if (node.edgesTo.length === 0) {
+            return [node];
+        }
+        return node.edgesTo
+            .map(n => this.getNodeAndTransitiveChildren(n))
+            .reduce((prev, curr) => Array.from(new Set(prev.concat(curr))), [node]);
+    }
+
     private static hasCycleRecursive(
         node: IDirectedGraphNode,
         visitedAlready: IDirectedGraphNode[],
