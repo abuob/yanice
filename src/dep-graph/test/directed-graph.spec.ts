@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { DirectedGraphUtil } from '../directed-graph'
 
 describe('DirectedGraphUtil', () => {
-    describe('isCyclic', () => {
+    describe('hasCycle', () => {
         it('should return true if there is a cycle in a given graph', () => {
             const graph1 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
@@ -29,9 +29,9 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('C', 'D')
                 .createDirectedEdge('D', 'A')
                 .build();
-            expect(DirectedGraphUtil.isCyclic(graph1)).to.equal(true);
-            expect(DirectedGraphUtil.isCyclic(graph2)).to.equal(true);
-            expect(DirectedGraphUtil.isCyclic(graph3)).to.equal(true);
+            expect(DirectedGraphUtil.hasCycle(graph1)).to.equal(true);
+            expect(DirectedGraphUtil.hasCycle(graph2)).to.equal(true);
+            expect(DirectedGraphUtil.hasCycle(graph3)).to.equal(true);
         });
 
         it('should return false if there is no cycle in a given graph', () => {
@@ -58,10 +58,10 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('B', 'D')
                 .createDirectedEdge('C', 'D')
                 .build();
-            expect(DirectedGraphUtil.isCyclic(graph0)).to.equal(false);
-            expect(DirectedGraphUtil.isCyclic(graph1)).to.equal(false);
-            expect(DirectedGraphUtil.isCyclic(graph2)).to.equal(false);
-            expect(DirectedGraphUtil.isCyclic(graph3)).to.equal(false);
+            expect(DirectedGraphUtil.hasCycle(graph0)).to.equal(false);
+            expect(DirectedGraphUtil.hasCycle(graph1)).to.equal(false);
+            expect(DirectedGraphUtil.hasCycle(graph2)).to.equal(false);
+            expect(DirectedGraphUtil.hasCycle(graph3)).to.equal(false);
         });
     });
 

@@ -12,11 +12,11 @@ export class DirectedGraphUtil {
         return new DirectedGraphBuilder();
     }
 
-    public static isCyclic(graph: IDirectedGraph): boolean {
+    public static hasCycle(graph: IDirectedGraph): boolean {
         let visitedAlready: IDirectedGraphNode[] = [];
         let result = false;
         graph.nodes.forEach(node => {
-            if (this.isCyclicRecursive(node, visitedAlready, [])) {
+            if (this.hasCycleRecursive(node, visitedAlready, [])) {
                 result = true;
             }
             visitedAlready = visitedAlready.concat(node);
@@ -24,7 +24,7 @@ export class DirectedGraphUtil {
         return result;
     }
 
-    private static isCyclicRecursive(
+    private static hasCycleRecursive(
         node: IDirectedGraphNode,
         visitedAlready: IDirectedGraphNode[],
         nodesInDfsTraversal: IDirectedGraphNode[]
@@ -36,7 +36,7 @@ export class DirectedGraphUtil {
             return true;
         }
         return node.edgesTo
-            .map(connectedNode => this.isCyclicRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
+            .map(connectedNode => this.hasCycleRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
             .reduce((prev, curr) => prev || curr, false);
     }
 }
