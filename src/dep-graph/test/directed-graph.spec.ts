@@ -87,5 +87,11 @@ describe('DirectedGraphUtil', () => {
                     {name: 'C', edgesTo: []},
                 ]});
         });
+
+        it('should throw an error when trying to add another node with the same name', () => {
+            const builderWithOneNode = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A');
+            expect(builderWithOneNode.addNode.bind(builderWithOneNode, 'A')).to.throw('Cannot add a node with name "A" to the graph, such a node already exists!');
+        });
     });
 });

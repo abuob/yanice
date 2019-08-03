@@ -47,6 +47,9 @@ class DirectedGraphBuilder {
     };
 
     public addNode(name: string): DirectedGraphBuilder {
+        if (this.graph.nodes.map(n => n.name).includes(name)) {
+            throw Error(`Cannot add a node with name "${name}" to the graph, such a node already exists!`);
+        }
         this.graph.nodes = this.graph.nodes.concat({ name, edgesTo: [] });
         return this;
     }
