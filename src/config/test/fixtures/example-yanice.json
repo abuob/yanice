@@ -1,0 +1,47 @@
+{
+  "projects": [
+    {
+      "projectName": "A",
+      "rootDir": "path/to/dir/A"
+    },
+    {
+      "projectName": "B",
+      "rootDir": "path/to/dir/B"
+    },
+    {
+      "projectName": "C",
+      "rootDir": "path/to/dir/C"
+    },
+    {
+      "projectName": "D",
+      "rootDir": "path/to/dir/D"
+    },
+    {
+      "projectName": "E",
+      "rootDir": "path/to/dir/E"
+    }
+  ],
+  "dependencyScopes": {
+    "lint": {
+      "A": [],
+      "B": [],
+      "C": [],
+      "D": [],
+      "E": []
+    },
+    "test": {
+      "A": ["B", "C"],
+      "B": ["D"],
+      "C": ["D"],
+      "D": ["E"],
+      "E": []
+    },
+    "illegalCycle": {
+      "A": ["B"],
+      "B": ["C"],
+      "C": ["D"],
+      "D": ["E"],
+      "E": ["A"]
+    }
+  }
+}
