@@ -1,6 +1,6 @@
 export interface IYaniceProject {
     projectName: string;
-    projectRoot: string;
+    rootDir: string;
 }
 
 export interface IYaniceConfig {
