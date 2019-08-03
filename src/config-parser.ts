@@ -1,12 +1,10 @@
-export interface YaniceProject {
+export interface IYaniceProject {
     projectName: string;
     projectRoot: string;
 }
 
-export interface YaniceConfig {
-    projects: YaniceProject[];
+export interface IYaniceConfig {
+    projects: IYaniceProject[];
 }
 
-export class ConfigParser {
-
-}
+export class ConfigParser {}

@@ -5,6 +5,8 @@
     "tslint-plugin-prettier"
   ],
   "rules": {
-    "prettier": true
+    "prettier": true,
+    "no-var-requires": false,
+    "max-classes-per-file": false
   }
 }

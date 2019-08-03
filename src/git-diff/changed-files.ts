@@ -10,13 +10,14 @@ export class ChangedFiles {
     }
 
     public static filesChangedBetweenWorkingTreeAndGivenBranch(branch: string): string[] {
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${branch}`)
+        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${branch}`);
     }
 
     private static getGitDiffNameOnlyOutputAsArrayOfFiles(gitDiffCommand: string): string[] {
-        return execSync(gitDiffCommand).toString()
+        return execSync(gitDiffCommand)
+            .toString()
             .split('\n')
-            .map((filePath:string) => filePath.trim())
-            .filter((filePath:string) => filePath.length > 0);
+            .map((filePath: string) => filePath.trim())
+            .filter((filePath: string) => filePath.length > 0);
     }
 }

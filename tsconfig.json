@@ -7,6 +7,6 @@
     "outDir": "./dist",
     "strict": true
   },
-  "include": ["index.ts"],
+  "include": ["**/*.ts"],
   "exclude": ["**/test/**"]
 }
