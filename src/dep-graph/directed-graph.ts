@@ -24,8 +24,19 @@ export class DirectedGraphUtil {
         return result;
     }
 
+    public static getTransitiveChildrenNames(graph: IDirectedGraph, name: string): string[] {
+        const givenNode = this.getNodeByName(graph, name);
+        if (!givenNode) {
+            return [];
+        }
+        const setOfChildren: Set<string> = this.getNodeAndTransitiveChildrenNames(graph, name)
+            .reduce((prev, curr) => prev.add(curr), new Set<string>());
+        setOfChildren.delete(name);
+        return Array.from(setOfChildren);
+    }
+
     public static getNodeAndTransitiveChildrenNames(graph: IDirectedGraph, name: string): string[] {
-        const givenNode = graph.nodes.find(n => n.name === name);
+        const givenNode = this.getNodeByName(graph, name);
         if (!givenNode) {
             return [];
         }
@@ -55,6 +66,14 @@ export class DirectedGraphUtil {
         return node.edgesTo
             .map(connectedNode => this.hasCycleRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
             .reduce((prev, curr) => prev || curr, false);
+    }
+
+    private static getNodeByName(graph: IDirectedGraph, name: string): IDirectedGraphNode | null {
+        const givenNode = graph.nodes.find(n => n.name === name);
+        if (!givenNode) {
+            return null;
+        }
+        return givenNode;
     }
 }
 

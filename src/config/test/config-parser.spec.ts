@@ -31,7 +31,7 @@ describe('ConfigParser', () => {
             expect(DirectedGraphUtil.hasCycle(actualGraphForTestScope!)).to.equal(false);
         });
 
-        it('should properly create a directed graph even when given a scope-definitions containing an illegal cycle', () => {
+        it('should properly create a directed graph even when given a scope-definition containing an illegal cycle', () => {
             const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfigByScope(yaniceJson, 'illegalCycle');
             expect(actualGraphForIllegalCycleScope).to.not.equal(null);
             expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'A')!.edgesTo.map(n => n.name)).to.have.same.members(['B']);
