@@ -29,8 +29,10 @@ export class DirectedGraphUtil {
         if (!givenNode) {
             return [];
         }
-        const setOfChildren: Set<string> = this.getNodeAndTransitiveChildrenNames(graph, name)
-            .reduce((prev, curr) => prev.add(curr), new Set<string>());
+        const setOfChildren: Set<string> = this.getNodeAndTransitiveChildrenNames(graph, name).reduce(
+            (prev, curr) => prev.add(curr),
+            new Set<string>()
+        );
         setOfChildren.delete(name);
         return Array.from(setOfChildren);
     }
