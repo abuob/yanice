@@ -13,7 +13,7 @@ export class ChangedProjects {
     }
 
     private static getProjectRootDirRegExp(rootDir: string): RegExp {
-        if (rootDir.substring(rootDir.length - 1, rootDir.length) === '/') {
+        if (rootDir.charAt(rootDir.length-1) === '/') {
             return new RegExp(rootDir);
         }
         return new RegExp(`${rootDir}/`);
