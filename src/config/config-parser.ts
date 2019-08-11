@@ -28,7 +28,7 @@ export class ConfigParser {
         });
         Object.keys(depScope).forEach(projectName => {
             depScope[projectName].forEach(dependentProject => {
-                graphBuilder.createDirectedEdge(projectName, dependentProject);
+                graphBuilder.createDirectedEdge(dependentProject, projectName);
             });
         });
         return graphBuilder.build();

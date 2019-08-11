@@ -133,17 +133,19 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('C', 'D')
                 .createDirectedEdge('D', 'E')
                 .build();
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph0, 'this-does-not-exist')).to.have.same.members([]);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph1, 'A')).to.have.same.members(['B']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph1, 'B')).to.have.same.members([]);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph2, 'A')).to.have.same.members(['B', 'C']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph2, 'B')).to.have.same.members(['C']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph2, 'C')).to.have.same.members([]);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, 'A')).to.have.same.members(['B', 'C', 'D', 'E']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, 'B')).to.have.same.members(['D', 'E']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, 'C')).to.have.same.members(['D', 'E']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, 'D')).to.have.same.members(['E']);
-            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, 'E')).to.have.same.members([]);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph0, ['this-does-not-exist'])).to.have.same.members([]);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph1, ['A'])).to.have.same.members(['B']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph1, ['B'])).to.have.same.members([]);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph2, ['A'])).to.have.same.members(['B', 'C']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph2, ['B'])).to.have.same.members(['C']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph2, ['C'])).to.have.same.members([]);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['A'])).to.have.same.members(['B', 'C', 'D', 'E']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['A', 'E'])).to.have.same.members(['B', 'C', 'D', 'E']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['B'])).to.have.same.members(['D', 'E']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['C'])).to.have.same.members(['D', 'E']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['B', 'C'])).to.have.same.members(['D', 'E']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['D'])).to.have.same.members(['E']);
+            expect(DirectedGraphUtil.getTransitiveChildrenNames(graph3, ['E'])).to.have.same.members([]);
         });
     });
 

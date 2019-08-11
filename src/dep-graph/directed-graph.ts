@@ -24,17 +24,27 @@ export class DirectedGraphUtil {
         return result;
     }
 
-    public static getTransitiveChildrenNames(graph: IDirectedGraph, name: string): string[] {
-        const givenNode = this.getNodeByName(graph, name);
-        if (!givenNode) {
-            return [];
-        }
-        const setOfChildren: Set<string> = this.getNodeAndTransitiveChildrenNames(graph, name).reduce(
-            (prev, curr) => prev.add(curr),
-            new Set<string>()
+    public static getTransitiveChildrenNames(graph: IDirectedGraph, ancestorNames: string[]): string[] {
+        return this.removeDupliateEntries(
+            ancestorNames
+                .map(ancestorName => {
+                    const givenNode = this.getNodeByName(graph, ancestorName);
+                    if (!givenNode) {
+                        return [];
+                    }
+                    const setOfChildren: Set<string> = this.getNodeAndTransitiveChildrenNames(graph, ancestorName).reduce(
+                        (prev, curr) => prev.add(curr),
+                        new Set<string>()
+                    );
+                    setOfChildren.delete(ancestorName);
+                    return Array.from(setOfChildren);
+                })
+                .reduce((prev, curr) => prev.concat(curr), [])
         );
-        setOfChildren.delete(name);
-        return Array.from(setOfChildren);
+    }
+
+    public static getTransitiveChildrenNamesIncludingAncestors(graph: IDirectedGraph, ancestorNames: string[]): string[] {
+        return this.removeDupliateEntries(this.getTransitiveChildrenNames(graph, ancestorNames).concat(ancestorNames));
     }
 
     public static getNodeAndTransitiveChildrenNames(graph: IDirectedGraph, name: string): string[] {
@@ -49,9 +59,9 @@ export class DirectedGraphUtil {
         if (node.edgesTo.length === 0) {
             return [node];
         }
-        return node.edgesTo
-            .map(n => this.getNodeAndTransitiveChildren(n))
-            .reduce((prev, curr) => Array.from(new Set(prev.concat(curr))), [node]);
+        return this.removeDupliateEntries(
+            node.edgesTo.map(n => this.getNodeAndTransitiveChildren(n)).reduce((prev, curr) => prev.concat(curr), [node])
+        );
     }
 
     private static hasCycleRecursive(
@@ -76,6 +86,11 @@ export class DirectedGraphUtil {
             return null;
         }
         return givenNode;
+    }
+
+    // poor man's removal of duplicate entries in an array
+    private static removeDupliateEntries<T>(input: T[]): T[] {
+        return Array.from(input.reduce((prev, curr) => prev.add(curr), new Set<T>()));
     }
 }
 
