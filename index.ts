@@ -35,5 +35,4 @@ if (!depGraph) {
     process.exit(1);
 }
 const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(depGraph!, changedProjectsRaw);
-
-log(affected);
+DirectedGraphUtil.sortTopologically(depGraph!, affected).forEach(projectName => log(projectName));
