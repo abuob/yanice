@@ -34,6 +34,6 @@ if (!depGraph) {
     log('dep-graph cannot be constructed!');
     process.exit(1);
 }
-const affected = DirectedGraphUtil.getNodeAndTransitiveChildrenNames(depGraph!, 'lib-2');
+const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(depGraph!, changedProjectsRaw);
 
 log(affected);
