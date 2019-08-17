@@ -149,6 +149,66 @@ describe('DirectedGraphUtil', () => {
         });
     });
 
+    describe('getNodeNamesTopologicallySorted', () => {
+        it('should return node-names topologically sorted', () => {
+            const graph1 = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .addNode('B')
+                .createDirectedEdge('A', 'B')
+                .build();
+            const graph2 = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .addNode('B')
+                .addNode('C')
+                .createDirectedEdge('A', 'B')
+                .createDirectedEdge('B', 'C')
+                .build();
+            const graph3 = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .addNode('B')
+                .addNode('C')
+                .addNode('D')
+                .addNode('E')
+                .createDirectedEdge('A', 'B')
+                .createDirectedEdge('A', 'C')
+                .createDirectedEdge('B', 'D')
+                .createDirectedEdge('C', 'D')
+                .createDirectedEdge('D', 'E')
+                .build();
+            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph1, ['B', 'A'])).to.deep.equal(['A', 'B']);
+            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph2, ['A', 'B', 'C'])).to.deep.equal(['A', 'B', 'C']);
+            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph2, ['B', 'C', 'A'])).to.deep.equal(['A', 'B', 'C']);
+            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph2, ['C', 'B', 'A'])).to.deep.equal(['A', 'B', 'C']);
+        });
+    });
+
+    describe('isAncestorOf', () => {
+        it('should calculate whether a node is an ancestor of another one or not', () => {
+            const graph1 = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .addNode('B')
+                .createDirectedEdge('A', 'B')
+                .build();
+            const graph2 = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .addNode('B')
+                .addNode('C')
+                .createDirectedEdge('A', 'B')
+                .createDirectedEdge('B', 'C')
+                .build();
+            expect(DirectedGraphUtil.isAncestorOf(graph1, 'A', 'B', false)).to.equal(true);
+            expect(DirectedGraphUtil.isAncestorOf(graph1, 'B', 'A', false)).to.equal(false);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'A', 'B', false)).to.equal(true);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'A', 'C', false)).to.equal(true);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'B', 'C', false)).to.equal(true);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'C', 'A', false)).to.equal(false);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'C', 'B', false)).to.equal(false);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'C', 'C', false)).to.equal(false);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'C', 'C', true)).to.equal(true);
+            expect(DirectedGraphUtil.isAncestorOf(graph2, 'C', 'C', true)).to.equal(true);
+        });
+    });
+
     describe('directedGraphBuilder', () => {
         it('should create the graphs correctly', () => {
             expect(DirectedGraphUtil.directedGraphBuilder

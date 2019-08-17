@@ -55,6 +55,25 @@ export class DirectedGraphUtil {
         return this.getNodeAndTransitiveChildren(givenNode).map(n => n.name);
     }
 
+    public static getNodeNamesTopologicallySorted(graph: IDirectedGraph, names: string[]): string[] {
+        return names.sort((a, b) => {
+            if(this.isAncestorOf(graph, a, b, false)) {
+                return -1;
+            }
+            if(this.isAncestorOf(graph, b, a, false)) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    public static isAncestorOf(graph: IDirectedGraph, ancestor: string, descendant: string, allowReflexive: boolean): boolean {
+        if(ancestor === descendant) {
+            return allowReflexive;
+        }
+        return this.getNodeAndTransitiveChildrenNames(graph, ancestor).includes(descendant);
+    }
+
     private static getNodeAndTransitiveChildren(node: IDirectedGraphNode): IDirectedGraphNode[] {
         if (node.edgesTo.length === 0) {
             return [node];
