@@ -55,8 +55,8 @@ export class DirectedGraphUtil {
         return this.getNodeAndTransitiveChildren(givenNode).map(n => n.name);
     }
 
-    public static getNodeNamesTopologicallySorted(graph: IDirectedGraph, names: string[]): string[] {
-        return names.sort((a, b) => {
+    public static sortTopologically(graph: IDirectedGraph, nodeNames: string[]): string[] {
+        return nodeNames.sort((a, b) => {
             if(this.isAncestorOf(graph, a, b, false)) {
                 return -1;
             }

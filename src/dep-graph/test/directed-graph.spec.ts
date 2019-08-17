@@ -149,7 +149,7 @@ describe('DirectedGraphUtil', () => {
         });
     });
 
-    describe('getNodeNamesTopologicallySorted', () => {
+    describe('sortTopologically', () => {
         it('should return node-names topologically sorted', () => {
             const graph1 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
@@ -175,10 +175,10 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('C', 'D')
                 .createDirectedEdge('D', 'E')
                 .build();
-            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph1, ['B', 'A'])).to.deep.equal(['A', 'B']);
-            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph2, ['A', 'B', 'C'])).to.deep.equal(['A', 'B', 'C']);
-            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph2, ['B', 'C', 'A'])).to.deep.equal(['A', 'B', 'C']);
-            expect(DirectedGraphUtil.getNodeNamesTopologicallySorted(graph2, ['C', 'B', 'A'])).to.deep.equal(['A', 'B', 'C']);
+            expect(DirectedGraphUtil.sortTopologically(graph1, ['B', 'A'])).to.deep.equal(['A', 'B']);
+            expect(DirectedGraphUtil.sortTopologically(graph2, ['A', 'B', 'C'])).to.deep.equal(['A', 'B', 'C']);
+            expect(DirectedGraphUtil.sortTopologically(graph2, ['B', 'C', 'A'])).to.deep.equal(['A', 'B', 'C']);
+            expect(DirectedGraphUtil.sortTopologically(graph2, ['C', 'B', 'A'])).to.deep.equal(['A', 'B', 'C']);
         });
     });
 
