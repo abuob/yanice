@@ -1,6 +1,6 @@
 ### [WORK IN PROGRESS]
 
-#yanice - "yet another incremental command executor"
+# yanice - "yet another incremental command executor"
 
 yanice takes care of change detection and incremental builds/command execution within a git-based monorepository.
 
