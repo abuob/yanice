@@ -57,13 +57,13 @@ Create a `yanice.json`-file on the root-level of the repository as follows:
       "P3": [],
       "lib-1": [],
       "lib-2": []
-    },
+    }
   }
 }
 ```
 
 Now let's assume you're currently doing some coding and would like to know what exactly you need to test. 
-A command such as `yanice test --branch=master` should, as per definition above, return list all projects affected by your changes (compared to the `master`-branch),
+A command such as `yanice test --branch=master` should, as per definition above, list all projects affected by your changes (compared to the `master`-branch),
 so if you for example make a change to lib-12 it should return lib-12, P1, P2, P3 (topologically sorted). 
 If you change P1, only P1 is returned as nothing depends on P1.
 
