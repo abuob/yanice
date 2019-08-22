@@ -20,15 +20,19 @@ describe('ChangedFiles', () => {
         ]);
     });
 
-    it('should be able to calculate changed files between current working tree and a given branch', () => {
-        // CAREFUL! If this test fails, you might have to manually delete the branch TEST-BRANCH-SHOULD-BE-DELETED
-        execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
-        expect(ChangedFiles.filesChangedBetweenWorkingTreeAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED')).to.have.same.members(
-            execSync('git diff HEAD~1 --name-only').toString()
-                .split('\n')
-                .map((filePath:string) => filePath.trim())
-                .filter((filePath:string) => filePath.length > 0)
-        );
-        execSync('git branch -d TEST-BRANCH-SHOULD-BE-DELETED');
+    describe('filesChangedBetweenWorkingTreeAndGivenBranch', () => {
+        it('should be able to calculate changed files between current working tree and a given branch', () => {
+            execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
+            expect(ChangedFiles.filesChangedBetweenWorkingTreeAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED')).to.have.same.members(
+                execSync('git diff HEAD~1 --name-only').toString()
+                    .split('\n')
+                    .map((filePath:string) => filePath.trim())
+                    .filter((filePath:string) => filePath.length > 0)
+            );
+        });
+
+        afterEach(() => {
+            execSync('git branch -d TEST-BRANCH-SHOULD-BE-DELETED');
+        });
     });
 });

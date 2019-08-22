@@ -10,7 +10,7 @@ export class ChangedFiles {
     }
 
     public static filesChangedBetweenWorkingTreeAndGivenBranch(branch: string): string[] {
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${branch}`);
+        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only $(git merge-base --fork-point ${branch})`);
     }
 
     private static getGitDiffNameOnlyOutputAsArrayOfFiles(gitDiffCommand: string): string[] {

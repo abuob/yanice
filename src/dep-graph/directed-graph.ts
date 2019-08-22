@@ -57,10 +57,10 @@ export class DirectedGraphUtil {
 
     public static sortTopologically(graph: IDirectedGraph, nodeNames: string[]): string[] {
         return nodeNames.sort((a, b) => {
-            if(this.isAncestorOf(graph, a, b, false)) {
+            if (this.isAncestorOf(graph, a, b, false)) {
                 return -1;
             }
-            if(this.isAncestorOf(graph, b, a, false)) {
+            if (this.isAncestorOf(graph, b, a, false)) {
                 return 1;
             }
             return 0;
@@ -68,7 +68,7 @@ export class DirectedGraphUtil {
     }
 
     public static isAncestorOf(graph: IDirectedGraph, ancestor: string, descendant: string, allowReflexive: boolean): boolean {
-        if(ancestor === descendant) {
+        if (ancestor === descendant) {
             return allowReflexive;
         }
         return this.getNodeAndTransitiveChildrenNames(graph, ancestor).includes(descendant);
