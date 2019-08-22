@@ -14,7 +14,7 @@
     "build": "tsc",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "test": "mocha -r ts-node/register \"**/*.spec.ts\"",
-    "prepublishOnly": "npm test && npm run build"
+    "prepublishOnly": "npm test && npm run lint && npm run build"
   },
   "repository": {
     "type": "git",
