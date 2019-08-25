@@ -4,6 +4,7 @@ export interface IYaniceArgs {
         branch: string | null;
         commit: string | null;
     };
+    includeUncommitted: boolean;
 }
 
 export class ArgsParser {
@@ -17,14 +18,21 @@ export class ArgsParser {
             diffTarget: {
                 branch: null,
                 commit: null
-            }
+            },
+            includeUncommitted: true
         };
         argv.slice(1).forEach(arg => {
-            if (/--branch=.+/.test(arg)) {
+            if (/^--branch=.+$/.test(arg)) {
                 resultArgs.diffTarget.branch = arg.replace(/--branch=/, '');
             }
-            if (/--commit=.+/.test(arg)) {
+            if (/^--commit=.+$/.test(arg)) {
                 resultArgs.diffTarget.commit = arg.replace(/--commit=/, '');
+            }
+            if (/^--includeUncommitted=true$/.test(arg)) {
+                resultArgs.includeUncommitted = true;
+            }
+            if (/^--includeUncommitted=false$/.test(arg)) {
+                resultArgs.includeUncommitted = false;
             }
         });
         return resultArgs;

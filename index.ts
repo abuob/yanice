@@ -25,7 +25,7 @@ const yaniceArgs: IYaniceArgs = ArgsParser.parseArgs(process.argv.slice(2));
 
 let changedFiles: string[] = [];
 if (yaniceArgs.diffTarget.branch) {
-    changedFiles = ChangedFiles.filesChangedBetweenWorkingTreeAndGivenBranch(yaniceArgs.diffTarget.branch);
+    changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenBranch(yaniceArgs.diffTarget.branch, yaniceArgs.includeUncommitted);
 }
 
 const changedProjectsRaw = ChangedProjects.getChangedProjectsRaw(yaniceConfigJson.projects, changedFiles);

@@ -20,11 +20,21 @@ describe('ChangedFiles', () => {
         ]);
     });
 
-    describe('filesChangedBetweenWorkingTreeAndGivenBranch', () => {
-        it('should be able to calculate changed files between current working tree and a given branch', () => {
+    describe('filesChangedBetweenCurrentAndGivenBranch', () => {
+        it('should be able to calculate changed files between current branch and a given branch', () => {
             execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
-            expect(ChangedFiles.filesChangedBetweenWorkingTreeAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED')).to.have.same.members(
-                execSync('git diff HEAD~1 --name-only').toString()
+            expect(ChangedFiles.filesChangedBetweenCurrentAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED', false)).to.have.same.members(
+                execSync('git diff --name-only HEAD~1 HEAD').toString()
+                    .split('\n')
+                    .map((filePath:string) => filePath.trim())
+                    .filter((filePath:string) => filePath.length > 0)
+            );
+        });
+
+        it('should be able to calculate changed files between working tree and a given branch', () => {
+            execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
+            expect(ChangedFiles.filesChangedBetweenCurrentAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED', true)).to.have.same.members(
+                execSync('git diff --name-only HEAD~1').toString()
                     .split('\n')
                     .map((filePath:string) => filePath.trim())
                     .filter((filePath:string) => filePath.length > 0)

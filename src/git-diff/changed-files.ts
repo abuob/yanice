@@ -9,8 +9,11 @@ export class ChangedFiles {
         return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only HEAD`);
     }
 
-    public static filesChangedBetweenWorkingTreeAndGivenBranch(branch: string): string[] {
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only $(git merge-base --fork-point ${branch})`);
+    public static filesChangedBetweenCurrentAndGivenBranch(branch: string, includeUncommitted: boolean): string[] {
+        if (includeUncommitted) {
+            return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only $(git merge-base --fork-point ${branch})`);
+        }
+        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${branch}...HEAD`);
     }
 
     private static getGitDiffNameOnlyOutputAsArrayOfFiles(gitDiffCommand: string): string[] {
