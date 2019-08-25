@@ -13,6 +13,12 @@ function log(message: any): void {
     console.log(message);
 }
 
+/**
+ * FIXME The index.ts in it's current form is pretty ugly, cleanup!
+ * It's essentially just a hack-together of all the different parts, should be refactored
+ * for better separation of concerns.
+ */
+
 const yaniceConfigPath = FindFileUtil.findFileInParentDirs('yanice.json');
 if (!yaniceConfigPath) {
     log('yanice.json not found!');
@@ -22,6 +28,12 @@ if (!yaniceConfigPath) {
 
 const yaniceConfigJson: IYaniceConfig = require(yaniceConfigPath!);
 const yaniceArgs: IYaniceArgs = ArgsParser.parseArgs(process.argv.slice(2));
+
+// TODO This is a temporary thing, we shouldn't handle "--all" like that!
+if (yaniceArgs.includeAllProjects) {
+    yaniceConfigJson.projects.forEach(project => log(project.projectName));
+    process.exit(0);
+}
 
 let changedFiles: string[] = [];
 if (yaniceArgs.diffTarget.branch) {

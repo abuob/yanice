@@ -5,6 +5,7 @@ export interface IYaniceArgs {
         commit: string | null;
     };
     includeUncommitted: boolean;
+    includeAllProjects: boolean;
 }
 
 export class ArgsParser {
@@ -19,7 +20,8 @@ export class ArgsParser {
                 branch: null,
                 commit: null
             },
-            includeUncommitted: true
+            includeUncommitted: true,
+            includeAllProjects: false
         };
         argv.slice(1).forEach(arg => {
             if (/^--branch=.+$/.test(arg)) {
@@ -33,6 +35,9 @@ export class ArgsParser {
             }
             if (/^--includeUncommitted=false$/.test(arg)) {
                 resultArgs.includeUncommitted = false;
+            }
+            if (/^--all$/.test(arg)) {
+                resultArgs.includeAllProjects = true;
             }
         });
         return resultArgs;
