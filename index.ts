@@ -46,5 +46,9 @@ if (!depGraph) {
     log('dep-graph cannot be constructed!');
     process.exit(1);
 }
+if (DirectedGraphUtil.hasCycle(depGraph!)) {
+    log('dependency graph must not contain a cycle!');
+    process.exit(1);
+}
 const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(depGraph!, changedProjectsRaw);
 DirectedGraphUtil.sortTopologically(depGraph!, affected).forEach(projectName => log(projectName));

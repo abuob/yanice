@@ -4,6 +4,10 @@ import { DirectedGraphUtil } from '../directed-graph'
 describe('DirectedGraphUtil', () => {
     describe('hasCycle', () => {
         it('should return true if there is a cycle in a given graph', () => {
+            const graph0 = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .createDirectedEdge('A', 'A')
+                .build();
             const graph1 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
                 .addNode('B')
@@ -29,6 +33,7 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('C', 'D')
                 .createDirectedEdge('D', 'A')
                 .build();
+            expect(DirectedGraphUtil.hasCycle(graph0)).to.equal(true);
             expect(DirectedGraphUtil.hasCycle(graph1)).to.equal(true);
             expect(DirectedGraphUtil.hasCycle(graph2)).to.equal(true);
             expect(DirectedGraphUtil.hasCycle(graph3)).to.equal(true);
