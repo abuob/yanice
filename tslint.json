@@ -8,6 +8,7 @@
     "prettier": true,
     "no-var-requires": false,
     "max-classes-per-file": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "no-non-null-assertion": true
   }
 }

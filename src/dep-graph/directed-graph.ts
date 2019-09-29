@@ -127,20 +127,12 @@ class DirectedGraphBuilder {
     }
 
     public createDirectedEdge(fromNodeWithName: string, toNodeWithName: string): DirectedGraphBuilder {
-        let fromNode: IDirectedGraphNode | null = null;
-        let toNode: IDirectedGraphNode | null = null;
-        this.graph.nodes.forEach(node => {
-            if (node.name === fromNodeWithName) {
-                fromNode = node;
-            }
-            if (node.name === toNodeWithName) {
-                toNode = node;
-            }
-        });
+        const fromNode = this.graph.nodes.find(node => node.name === fromNodeWithName);
+        const toNode = this.graph.nodes.find(node => node.name === toNodeWithName);
         if (!fromNode || !toNode) {
             return this;
         }
-        fromNode!.edgesTo = fromNode!.edgesTo.concat(toNode);
+        fromNode.edgesTo = fromNode.edgesTo.concat(toNode);
         return this;
     }
 
