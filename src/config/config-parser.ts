@@ -4,15 +4,20 @@ export interface IYaniceProject {
     projectName: string;
     pathRegExp: RegExp;
     pathGlob: string;
-    commands: IYaniceCommands;
+    commands: ICommandPerScope;
 }
 
 export interface IYaniceDependencyScope {
     [project: string]: string[];
 }
 
-export interface IYaniceCommands {
-    [name: string]: string;
+export interface IYaniceCommand {
+    command: string;
+    cwd: string;
+}
+
+export interface ICommandPerScope {
+    [scope: string]: IYaniceCommand;
 }
 
 export interface IYaniceJson {
@@ -20,7 +25,7 @@ export interface IYaniceJson {
         projectName: string;
         pathRegExp?: string;
         pathGlob?: string;
-        commands?: IYaniceCommands;
+        commands?: ICommandPerScope;
     }>;
     dependencyScopes: {
         [name: string]: IYaniceDependencyScope;
