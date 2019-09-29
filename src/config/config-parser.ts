@@ -54,6 +54,11 @@ export class ConfigParser {
         };
     }
 
+    public static supportsScopeCommand(yaniceConfig: IYaniceConfig, projectName: string, scope: string): boolean {
+        const yaniceProject = yaniceConfig.projects.find(project => project.projectName === projectName);
+        return !!yaniceProject && Object.keys(yaniceProject.commands).includes(scope);
+    }
+
     public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig, scope: string): IDirectedGraph | null {
         const depScope: IYaniceDependencyScope = yaniceConfig.dependencyScopes[scope];
         if (!depScope) {

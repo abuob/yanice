@@ -50,7 +50,14 @@ function main(): void {
     if (DirectedGraphUtil.hasCycle(depGraph)) {
         log('dependency graph must not contain a cycle!');
         process.exit(1);
+        return;
     }
     const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(depGraph, changedProjectsRaw);
-    DirectedGraphUtil.sortTopologically(depGraph, affected).forEach(projectName => log(projectName));
+    const affectedSortedAndFiltered = DirectedGraphUtil.sortTopologically(depGraph, affected).filter(projectName => {
+        return (
+            !yaniceArgs.includeCommandSupportedOnly ||
+            ConfigParser.supportsScopeCommand(yaniceConfigJson, projectName, yaniceArgs.givenScope)
+        );
+    });
+    affectedSortedAndFiltered.forEach(projectName => log(projectName));
 }

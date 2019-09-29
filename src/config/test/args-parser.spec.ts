@@ -15,7 +15,9 @@ describe('ArgsParser', () => {
                     commit: null
                 },
                 includeUncommitted: true,
-                includeAllProjects: false
+                includeAllProjects: false,
+                includeCommandSupportedOnly: false,
+                outputOnly: false
             });
             expect(actualArgs2).to.deep.equal({
                 givenScope: 'test',
@@ -24,7 +26,9 @@ describe('ArgsParser', () => {
                     commit: null
                 },
                 includeUncommitted: false,
-                includeAllProjects: false
+                includeAllProjects: false,
+                includeCommandSupportedOnly: false,
+                outputOnly: false
             });
             expect(actualArgs3).to.deep.equal({
                 givenScope: 'build',
@@ -33,7 +37,9 @@ describe('ArgsParser', () => {
                     commit: '1234567'
                 },
                 includeUncommitted: true,
-                includeAllProjects: false
+                includeAllProjects: false,
+                includeCommandSupportedOnly: false,
+                outputOnly: false
             });
             expect(actualArgs4).to.deep.equal({
                 givenScope: 'build',
@@ -42,7 +48,9 @@ describe('ArgsParser', () => {
                     commit: null,
                 },
                 includeUncommitted: true,
-                includeAllProjects: true
+                includeAllProjects: true,
+                includeCommandSupportedOnly: false,
+                outputOnly: false
             });
         });
     });
