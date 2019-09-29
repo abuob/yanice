@@ -2,19 +2,19 @@
   "projects": [
     {
       "projectName": "project-A",
-      "rootDir": "project-A"
+      "pathRegExp": "project-A"
     },
     {
       "projectName": "project-B",
-      "rootDir": "project-B"
+      "pathRegExp": "project-B"
     },
     {
       "projectName": "lib-1",
-      "rootDir": "libs/lib-1"
+      "pathRegExp": "libs/lib-1"
     },
     {
       "projectName": "lib-2",
-      "rootDir": "libs/lib-2"
+      "pathRegExp": "libs/lib-2"
     }
   ],
   "dependencyScopes": {

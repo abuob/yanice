@@ -1,33 +1,51 @@
 import { expect } from 'chai';
 import { ChangedProjects } from '../changed-projects'
-const execSync = require('child_process').execSync;
+import { IYaniceProject } from '../../config/config-parser'
 
 describe('ChangedProjects', () => {
     describe('getChangedProjectsRaw', () => {
-        const exampleProjects = [
+        const exampleProjects: IYaniceProject[] = [
             {
                 projectName: "A",
-                rootDir: "path/to/dir/A"
+                pathRegExp: new RegExp("path/to/dir/A"),
+                pathGlob: '**',
+                commands: {}
             },
             {
                 projectName: "AAA",
-                rootDir: "path/to/dir/AAA"
+                pathRegExp: new RegExp("path.*AAA"),
+                pathGlob: '**',
+                commands: {}
             },
             {
                 projectName: "B",
-                rootDir: "path/to/dir/B"
+                pathRegExp: /path\/to\/dir\/B/,
+                pathGlob: '**',
+                commands: {}
             },
             {
                 projectName: "C",
-                rootDir: "path/lib/C"
+                pathRegExp: /.*/,
+                pathGlob: 'path/lib/C',
+                commands: {}
             },
             {
                 projectName: "D",
-                rootDir: "path/lib/D"
+                pathRegExp: new RegExp("path/lib/D"),
+                pathGlob: '**',
+                commands: {}
             },
             {
                 projectName: "E",
-                rootDir: "some/random/location"
+                pathRegExp: new RegExp("some/random/location"),
+                pathGlob: '**',
+                commands: {}
+            },
+            {
+                projectName: "all-javascript-files",
+                pathRegExp: /.*\.js/,
+                pathGlob: '**/*.js',
+                commands: {}
             }
         ];
         const actual0 = ChangedProjects.getChangedProjectsRaw(exampleProjects, []);
@@ -48,9 +66,9 @@ describe('ChangedProjects', () => {
             'path/to/dir/AAA/someOtherFile.js'
         ]);
         expect(actual0).to.have.same.members([]);
-        expect(actual1).to.have.same.members(['A']);
+        expect(actual1).to.have.same.members(['A', 'all-javascript-files']);
         expect(actual2).to.have.same.members([]);
-        expect(actual3).to.have.same.members(['A', 'E']);
-        expect(actual4).to.have.same.members(['A', 'AAA']);
+        expect(actual3).to.have.same.members(['A', 'E', 'all-javascript-files']);
+        expect(actual4).to.have.same.members(['A', 'AAA', 'all-javascript-files']);
     });
 });

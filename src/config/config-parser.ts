@@ -2,11 +2,29 @@ import { DirectedGraphUtil, IDirectedGraph } from '../dep-graph/directed-graph';
 
 export interface IYaniceProject {
     projectName: string;
-    rootDir: string;
+    pathRegExp: RegExp;
+    pathGlob: string;
+    commands: IYaniceCommands;
 }
 
 export interface IYaniceDependencyScope {
     [project: string]: string[];
+}
+
+export interface IYaniceCommands {
+    [name: string]: string;
+}
+
+export interface IYaniceJson {
+    projects: Array<{
+        projectName: string;
+        pathRegExp?: string;
+        pathGlob?: string;
+        commands?: IYaniceCommands;
+    }>;
+    dependencyScopes: {
+        [name: string]: IYaniceDependencyScope;
+    };
 }
 
 export interface IYaniceConfig {
@@ -17,6 +35,25 @@ export interface IYaniceConfig {
 }
 
 export class ConfigParser {
+    /**
+     * Ensure that a valid yaniceJson is entered here (jsonschema-verified).
+     */
+    public static getConfigFromYaniceJson(yaniceJson: IYaniceJson): IYaniceConfig {
+        return {
+            projects: yaniceJson.projects.map(
+                (project): IYaniceProject => {
+                    return {
+                        projectName: project.projectName,
+                        commands: project.commands ? project.commands : {},
+                        pathGlob: project.pathGlob ? project.pathGlob : '**',
+                        pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/
+                    };
+                }
+            ),
+            dependencyScopes: yaniceJson.dependencyScopes
+        };
+    }
+
     public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig, scope: string): IDirectedGraph | null {
         const depScope: IYaniceDependencyScope = yaniceConfig.dependencyScopes[scope];
         if (!depScope) {

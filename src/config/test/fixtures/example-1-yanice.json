@@ -2,23 +2,23 @@
   "projects": [
     {
       "projectName": "A",
-      "rootDir": "path/to/dir/A"
+      "pathRegExp": "path/to/dir/A"
     },
     {
       "projectName": "B",
-      "rootDir": "path/to/dir/B"
+      "pathRegExp": "path/to/dir/B"
     },
     {
       "projectName": "C",
-      "rootDir": "path/to/dir/C"
+      "pathRegExp": "path/to/dir/C"
     },
     {
       "projectName": "D",
-      "rootDir": "path/to/dir/D"
+      "pathRegExp": "path/to/dir/D"
     },
     {
       "projectName": "E",
-      "rootDir": "path/to/dir/E"
+      "pathRegExp": "path/to/dir/E"
     }
   ],
   "dependencyScopes": {

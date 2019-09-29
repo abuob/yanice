@@ -24,23 +24,23 @@ Create a `yanice.json`-file on the root-level of the repository as follows:
   "projects": [
     {
       "projectName": "P1",
-      "rootDir": "path/to/dir/P1"
+      "pathRegExp": "path/to/dir/P1"
     },
     {
       "projectName": "P2",
-      "rootDir": "path/to/dir/P2"
+      "pathRegExp": "path/to/dir/P2"
     },
     {
       "projectName": "P2",
-      "rootDir": "path/to/dir/P2"
+      "pathRegExp": "path/to/dir/P2"
     },
     {
       "projectName": "lib-123",
-      "rootDir": "libs/lib-123"
+      "pathRegExp": "libs/lib-123"
     },
     {
       "projectName": "lib-12",
-      "rootDir": "libs/lib-12"
+      "pathRegExp": "libs/lib-12"
     }
   ],
   "dependencyScopes": {

@@ -7,12 +7,12 @@ import { DirectedGraphUtil } from '../../dep-graph/directed-graph'
 describe('ConfigParser', () => {
     describe('getDepGraphFromConfigByScope', () => {
         it('should return null if given a scope that is not defined', () => {
-            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfigByScope(yaniceJson1, 'scopeDoesNotExist');
+            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'scopeDoesNotExist');
             expect(actualGraphForTestScope).to.equal(null);
         });
 
         it('should properly create a directed graph when given example-1-yanice.json with test-scope', () => {
-            expect(ConfigParser.getDepGraphFromConfigByScope(yaniceJson1, 'lint')).to.deep.equal({nodes: [
+            expect(ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'lint')).to.deep.equal({nodes: [
                     {name: 'A', edgesTo: []},
                     {name: 'B', edgesTo: []},
                     {name: 'C', edgesTo: []},
@@ -22,7 +22,7 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph when given example-2-yanice.json with test-scope', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfigByScope(yaniceJson2, 'test');
+            const actualGraph = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2), 'test');
             expect(actualGraph).to.not.equal(null);
             expect(actualGraph!.nodes.find(n => n.name === 'project-A')!.edgesTo.map(n => n.name)).to.have.same.members([]);
             expect(actualGraph!.nodes.find(n => n.name === 'lib-1')!.edgesTo.map(n => n.name)).to.have.same.members(['project-A']);
@@ -30,7 +30,7 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph when given a scope-definition', () => {
-            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfigByScope(yaniceJson1, 'test');
+            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'test');
             expect(actualGraphForTestScope).to.not.equal(null);
             expect(actualGraphForTestScope!.nodes.find(n => n.name === 'A')!.edgesTo.map(n => n.name)).to.have.same.members([]);
             expect(actualGraphForTestScope!.nodes.find(n => n.name === 'B')!.edgesTo.map(n => n.name)).to.have.same.members(['A']);
@@ -41,7 +41,7 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph even when given a scope-definition containing an illegal cycle', () => {
-            const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfigByScope(yaniceJson1, 'illegalCycle');
+            const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'illegalCycle');
             expect(actualGraphForIllegalCycleScope).to.not.equal(null);
             expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'A')!.edgesTo.map(n => n.name)).to.have.same.members(['E']);
             expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'B')!.edgesTo.map(n => n.name)).to.have.same.members(['A']);
