@@ -11,6 +11,21 @@ describe('ConfigParser', () => {
             expect(actualGraphForTestScope).to.equal(null);
         });
 
+        it('should properly map commands to default values when none are given', () => {
+            const yaniceConfig = ConfigParser.getConfigFromYaniceJson(yaniceJson1);
+            const yaniceProject1 = yaniceConfig.projects.find(project => project.projectName === 'A');
+            const yaniceProject2 = yaniceConfig.projects.find(project => project.projectName === 'B');
+            expect(yaniceProject1!.commands.lint).to.deep.equal({
+                command: 'lint A',
+                cwd: 'path/to/dir/A'
+            });
+            expect(yaniceProject1!.commands.test).to.equal(undefined);
+            expect(yaniceProject2!.commands.lint).to.deep.equal({
+                command: 'lint B',
+                cwd: './'
+            });
+        });
+
         it('should properly create a directed graph when given example-1-yanice.json with test-scope', () => {
             expect(ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'lint')).to.deep.equal({nodes: [
                     {name: 'A', edgesTo: []},

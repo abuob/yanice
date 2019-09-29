@@ -2,7 +2,8 @@
   "projects": [
     {
       "projectName": "project-A",
-      "pathRegExp": "project-A"
+      "pathRegExp": "project-A",
+      "pathGlob": "project-A/**"
     },
     {
       "projectName": "project-B",

@@ -1,0 +1,68 @@
+{
+  "projects": [
+    {
+      "projectName": "A",
+      "pathRegExp": "path/to/dir/A",
+      "commands": {
+        "lint": {
+          "command": "lint A",
+          "cwd": "path/to/dir/A"
+        }
+      }
+    },
+    {
+      "projectName": "B",
+      "pathRegExp": "path/to/dir/B",
+      "commands": {
+        "lint": {
+          "command": "lint B"
+        },
+        "test": {
+          "command": "test B"
+        }
+      }
+    },
+    {
+      "projectName": "C",
+      "pathRegExp": "path/to/dir/C",
+      "commands": {
+        "lint": {
+          "command": "lint C"
+        },
+        "test": {
+          "command": "test C"
+        }
+      }
+    },
+    {
+      "projectName": "D",
+      "pathRegExp": "path/to/dir/D",
+      "commands": {
+        "test": {
+          "command": "test D"
+        }
+      }
+    },
+    {
+      "projectName": "E",
+      "pathRegExp": "path/to/dir/E",
+      "commands": {}
+    }
+  ],
+  "dependencyScopes": {
+    "lint": {
+      "A": [],
+      "B": [],
+      "C": [],
+      "D": [],
+      "E": []
+    },
+    "test": {
+      "A": ["B", "C"],
+      "B": ["D"],
+      "C": ["D"],
+      "D": ["E"],
+      "E": []
+    }
+  }
+}

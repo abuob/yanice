@@ -31,7 +31,7 @@ export class YaniceExecutor {
     }
 
     public parseArgs(args: string[]): YaniceExecutor {
-        this.yaniceArgs = ArgsParser.parseArgs(process.argv.slice(2));
+        this.yaniceArgs = ArgsParser.parseArgs(args);
         return this;
     }
 

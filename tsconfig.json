@@ -10,5 +10,5 @@
     "esModuleInterop": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["**/test/**", "dist/**"]
+  "exclude": ["**/__test/**", "dist/**"]
 }

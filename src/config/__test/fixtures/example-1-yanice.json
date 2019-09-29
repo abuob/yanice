@@ -2,11 +2,22 @@
   "projects": [
     {
       "projectName": "A",
-      "pathRegExp": "path/to/dir/A"
+      "pathRegExp": "path/to/dir/A",
+      "commands": {
+        "lint": {
+          "command": "lint A",
+          "cwd": "path/to/dir/A"
+        }
+      }
     },
     {
       "projectName": "B",
-      "pathRegExp": "path/to/dir/B"
+      "pathRegExp": "path/to/dir/B",
+      "commands": {
+        "lint": {
+          "command": "lint B"
+        }
+      }
     },
     {
       "projectName": "C",

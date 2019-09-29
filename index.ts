@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import { YaniceExecutor } from './src/yaniceExecutor';
+import { YaniceExecutor } from './src/yanice-executor';
 
 new YaniceExecutor()
     .loadConfiguration()

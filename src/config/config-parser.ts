@@ -1,5 +1,22 @@
 import { DirectedGraphUtil, IDirectedGraph } from '../dep-graph/directed-graph';
 
+export interface IYaniceJson {
+    projects: Array<{
+        projectName: string;
+        pathRegExp?: string;
+        pathGlob?: string;
+        commands?: {
+            [scope: string]: {
+                command: string;
+                cwd?: string;
+            };
+        };
+    }>;
+    dependencyScopes: {
+        [name: string]: IYaniceDependencyScope;
+    };
+}
+
 export interface IYaniceProject {
     projectName: string;
     pathRegExp: RegExp;
@@ -20,18 +37,6 @@ export interface ICommandPerScope {
     [scope: string]: IYaniceCommand;
 }
 
-export interface IYaniceJson {
-    projects: Array<{
-        projectName: string;
-        pathRegExp?: string;
-        pathGlob?: string;
-        commands?: ICommandPerScope;
-    }>;
-    dependencyScopes: {
-        [name: string]: IYaniceDependencyScope;
-    };
-}
-
 export interface IYaniceConfig {
     projects: IYaniceProject[];
     dependencyScopes: {
@@ -47,9 +52,28 @@ export class ConfigParser {
         return {
             projects: yaniceJson.projects.map(
                 (project): IYaniceProject => {
+                    // TODO Check if we can simplify this.
+                    // Looks complicated (sorry for that) but essentially we're just ensuring that:
+                    // * commands is never undefined; if no commands are declared in the yanice.json, commands is an empty object
+                    // * if for a command no cwd is given, use './' as default (cwd is never undefined on IYaniceConfig).
+                    const commands = project.commands
+                        ? Object.keys(project.commands).reduce((prev: ICommandPerScope, curr: string): ICommandPerScope => {
+                              if (!project.commands || !project.commands[curr]) {
+                                  return prev;
+                              }
+                              const cwd: string =
+                                  project.commands[curr] && project.commands[curr].cwd ? (project.commands[curr].cwd as string) : './';
+                              prev[curr] = {
+                                  command: project.commands[curr].command,
+                                  cwd
+                              };
+                              return prev;
+                          }, {})
+                        : {};
+
                     return {
                         projectName: project.projectName,
-                        commands: project.commands ? project.commands : {},
+                        commands,
                         pathGlob: project.pathGlob ? project.pathGlob : '**',
                         pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/
                     };
