@@ -20,7 +20,7 @@ export function execucteInParallelLimited(
         (command: IYaniceCommand, done: () => void) => {
             const workingDir = path.resolve(baseDirectory, command.cwd);
             initTaskCallback(command, workingDir);
-            exec(command, { cwd: workingDir }, (err: any, stdout: any, stderr: any): void => {
+            exec(command.command, { cwd: workingDir }, (err: any, stdout: any, stderr: any): void => {
                 if (err) {
                     anyTaskFailed = true;
                     afterTaskCallback(command, 1);

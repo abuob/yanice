@@ -1,12 +1,15 @@
 import { ArgsParser, IYaniceArgs } from './config/args-parser';
-import { ConfigParser, IYaniceConfig } from './config/config-parser';
+import { ConfigParser, IYaniceCommand, IYaniceConfig } from './config/config-parser';
 import { DirectedGraphUtil, IDirectedGraph } from './dep-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
+import { execucteInParallelLimited } from './util/execute-in-parallel-limited';
 import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
+import { LogUtil } from './util/log-util';
 
 export class YaniceExecutor {
+    private baseDirectory: string | null = null;
     private yaniceConfig: IYaniceConfig | null = null;
     private yaniceArgs: IYaniceArgs | null = null;
     private changedFiles: string[] = [];
@@ -20,6 +23,7 @@ export class YaniceExecutor {
             this.exitYanice(1, 'yanice.json not found!');
             return this;
         }
+        this.baseDirectory = yaniceConfigPath.replace(/yanice\.json/, '');
         const yaniceConfigJson = require(yaniceConfigPath);
         // TODO Verify jsonschema of yaniceConfigJson
         this.yaniceConfig = ConfigParser.getConfigFromYaniceJson(yaniceConfigJson);
@@ -105,10 +109,32 @@ export class YaniceExecutor {
     }
 
     public executeCommands(): YaniceExecutor {
-        // TODO Implenent this! For the time being, just output as if outputOnly=true.
-        if (this.yaniceArgs) {
-            this.affectedProjects.forEach(projectName => log(projectName));
-            this.exitYanice(0, null);
+        if (this.yaniceConfig && this.yaniceArgs && this.baseDirectory) {
+            const scope = this.yaniceArgs.givenScope;
+            const commands: IYaniceCommand[] = this.yaniceConfig.projects
+                .filter(project => this.affectedProjects.includes(project.projectName))
+                .map(project => project.commands[scope]);
+
+            execucteInParallelLimited(
+                commands,
+                2,
+                this.baseDirectory,
+                (command, dir) => {
+                    return;
+                },
+                (command, exitCode) => {
+                    if (exitCode === 0) {
+                        LogUtil.printCommandSuccess(command);
+                    } else {
+                        LogUtil.printCommandFailure(command);
+                    }
+                },
+                exitCode => {
+                    if (exitCode !== 0) {
+                        this.exitYanice(1, null);
+                    }
+                }
+            );
         }
         return this;
     }
