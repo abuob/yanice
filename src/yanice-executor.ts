@@ -132,7 +132,7 @@ export class YaniceExecutor {
 
             execucteInParallelLimited(
                 commands,
-                2,
+                this.yaniceArgs.concurrency,
                 this.baseDirectory,
                 (command, dir) => {
                     return;

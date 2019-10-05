@@ -16,6 +16,10 @@
     "test": "mocha -r ts-node/register \"**/*.spec.ts\"",
     "prepublishOnly": "npm test && npm run lint && npm run build"
   },
+  "keywords": [
+    "monorepo",
+    "change detection"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abuob/yanice.git"

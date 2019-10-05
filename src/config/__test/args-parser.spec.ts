@@ -5,8 +5,8 @@ describe('ArgsParser', () => {
     describe('parseArgs', () => {
         it('should parse valid arguments correctly', () => {
             const actualArgs1 = ArgsParser.parseArgs(["lint", "--branch=origin/develop", "--includeUncommitted=true"]);
-            const actualArgs2 = ArgsParser.parseArgs(["test", "--branch=master", "--includeUncommitted=false"]);
-            const actualArgs3 = ArgsParser.parseArgs(["build", "--commit=1234567"]);
+            const actualArgs2 = ArgsParser.parseArgs(["test", "--branch=master", "--includeUncommitted=false", "--concurrency=123"]);
+            const actualArgs3 = ArgsParser.parseArgs(["build", "--commit=1234567", "--concurrency=3"]);
             const actualArgs4 = ArgsParser.parseArgs(["build", "--all", "--responsibles"]);
             expect(actualArgs1).to.deep.equal({
                 givenScope: 'lint',
@@ -18,7 +18,8 @@ describe('ArgsParser', () => {
                 includeAllProjects: false,
                 includeCommandSupportedOnly: true,
                 outputOnly: false,
-                outputResponsibles: false
+                outputResponsibles: false,
+                concurrency: 1
             });
             expect(actualArgs2).to.deep.equal({
                 givenScope: 'test',
@@ -30,7 +31,8 @@ describe('ArgsParser', () => {
                 includeAllProjects: false,
                 includeCommandSupportedOnly: true,
                 outputOnly: false,
-                outputResponsibles: false
+                outputResponsibles: false,
+                concurrency: 123
             });
             expect(actualArgs3).to.deep.equal({
                 givenScope: 'build',
@@ -42,7 +44,8 @@ describe('ArgsParser', () => {
                 includeAllProjects: false,
                 includeCommandSupportedOnly: true,
                 outputOnly: false,
-                outputResponsibles: false
+                outputResponsibles: false,
+                concurrency: 3
             });
             expect(actualArgs4).to.deep.equal({
                 givenScope: 'build',
@@ -54,7 +57,8 @@ describe('ArgsParser', () => {
                 includeAllProjects: true,
                 includeCommandSupportedOnly: true,
                 outputOnly: false,
-                outputResponsibles: true
+                outputResponsibles: true,
+                concurrency: 1
             });
         });
     });

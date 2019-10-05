@@ -11,6 +11,7 @@ export interface IYaniceArgs {
     includeCommandSupportedOnly: boolean;
     outputOnly: boolean;
     outputResponsibles: boolean;
+    concurrency: number;
 }
 
 export class ArgsParser {
@@ -29,7 +30,8 @@ export class ArgsParser {
             includeAllProjects: false,
             includeCommandSupportedOnly: true,
             outputOnly: false,
-            outputResponsibles: false
+            outputResponsibles: false,
+            concurrency: 1
         };
         argv.slice(1).forEach(arg => {
             if (/^--branch=.+$/.test(arg)) {
@@ -58,6 +60,10 @@ export class ArgsParser {
             }
             if (/^--outputOnly=false$/.test(arg)) {
                 resultArgs.outputOnly = false;
+                return;
+            }
+            if (/^--concurrency=(\d)+$/.test(arg)) {
+                resultArgs.concurrency = parseInt(arg.replace(/--concurrency=/, ''), 10);
                 return;
             }
             if (/^--outputOnly=true$/.test(arg)) {
