@@ -35,14 +35,6 @@ export class YaniceExecutor {
         return this;
     }
 
-    public outputAndExitIfIncludeAllProjects(): YaniceExecutor {
-        if (this.yaniceArgs && this.yaniceConfig && this.yaniceArgs.includeAllProjects) {
-            this.yaniceConfig.projects.forEach(project => log(project.projectName));
-            this.exitYanice(0, null);
-        }
-        return this;
-    }
-
     public calculateChangedFiles(): YaniceExecutor {
         if (this.yaniceArgs && this.yaniceArgs.diffTarget.branch) {
             this.changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenBranch(
@@ -80,9 +72,13 @@ export class YaniceExecutor {
     }
 
     public calculateAffectedProjects(): YaniceExecutor {
-        if (this.depGraph && this.changedProjects) {
-            const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(this.depGraph, this.changedProjects);
-            this.affectedProjects = DirectedGraphUtil.sortTopologically(this.depGraph, affected);
+        if (this.depGraph && this.changedProjects && this.yaniceArgs && this.yaniceConfig) {
+            if (!this.yaniceArgs.includeAllProjects) {
+                const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(this.depGraph, this.changedProjects);
+                this.affectedProjects = DirectedGraphUtil.sortTopologically(this.depGraph, affected);
+            } else {
+                this.affectedProjects = this.yaniceConfig.projects.map(project => project.projectName);
+            }
         }
         return this;
     }
