@@ -89,7 +89,7 @@ export class YaniceExecutor {
                 return true;
             }
             return (
-                !this.yaniceArgs.includeCommandSupportedOnly ||
+                (!this.yaniceArgs.includeCommandSupportedOnly && this.yaniceArgs.outputOnly) ||
                 ConfigParser.supportsScopeCommand(this.yaniceConfig, projectName, this.yaniceArgs.givenScope)
             );
         });

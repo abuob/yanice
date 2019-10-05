@@ -45,6 +45,18 @@ describe('YaniceExecutor', () => {
         expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
     });
 
+    it('should filter unsupported commands when outputOnly=false even when includeCommandSupportedOnly=true', () => {
+        yaniceExecutor
+            .parseArgs(['lint', '--outputOnly=false', '--includeCommandSupportedOnly=false', '--all'])
+            .calculateChangedProjects()
+            .calculateDepGraphForGivenScope()
+            .verifyDepGraphValidity()
+            .calculateAffectedProjects()
+            .filterOutUnsupportedProjectsIfNeeded();
+        expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
+        expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B', 'C']);
+    });
+
     it('should set affectedProjects to all projects that support the given scope when --all parameter is given', () => {
         yaniceExecutor
             .parseArgs(['lint', '--outputOnly=true', '--includeCommandSupportedOnly=true', '--all'])
