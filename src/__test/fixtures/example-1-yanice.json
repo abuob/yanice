@@ -8,7 +8,8 @@
           "command": "lint A",
           "cwd": "path/to/dir/A"
         }
-      }
+      },
+      "responsibles": ["Alice"]
     },
     {
       "projectName": "B",
@@ -20,7 +21,8 @@
         "test": {
           "command": "test B"
         }
-      }
+      },
+      "responsibles": ["Bob"]
     },
     {
       "projectName": "C",
@@ -32,7 +34,8 @@
         "test": {
           "command": "test C"
         }
-      }
+      },
+      "responsibles": ["Clara"]
     },
     {
       "projectName": "D",
@@ -41,12 +44,14 @@
         "test": {
           "command": "test D"
         }
-      }
+      },
+      "responsibles": ["David"]
     },
     {
       "projectName": "E",
       "pathRegExp": "path/to/dir/E",
-      "commands": {}
+      "commands": {},
+      "responsibles": ["Edith"]
     }
   ],
   "dependencyScopes": {

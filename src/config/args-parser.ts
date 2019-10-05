@@ -10,6 +10,7 @@ export interface IYaniceArgs {
     includeAllProjects: boolean;
     includeCommandSupportedOnly: boolean;
     outputOnly: boolean;
+    outputResponsibles: boolean;
 }
 
 export class ArgsParser {
@@ -26,8 +27,9 @@ export class ArgsParser {
             },
             includeUncommitted: true,
             includeAllProjects: false,
-            includeCommandSupportedOnly: false,
-            outputOnly: false
+            includeCommandSupportedOnly: true,
+            outputOnly: false,
+            outputResponsibles: false
         };
         argv.slice(1).forEach(arg => {
             if (/^--branch=.+$/.test(arg)) {
@@ -60,6 +62,10 @@ export class ArgsParser {
             }
             if (/^--outputOnly=true$/.test(arg)) {
                 resultArgs.outputOnly = true;
+                return;
+            }
+            if (/^--responsibles$/.test(arg)) {
+                resultArgs.outputResponsibles = true;
                 return;
             }
             if (/^--all$/.test(arg)) {

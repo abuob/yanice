@@ -7,7 +7,7 @@ describe('ArgsParser', () => {
             const actualArgs1 = ArgsParser.parseArgs(["lint", "--branch=origin/develop", "--includeUncommitted=true"]);
             const actualArgs2 = ArgsParser.parseArgs(["test", "--branch=master", "--includeUncommitted=false"]);
             const actualArgs3 = ArgsParser.parseArgs(["build", "--commit=1234567"]);
-            const actualArgs4 = ArgsParser.parseArgs(["build", "--all"]);
+            const actualArgs4 = ArgsParser.parseArgs(["build", "--all", "--responsibles"]);
             expect(actualArgs1).to.deep.equal({
                 givenScope: 'lint',
                 diffTarget: {
@@ -16,8 +16,9 @@ describe('ArgsParser', () => {
                 },
                 includeUncommitted: true,
                 includeAllProjects: false,
-                includeCommandSupportedOnly: false,
-                outputOnly: false
+                includeCommandSupportedOnly: true,
+                outputOnly: false,
+                outputResponsibles: false
             });
             expect(actualArgs2).to.deep.equal({
                 givenScope: 'test',
@@ -27,8 +28,9 @@ describe('ArgsParser', () => {
                 },
                 includeUncommitted: false,
                 includeAllProjects: false,
-                includeCommandSupportedOnly: false,
-                outputOnly: false
+                includeCommandSupportedOnly: true,
+                outputOnly: false,
+                outputResponsibles: false
             });
             expect(actualArgs3).to.deep.equal({
                 givenScope: 'build',
@@ -38,8 +40,9 @@ describe('ArgsParser', () => {
                 },
                 includeUncommitted: true,
                 includeAllProjects: false,
-                includeCommandSupportedOnly: false,
-                outputOnly: false
+                includeCommandSupportedOnly: true,
+                outputOnly: false,
+                outputResponsibles: false
             });
             expect(actualArgs4).to.deep.equal({
                 givenScope: 'build',
@@ -49,8 +52,9 @@ describe('ArgsParser', () => {
                 },
                 includeUncommitted: true,
                 includeAllProjects: true,
-                includeCommandSupportedOnly: false,
-                outputOnly: false
+                includeCommandSupportedOnly: true,
+                outputOnly: false,
+                outputResponsibles: true
             });
         });
     });

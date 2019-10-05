@@ -80,4 +80,18 @@ describe('YaniceExecutor', () => {
         expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
         expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['B', 'C', 'D']);
     });
+
+    it('should calculate responsibles correctly', () => {
+        yaniceExecutor
+            .parseArgs(['lint', '--responsibles', '--includeCommandSupportedOnly=true'])
+            .calculateChangedProjects()
+            .calculateDepGraphForGivenScope()
+            .verifyDepGraphValidity()
+            .calculateAffectedProjects()
+            .calculateResponsibles()
+            .filterOutUnsupportedProjectsIfNeeded();
+        expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
+        expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B']);
+        expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'Bob', 'Edith']);
+    });
 });

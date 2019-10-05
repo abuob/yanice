@@ -11,6 +11,7 @@ export interface IYaniceJson {
                 cwd?: string;
             };
         };
+        responsibles?: string[];
     }>;
     dependencyScopes: {
         [name: string]: IYaniceDependencyScope;
@@ -22,6 +23,7 @@ export interface IYaniceProject {
     pathRegExp: RegExp;
     pathGlob: string;
     commands: ICommandPerScope;
+    responsibles: string[];
 }
 
 export interface IYaniceDependencyScope {
@@ -75,7 +77,8 @@ export class ConfigParser {
                         projectName: project.projectName,
                         commands,
                         pathGlob: project.pathGlob ? project.pathGlob : '**',
-                        pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/
+                        pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/,
+                        responsibles: project.responsibles ? project.responsibles : []
                     };
                 }
             ),

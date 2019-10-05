@@ -10,6 +10,8 @@ new YaniceExecutor()
     .calculateDepGraphForGivenScope()
     .verifyDepGraphValidity()
     .calculateAffectedProjects()
+    .calculateResponsibles()
+    .outputResponsiblesAndExitIfShowResponsiblesMode()
     .filterOutUnsupportedProjectsIfNeeded()
     .outputAffectedAndExitIfOutputOnlyMode()
     .executeCommands();

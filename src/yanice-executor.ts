@@ -16,6 +16,7 @@ export class YaniceExecutor {
     private changedProjects: string[] = [];
     private depGraph: IDirectedGraph | null = null;
     private affectedProjects: string[] = [];
+    private responsibles: string[] = [];
 
     public loadConfiguration(): YaniceExecutor {
         const yaniceConfigPath = FindFileUtil.findFileInParentDirs('yanice.json');
@@ -93,6 +94,24 @@ export class YaniceExecutor {
                 ConfigParser.supportsScopeCommand(this.yaniceConfig, projectName, this.yaniceArgs.givenScope)
             );
         });
+        return this;
+    }
+
+    public calculateResponsibles(): YaniceExecutor {
+        if (this.yaniceConfig && this.affectedProjects) {
+            this.responsibles = this.yaniceConfig.projects
+                .filter(project => this.affectedProjects.includes(project.projectName))
+                .map(project => project.responsibles)
+                .reduce((curr, prev) => curr.concat(prev), []);
+        }
+        return this;
+    }
+
+    public outputResponsiblesAndExitIfShowResponsiblesMode(): YaniceExecutor {
+        if (this.yaniceArgs && this.yaniceArgs.outputResponsibles) {
+            this.responsibles.forEach(responsible => log(responsible));
+            this.exitYanice(0, null);
+        }
         return this;
     }
 

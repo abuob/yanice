@@ -9,43 +9,50 @@ describe('ChangedProjects', () => {
                 projectName: "A",
                 pathRegExp: new RegExp("path/to/dir/A"),
                 pathGlob: '**',
-                commands: {}
+                commands: {},
+                responsibles: []
             },
             {
                 projectName: "AAA",
                 pathRegExp: new RegExp("path.*AAA"),
                 pathGlob: '**',
-                commands: {}
+                commands: {},
+                responsibles: []
             },
             {
                 projectName: "B",
                 pathRegExp: /path\/to\/dir\/B/,
                 pathGlob: '**',
-                commands: {}
+                commands: {},
+                responsibles: []
             },
             {
                 projectName: "C",
                 pathRegExp: /.*/,
                 pathGlob: 'path/lib/C',
-                commands: {}
+                commands: {},
+                responsibles: []
             },
             {
                 projectName: "D",
                 pathRegExp: new RegExp("path/lib/D"),
                 pathGlob: '**',
-                commands: {}
+                commands: {},
+                responsibles: []
             },
             {
                 projectName: "E",
                 pathRegExp: new RegExp("some/random/location"),
                 pathGlob: '**',
-                commands: {}
+                commands: {},
+                responsibles: []
             },
             {
                 projectName: "all-javascript-files",
                 pathRegExp: /.*\.js/,
                 pathGlob: '**/*.js',
-                commands: {}
+                commands: {},
+                responsibles: []
             }
         ];
         const actual0 = ChangedProjects.getChangedProjectsRaw(exampleProjects, []);
