@@ -10,10 +10,21 @@ export class ChangedFiles {
     }
 
     public static filesChangedBetweenCurrentAndGivenBranch(branch: string, includeUncommitted: boolean): string[] {
+        const revisionSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${branch}`);
         if (includeUncommitted) {
-            return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only $(git merge-base --fork-point ${branch})`);
+            // Due to using --fork-point, we need to provide an actual ref (commit-SHA won't do).
+            const mergeBaseSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git merge-base --fork-point ${branch}`);
+            return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${mergeBaseSHA}`);
         }
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${branch}...HEAD`);
+        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${revisionSHA}...HEAD`);
+    }
+
+    public static gitCommandWithRevisionShaAsOutput(gitCommand: string): string {
+        return execSync(gitCommand)
+            .toString()
+            .split('\n')
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0)[0];
     }
 
     private static getGitDiffNameOnlyOutputAsArrayOfFiles(gitDiffCommand: string): string[] {

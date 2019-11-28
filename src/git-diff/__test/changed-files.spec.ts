@@ -20,6 +20,11 @@ describe('ChangedFiles', () => {
         ]);
     });
 
+    it('should be able to invoke git rev-parse and parse its output properly', () => {
+        expect(ChangedFiles.gitCommandWithRevisionShaAsOutput('git rev-parse b23ded520')).to.equal('b23ded5203046efc559d18a9846b21d610120533');
+        expect(ChangedFiles.gitCommandWithRevisionShaAsOutput('git rev-parse 0bd7920d8')).to.equal('0bd7920d8df462e2da289bd8dc097a2d8e3191a2');
+    });
+
     describe('filesChangedBetweenCurrentAndGivenBranch', () => {
         it('should be able to calculate changed files between current branch and a given branch', () => {
             execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
