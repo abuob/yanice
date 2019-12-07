@@ -140,15 +140,15 @@ directory, otherwise in the same directory as the yanice.json.
       "P3": [
         "lib-123"
       ],
-      "lib-1": [],
-      "lib-2": []
+      "lib-123": [],
+      "lib-12": []
     },
     "lint": {
       "P1": [],
       "P2": [],
       "P3": [],
-      "lib-1": [],
-      "lib-2": []
+      "lib-123": [],
+      "lib-12": []
     }
   }
 }
