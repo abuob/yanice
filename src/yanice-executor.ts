@@ -1,5 +1,6 @@
 import { ArgsParser, IYaniceArgs } from './config/args-parser';
 import { ConfigParser, IYaniceCommand, IYaniceConfig } from './config/config-parser';
+import { ConfigVerifier } from './config/config-verifier';
 import { DirectedGraphUtil, IDirectedGraph } from './dep-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
@@ -26,7 +27,7 @@ export class YaniceExecutor {
         }
         this.baseDirectory = yaniceConfigPath.replace(/yanice\.json/, '');
         const yaniceConfigJson = require(yaniceConfigPath);
-        // TODO Verify jsonschema of yaniceConfigJson
+        this.validateYaniceJson(yaniceConfigJson);
         this.yaniceConfig = ConfigParser.getConfigFromYaniceJson(yaniceConfigJson);
         return this;
     }
@@ -152,6 +153,20 @@ export class YaniceExecutor {
             );
         }
         return this;
+    }
+
+    private validateYaniceJson(yaniceConfigJson: any): void {
+        if (!ConfigVerifier.verifyYaniceJsonWithSchema(yaniceConfigJson)) {
+            ConfigVerifier.printErrorOnVerifyYaniceJsonWithSchemaFailure(yaniceConfigJson);
+            this.exitYanice(1, 'yanice.json does not conform to json-schema, please make sure your yanice.json is valid!');
+        }
+        if (!ConfigVerifier.verifyDependencyScopeProjectNames(yaniceConfigJson)) {
+            ConfigVerifier.printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfigJson);
+            this.exitYanice(
+                1,
+                'yanice.json contains projectNames under dependencyScopes that are not defined as projects! Make sure your dependency trees are defined correctly.'
+            );
+        }
     }
 
     private exitYanice(exitCode: number, message: string | null): void {

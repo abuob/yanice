@@ -50,6 +50,7 @@ is not provided, it matches any file (i.e., if you do not provide either, a proj
 directory, otherwise in the same directory as the yanice.json.
 ```
 {
+  "$schema": "./node_modules/yanice/schema.json",
   "projects": [
     {
       "projectName": "P1",

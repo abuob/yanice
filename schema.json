@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "projectName": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+          },
+          "pathGlob": {
+            "type": "string"
+          },
+          "pathRegExp": {
+            "type": "string"
+          },
+          "commands": {
+            "type": "object",
+            "patternProperties": {
+              "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string"
+                  },
+                  "cwd": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "command"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "responsibles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "projectName"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "dependencyScopes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][0-9a-zA-Z-]*$": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][0-9a-zA-Z-]*$": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "projects",
+    "dependencyScopes"
+  ]
+}

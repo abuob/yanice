@@ -1,0 +1,20 @@
+{
+  "projects": [
+    {
+      "projectName": "project-A",
+      "pathRegExp": "project-A",
+      "pathGlob": "project-A/**"
+    },
+    {
+      "projectName": "project-B",
+      "pathRegExp": "project-B"
+    }
+  ],
+  "dependencyScopes": {
+    "test": {
+      "project-A": [],
+      "project-B": [],
+      "project-DOES-NOT-EXIST": []
+    }
+  }
+}
