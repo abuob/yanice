@@ -33,6 +33,10 @@ export class YaniceExecutor {
     }
 
     public parseArgs(args: string[]): YaniceExecutor {
+        if (!this.yaniceConfig) {
+            return this;
+        }
+        this.verifyScopeParam(args, this.yaniceConfig);
         this.yaniceArgs = ArgsParser.parseArgs(args);
         return this;
     }
@@ -153,6 +157,25 @@ export class YaniceExecutor {
             );
         }
         return this;
+    }
+
+    private verifyScopeParam(args: string[], yaniceConfig: IYaniceConfig): void {
+        const scopeParam: string | undefined = args[0];
+        const scopes = Object.keys(yaniceConfig.dependencyScopes);
+        if (!scopeParam) {
+            this.exitYanice(
+                1,
+                `No scope was provided! Please select one of the following scopes as first input parameter: ${scopes.join(', ')}`
+            );
+        }
+        if (!scopes.includes(scopeParam)) {
+            this.exitYanice(
+                1,
+                `"${scopeParam}" is not a defined scope! Please select one of the following scopes as first input parameter: ${scopes.join(
+                    ', '
+                )}`
+            );
+        }
     }
 
     private validateYaniceJson(yaniceConfigJson: any): void {
