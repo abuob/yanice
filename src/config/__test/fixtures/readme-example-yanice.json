@@ -1,0 +1,104 @@
+{
+  "$schema": "./node_modules/yanice/schema.json",
+  "projects": [
+    {
+      "projectName": "P1",
+      "pathGlob": "path/to/dir/P1/**",
+      "commands": {
+        "lint": {
+          "command": "npm run lint-P1"
+        },
+        "test": {
+          "command": "npm run test-P1",
+          "cwd": "path/to/dir/P1"
+        }
+      },
+      "responsibles": [
+        "Alice"
+      ]
+    },
+    {
+      "projectName": "P2",
+      "pathGlob": "path/to/dir/P2/**",
+      "pathRegExp": "path/to/dir/P2",
+      "commands": {
+        "lint": {
+          "command": "npm run lint-P2",
+          "cwd": "path/to/dir/P2"
+        }
+      },
+      "responsibles": [
+        "Bob"
+      ]
+    },
+    {
+      "projectName": "P3",
+      "pathRegExp": "path/to/dir/P3",
+      "commands": {
+        "lint": {
+          "command": "npm run lint-P2",
+          "cwd": "path/to/dir/P2"
+        }
+      },
+      "responsibles": [
+        "Harry"
+      ]
+    },
+    {
+      "projectName": "lib-123",
+      "pathRegExp": "libs/lib-123",
+      "commands": {
+        "lint": {
+          "command": "npm run lint-123"
+        },
+        "test": {
+          "command": "npm run test-lib-123",
+          "cwd": "libs/lib-123"
+        }
+      },
+      "responsibles": [
+        "David"
+      ]
+    },
+    {
+      "projectName": "lib-12",
+      "pathRegExp": "libs/lib-12",
+      "commands": {
+        "lint": {
+          "command": "npm run lint-lib-12"
+        },
+        "test": {
+          "command": "npm run test-lib-12",
+          "cwd": "libs/lib-12"
+        }
+      },
+      "responsibles": [
+        "Alice",
+        "Bob",
+        "Harry"
+      ]
+    }
+  ],
+  "dependencyScopes": {
+    "test": {
+      "P1": [
+        "lib-123", "lib-12"
+      ],
+      "P2": [
+        "lib-123", "lib-12"
+      ],
+      "P3": [
+        "lib-123"
+      ],
+      "lib-123": [],
+      "lib-12": []
+    },
+    "lint": {
+      "P1": [],
+      "P2": [],
+      "P3": [],
+      "lib-123": [],
+      "lib-12": []
+    }
+  }
+}

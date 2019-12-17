@@ -105,7 +105,7 @@ directory, otherwise in the same directory as the yanice.json.
         "test": {
           "command": "npm run test-lib-123",
           "cwd": "libs/lib-123"
-        },
+        }
       },
       "responsibles": [
         "David"
@@ -121,7 +121,7 @@ directory, otherwise in the same directory as the yanice.json.
         "test": {
           "command": "npm run test-lib-12",
           "cwd": "libs/lib-12"
-        },
+        }
       },
       "responsibles": [
         "Alice",
@@ -133,10 +133,10 @@ directory, otherwise in the same directory as the yanice.json.
   "dependencyScopes": {
     "test": {
       "P1": [
-        "lib-123, lib-12"
+        "lib-123", "lib-12"
       ],
       "P2": [
-        "lib-123, lib-12"
+        "lib-123", "lib-12"
       ],
       "P3": [
         "lib-123"
@@ -153,4 +153,5 @@ directory, otherwise in the same directory as the yanice.json.
     }
   }
 }
+
 ```
