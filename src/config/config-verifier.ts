@@ -31,20 +31,15 @@ export class ConfigVerifier {
 
     public static verifyDependencyScopeProjectNames(yaniceConfig: IYaniceJson): boolean {
         const allProjectNames = yaniceConfig.projects.map(project => project.projectName);
-        let result = true;
-        Object.keys(yaniceConfig.dependencyScopes).forEach(scope => {
-            Object.keys(yaniceConfig.dependencyScopes[scope]).forEach(dependentChild => {
-                if (!allProjectNames.includes(dependentChild)) {
-                    result = false;
-                }
-                yaniceConfig.dependencyScopes[scope][dependentChild].forEach(parentDependency => {
-                    if (!allProjectNames.includes(parentDependency)) {
-                        result = false;
-                    }
-                });
-            });
-        });
-        return result;
+        return !Object.keys(yaniceConfig.dependencyScopes).some(scope =>
+            Object.keys(yaniceConfig.dependencyScopes[scope]).some(
+                dependentChild =>
+                    !allProjectNames.includes(dependentChild) ||
+                    yaniceConfig.dependencyScopes[scope][dependentChild].some(
+                        parentDependency => !allProjectNames.includes(parentDependency)
+                    )
+            )
+        );
     }
 
     public static printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfig: IYaniceJson): void {
