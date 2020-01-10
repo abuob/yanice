@@ -1,4 +1,9 @@
 {
+  "$schema": "../../../../schema.json",
+  "options": {
+    "commandOutput": "append-at-end",
+    "outputFilters": ["npmError"]
+  },
   "projects": [
     {
       "projectName": "project-A",

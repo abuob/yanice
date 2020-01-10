@@ -5,6 +5,20 @@ import { expect } from 'chai';
 import { DirectedGraphUtil } from '../../dep-graph/directed-graph'
 
 describe('ConfigParser', () => {
+    describe('getConfigFromYaniceJson', () => {
+        it('should set the options to default values if none are specified', () => {
+            const actualYaniceConfig1 = ConfigParser.getConfigFromYaniceJson(yaniceJson1 as any);
+            expect(actualYaniceConfig1.options.outputFilters).to.have.same.members([]);
+            expect(actualYaniceConfig1.options.commandOutput).to.equal('ignore');
+        });
+
+        it('should set the options to the values specified in the yaniceJson', () => {
+            const actualYaniceConfig2 = ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any);
+            expect(actualYaniceConfig2.options.outputFilters).to.have.same.members(['npmError']);
+            expect(actualYaniceConfig2.options.commandOutput).to.equal('append-at-end');
+        });
+    });
+
     describe('getDepGraphFromConfigByScope', () => {
         it('should return null if given a scope that is not defined', () => {
             const actualGraphForTestScope = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'scopeDoesNotExist');
@@ -37,7 +51,7 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph when given example-2-yanice.json with test-scope', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2), 'test');
+            const actualGraph = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any), 'test');
             expect(actualGraph).to.not.equal(null);
             expect(actualGraph!.nodes.find(n => n.name === 'project-A')!.edgesTo.map(n => n.name)).to.have.same.members([]);
             expect(actualGraph!.nodes.find(n => n.name === 'lib-1')!.edgesTo.map(n => n.name)).to.have.same.members(['project-A']);

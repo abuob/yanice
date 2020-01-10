@@ -2,6 +2,20 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "options": {
+      "type": "object",
+      "properties": {
+        "commandOutput": {
+          "enum": ["ignore", "append-at-end", "append-at-end-on-error"]
+        },
+        "outputFilters": {
+          "type": "array",
+          "items": {
+            "enum": ["npmError", "karmaProgressSuccess", "ignoreStderr", "ignoreStdout"]
+          }
+        }
+      }
+    },
     "projects": {
       "type": "array",
       "items": {

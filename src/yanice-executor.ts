@@ -4,7 +4,7 @@ import { ConfigVerifier } from './config/config-verifier';
 import { DirectedGraphUtil, IDirectedGraph } from './dep-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
-import { execucteInParallelLimited } from './util/execute-in-parallel-limited';
+import { execucteInParallelLimited, ICommandExecutionResult } from './util/execute-in-parallel-limited';
 import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
@@ -142,15 +142,18 @@ export class YaniceExecutor {
                 (command, dir) => {
                     return;
                 },
-                (command, exitCode) => {
-                    if (exitCode === 0) {
+                (command, commandExecutionResult: ICommandExecutionResult) => {
+                    if (commandExecutionResult.exitCode === 0) {
                         LogUtil.printCommandSuccess(command);
                     } else {
                         LogUtil.printCommandFailure(command);
                     }
                 },
-                exitCode => {
-                    if (exitCode !== 0) {
+                (commandsExecutionResults: ICommandExecutionResult[]) => {
+                    if (this.yaniceConfig) {
+                        LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, commandsExecutionResults);
+                    }
+                    if (commandsExecutionResults.some(result => result.exitCode !== 0)) {
                         this.exitYanice(1, null);
                     }
                 }

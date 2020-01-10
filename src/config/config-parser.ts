@@ -1,6 +1,16 @@
 import { DirectedGraphUtil, IDirectedGraph } from '../dep-graph/directed-graph';
+import { commandOutputFilterType } from '../util/output-filter';
 
+export type commandOutputOptionsType = 'ignore' | 'append-at-end' | 'append-at-end-on-error';
+
+// This is the interface describing the content of the 'yanice.json'-file. It should adhere and is validated against
+// jsonschema (schema.json). This interface is only used for when we initially read the config-file; later, we only want to work
+// with the IYaniceConfig, where all options etc. are set to default if undefined.
 export interface IYaniceJson {
+    options?: {
+        commandOutput?: commandOutputOptionsType;
+        outputFilters?: commandOutputFilterType[];
+    };
     projects: Array<{
         projectName: string;
         pathRegExp?: string;
@@ -40,6 +50,10 @@ export interface ICommandPerScope {
 }
 
 export interface IYaniceConfig {
+    options: {
+        commandOutput: commandOutputOptionsType;
+        outputFilters: commandOutputFilterType[];
+    };
     projects: IYaniceProject[];
     dependencyScopes: {
         [name: string]: IYaniceDependencyScope;
@@ -52,6 +66,10 @@ export class ConfigParser {
      */
     public static getConfigFromYaniceJson(yaniceJson: IYaniceJson): IYaniceConfig {
         return {
+            options: {
+                commandOutput: yaniceJson.options && yaniceJson.options.commandOutput ? yaniceJson.options.commandOutput : 'ignore',
+                outputFilters: yaniceJson.options && yaniceJson.options.outputFilters ? yaniceJson.options.outputFilters : []
+            },
             projects: yaniceJson.projects.map(
                 (project): IYaniceProject => {
                     // TODO Check if we can simplify this.
@@ -82,6 +100,8 @@ export class ConfigParser {
                     };
                 }
             ),
+            // TODO: Make sure we handle "unspecified" projects correctly (i.e., projects that are omitted in dependencyScopes)
+            // Expected behaviour: Whether you declare "project-A": [] or omit dependency-declaration of "project-A" should not make a difference
             dependencyScopes: yaniceJson.dependencyScopes
         };
     }
