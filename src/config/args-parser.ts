@@ -50,6 +50,10 @@ export class ArgsParser {
                 resultArgs.includeUncommitted = false;
                 return;
             }
+            if (/^--include-uncommitted$/.test(arg)) {
+                resultArgs.includeUncommitted = true;
+                return;
+            }
             if (/^--includeCommandSupportedOnly=false$/.test(arg)) {
                 resultArgs.includeCommandSupportedOnly = false;
                 return;
@@ -62,12 +66,16 @@ export class ArgsParser {
                 resultArgs.outputOnly = false;
                 return;
             }
-            if (/^--concurrency=(\d)+$/.test(arg)) {
-                resultArgs.concurrency = parseInt(arg.replace(/--concurrency=/, ''), 10);
-                return;
-            }
             if (/^--outputOnly=true$/.test(arg)) {
                 resultArgs.outputOnly = true;
+                return;
+            }
+            if (/^--output-only$/.test(arg)) {
+                resultArgs.outputOnly = true;
+                return;
+            }
+            if (/^--concurrency=(\d)+$/.test(arg)) {
+                resultArgs.concurrency = parseInt(arg.replace(/--concurrency=/, ''), 10);
                 return;
             }
             if (/^--responsibles$/.test(arg)) {

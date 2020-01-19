@@ -42,11 +42,19 @@ export class YaniceExecutor {
     }
 
     public calculateChangedFiles(): YaniceExecutor {
-        if (this.yaniceArgs && this.yaniceArgs.diffTarget.branch) {
-            this.changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenBranch(
-                this.yaniceArgs.diffTarget.branch,
-                this.yaniceArgs.includeUncommitted
-            );
+        if (this.yaniceArgs) {
+            if (this.yaniceArgs.diffTarget.branch) {
+                this.changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenBranch(
+                    this.yaniceArgs.diffTarget.branch,
+                    this.yaniceArgs.includeUncommitted
+                );
+            }
+            if (this.yaniceArgs.diffTarget.commit && this.changedFiles.length === 0) {
+                this.changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenCommit(
+                    this.yaniceArgs.diffTarget.commit,
+                    this.yaniceArgs.includeUncommitted
+                );
+            }
         }
         return this;
     }
