@@ -43,14 +43,14 @@ export class YaniceExecutor {
 
     public calculateChangedFiles(): YaniceExecutor {
         if (this.yaniceArgs) {
-            if (this.yaniceArgs.diffTarget.branch) {
-                this.changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenBranch(
-                    this.yaniceArgs.diffTarget.branch,
-                    this.yaniceArgs.includeUncommitted
+            if (this.yaniceArgs.diffTarget.branch || this.yaniceArgs.diffTarget.rev) {
+                const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(
+                    `git rev-parse ${this.yaniceArgs.diffTarget.branch || this.yaniceArgs.diffTarget.rev}`
                 );
+                this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, this.yaniceArgs.includeUncommitted);
             }
             if (this.yaniceArgs.diffTarget.commit && this.changedFiles.length === 0) {
-                this.changedFiles = ChangedFiles.filesChangedBetweenCurrentAndGivenCommit(
+                this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(
                     this.yaniceArgs.diffTarget.commit,
                     this.yaniceArgs.includeUncommitted
                 );

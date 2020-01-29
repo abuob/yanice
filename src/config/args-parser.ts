@@ -5,6 +5,7 @@ export interface IYaniceArgs {
     diffTarget: {
         branch: string | null;
         commit: string | null;
+        rev: string | null;
     };
     includeUncommitted: boolean;
     includeAllProjects: boolean;
@@ -24,7 +25,8 @@ export class ArgsParser {
             givenScope: argv[0],
             diffTarget: {
                 branch: null,
-                commit: null
+                commit: null,
+                rev: null
             },
             includeUncommitted: true,
             includeAllProjects: false,
@@ -40,6 +42,10 @@ export class ArgsParser {
             }
             if (/^--commit=.+$/.test(arg)) {
                 resultArgs.diffTarget.commit = arg.replace(/--commit=/, '');
+                return;
+            }
+            if (/^--rev=.+$/.test(arg)) {
+                resultArgs.diffTarget.rev = arg.replace(/--rev=/, '');
                 return;
             }
             if (/^--includeUncommitted=true$/.test(arg)) {

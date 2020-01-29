@@ -26,9 +26,12 @@ describe('ChangedFiles', () => {
     });
 
     describe('filesChangedBetweenCurrentAndGivenBranch', () => {
-        it('should be able to calculate changed files between current branch and a given branch', () => {
-            execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
-            expect(ChangedFiles.filesChangedBetweenCurrentAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED', false)).to.have.same.members(
+        const temporaryBranchName = 'TEST-BRANCH-SHOULD-BE-DELETED';
+
+        it('should be able to calculate changed files between current HEAD and a given branch', () => {
+            execSync(`git branch ${temporaryBranchName} HEAD~1`);
+            const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${temporaryBranchName}`);
+            expect(ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, false)).to.have.same.members(
                 execSync('git diff --name-only HEAD~1 HEAD').toString()
                     .split('\n')
                     .map((filePath:string) => filePath.trim())
@@ -36,9 +39,10 @@ describe('ChangedFiles', () => {
             );
         });
 
-        it('should be able to calculate changed files between working tree and a given branch', () => {
-            execSync('git branch TEST-BRANCH-SHOULD-BE-DELETED HEAD~1');
-            expect(ChangedFiles.filesChangedBetweenCurrentAndGivenBranch('TEST-BRANCH-SHOULD-BE-DELETED', true)).to.have.same.members(
+        it('should be able to calculate changed files between working tree (including index) and a given branch', () => {
+            execSync(`git branch ${temporaryBranchName} HEAD~1`);
+            const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${temporaryBranchName}`);
+            expect(ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, true)).to.have.same.members(
                 execSync('git diff --name-only HEAD~1').toString()
                     .split('\n')
                     .map((filePath:string) => filePath.trim())
@@ -47,7 +51,7 @@ describe('ChangedFiles', () => {
         });
 
         afterEach(() => {
-            execSync('git branch -d TEST-BRANCH-SHOULD-BE-DELETED');
+            execSync(`git branch -d ${temporaryBranchName}`);
         });
     });
 });

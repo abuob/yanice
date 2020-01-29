@@ -9,12 +9,7 @@ export class ChangedFiles {
         return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only HEAD`);
     }
 
-    public static filesChangedBetweenCurrentAndGivenBranch(branch: string, includeUncommitted: boolean): string[] {
-        const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${branch}`);
-        return ChangedFiles.filesChangedBetweenCurrentAndGivenCommit(commitSHA, includeUncommitted);
-    }
-
-    public static filesChangedBetweenCurrentAndGivenCommit(commitSHA: string, includeUncommitted: boolean): string[] {
+    public static filesChangedBetweenHeadAndGivenCommit(commitSHA: string, includeUncommitted: boolean): string[] {
         if (includeUncommitted) {
             const mergeBaseSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git merge-base --octopus ${commitSHA}`);
             return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${mergeBaseSHA}`);
