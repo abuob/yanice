@@ -100,8 +100,6 @@ export class ConfigParser {
                     };
                 }
             ),
-            // TODO: Make sure we handle "unspecified" projects correctly (i.e., projects that are omitted in dependencyScopes)
-            // Expected behaviour: Whether you declare "project-A": [] or omit dependency-declaration of "project-A" should not make a difference
             dependencyScopes: yaniceJson.dependencyScopes
         };
     }
@@ -117,9 +115,11 @@ export class ConfigParser {
             return null;
         }
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
-        Object.keys(depScope).forEach(projectName => {
-            graphBuilder.addNode(projectName);
-        });
+        yaniceConfig.projects
+            .map(p => p.projectName)
+            .forEach(projectName => {
+                graphBuilder.addNode(projectName);
+            });
         Object.keys(depScope).forEach(projectName => {
             depScope[projectName].forEach(dependentProject => {
                 graphBuilder.createDirectedEdge(dependentProject, projectName);

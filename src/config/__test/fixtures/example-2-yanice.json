@@ -29,6 +29,10 @@
       "project-B": ["lib-2"],
       "lib-1": [],
       "lib-2": []
+    },
+    "build-some": {
+      "project-A": ["lib-1"],
+      "project-B": ["lib-2"]
     }
   }
 }

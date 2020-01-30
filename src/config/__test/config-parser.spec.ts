@@ -79,5 +79,14 @@ describe('ConfigParser', () => {
             expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'E')!.edgesTo.map(n => n.name)).to.have.same.members(['D']);
             expect(DirectedGraphUtil.hasCycle(actualGraphForIllegalCycleScope!)).to.equal(true);
         });
+
+        it('should create nodes for projects even if they are not explicitly listed in the dependency scope', () => {
+            expect(ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any), 'build-some')).to.deep.equal({nodes: [
+                    {name: 'project-A', edgesTo: []},
+                    {name: 'project-B', edgesTo: []},
+                    {name: 'lib-1', edgesTo: [{name: 'project-A', edgesTo: []}]},
+                    {name: 'lib-2', edgesTo: [{name: 'project-B', edgesTo: []}]},
+                ]});
+        });
     });
 });
