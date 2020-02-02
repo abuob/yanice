@@ -11,6 +11,7 @@ describe('ArgsParser', () => {
             const actualArgs5 = ArgsParser.parseArgs(["lint", "--branch=master", "--include-uncommitted", "--output-only"]);
             const actualArgs6 = ArgsParser.parseArgs(["lint", "--branch=master", "--outputOnly=false"]);
             const actualArgs7 = ArgsParser.parseArgs(["lint", "--rev=HEAD~1"]);
+            const actualArgs8 = ArgsParser.parseArgs(["lint", "--visualize", "--branch=master"]);
 
             const args: IYaniceArgs = {
                 givenScope: 'lint',
@@ -24,6 +25,7 @@ describe('ArgsParser', () => {
                 includeCommandSupportedOnly: true,
                 outputOnly: false,
                 outputResponsibles: false,
+                visualizeDepGraph: false,
                 concurrency: 1
             };
 
@@ -75,6 +77,10 @@ describe('ArgsParser', () => {
                     commit: null,
                     rev: 'HEAD~1'
                 }
+            });
+            expect(actualArgs8).to.deep.equal({
+                ...args,
+                visualizeDepGraph: true
             });
         });
     });

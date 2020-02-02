@@ -12,6 +12,7 @@ export interface IYaniceArgs {
     includeCommandSupportedOnly: boolean;
     outputOnly: boolean;
     outputResponsibles: boolean;
+    visualizeDepGraph: boolean;
     concurrency: number;
 }
 
@@ -33,6 +34,7 @@ export class ArgsParser {
             includeCommandSupportedOnly: true,
             outputOnly: false,
             outputResponsibles: false,
+            visualizeDepGraph: false,
             concurrency: 1
         };
         argv.slice(1).forEach(arg => {
@@ -86,6 +88,10 @@ export class ArgsParser {
             }
             if (/^--responsibles$/.test(arg)) {
                 resultArgs.outputResponsibles = true;
+                return;
+            }
+            if (/^--visualize$/.test(arg)) {
+                resultArgs.visualizeDepGraph = true;
                 return;
             }
             if (/^--all$/.test(arg)) {

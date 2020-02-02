@@ -14,4 +14,5 @@ new YaniceExecutor()
     .outputResponsiblesAndExitIfShowResponsiblesMode()
     .filterOutUnsupportedProjectsIfNeeded()
     .outputAffectedAndExitIfOutputOnlyMode()
+    .visualizeDepGraphIfInVisualizationMode()
     .executeCommands();

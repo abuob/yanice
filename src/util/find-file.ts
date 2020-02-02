@@ -2,6 +2,14 @@ import { statSync } from 'fs';
 import * as path from 'path';
 
 export class FindFileUtil {
+    public static findFileInParentDirsFromInitialDir(fileName: string, initialDir: string): string | null {
+        return this.findFileInParentDirsRecursively(initialDir, fileName);
+    }
+
+    /**
+     * @deprecated
+     * TODO Remove
+     */
     public static findFileInParentDirs(fileName: string): string | null {
         return this.findFileInParentDirsRecursively(process.cwd(), fileName);
     }

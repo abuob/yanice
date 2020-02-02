@@ -8,6 +8,8 @@ import { execucteInParallelLimited, ICommandExecutionResult } from './util/execu
 import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
+import { DepGraphVisualizationServer } from './visualization/dep-graph-visualization-server';
+import { GraphDotRenderer } from './visualization/graph-dot-renderer';
 
 export class YaniceExecutor {
     private baseDirectory: string | null = null;
@@ -136,8 +138,16 @@ export class YaniceExecutor {
         return this;
     }
 
+    public visualizeDepGraphIfInVisualizationMode(): YaniceExecutor {
+        if (this.yaniceArgs && this.yaniceArgs.visualizeDepGraph && this.depGraph) {
+            DepGraphVisualizationServer.serveDotRenderedGraph(GraphDotRenderer.getDotRepresentation(this.depGraph));
+        }
+        return this;
+    }
+
     public executeCommands(): YaniceExecutor {
-        if (this.yaniceConfig && this.yaniceArgs && this.baseDirectory) {
+        // TODO Refactor: Make execution of commands/output-only/visualization independent. They should not be aware of each other.
+        if (this.yaniceConfig && this.yaniceArgs && this.baseDirectory && !this.yaniceArgs.visualizeDepGraph) {
             const scope = this.yaniceArgs.givenScope;
             const commands: IYaniceCommand[] = this.yaniceConfig.projects
                 .filter(project => this.affectedProjects.includes(project.projectName))
