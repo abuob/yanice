@@ -2,13 +2,67 @@
 <meta charset="utf-8">
 <body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://unpkg.com/viz.js@1.8.1/viz.js" type="javascript/worker"></script>
-<script src="https://unpkg.com/d3-graphviz@2.6.1/build/d3-graphviz.js"></script>
-<div id="graph" style="text-align: center;"></div>
+<script src="https://dagrejs.github.io/project/dagre/v0.7.5/dagre.min.js"></script>
+<script src="https://dagrejs.github.io/project/graphlib-dot/v0.6.3/graphlib-dot.min.js"></script>
+<script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js"></script>
+
+<style>
+    .node {
+        white-space: nowrap;
+    }
+
+    .node rect,
+    .node circle,
+    .node ellipse {
+        stroke: #333;
+        fill: #fff;
+        stroke-width: 1.5px;
+    }
+
+    .cluster rect {
+        stroke: #333;
+        fill: #000;
+        fill-opacity: 0.1;
+        stroke-width: 1.5px;
+    }
+
+    .edgePath path.path {
+        stroke: #333;
+        stroke-width: 1.5px;
+        fill: none;
+    }
+</style>
+
+<svg id="svg-id" height="450" width="800" style="margin: auto; display: block">
+    <g/>
+</svg>
 <script>
+    var render = dagreD3.render();
+    var dagreGraph = graphlibDot.read('INSERT_DOT_REPRESENTATION_OF_GRAPH_HERE');
+    var svg = d3.select("svg"),
+        inner = d3.select("svg g"),
+        zoom = d3.zoom().on("zoom", function() {
+            inner.attr("transform", d3.event.transform);
+        });
+    svg.call(zoom);
 
-    d3.select("#graph").graphviz()
-        .fade(false)
-        .renderDot('INSERT_DOT_REPRESENTATION_OF_GRAPH_HERE');
+    if (!dagreGraph.graph().hasOwnProperty("marginx") &&
+        !dagreGraph.graph().hasOwnProperty("marginy")) {
+        dagreGraph.graph().marginx = 20;
+        dagreGraph.graph().marginy = 20;
+    }
 
+    dagreGraph.graph().transition = function(selection) {
+        return selection.transition().duration(500);
+    };
+
+    dagre.layout(dagreGraph);
+
+    console.log(dagreGraph.graph());
+    render(d3.select("svg g"), dagreGraph);
+
+    var svgHeight = dagreGraph.graph().height;
+    var svgWidth = dagreGraph.graph().width;
+    document.getElementById('svg-id').setAttribute("height", svgHeight * 1.2);
+    document.getElementById('svg-id').setAttribute("width", svgWidth * 1.2);
 </script>
