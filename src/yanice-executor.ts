@@ -9,6 +9,7 @@ import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
 import { DepGraphVisualizationServer } from './visualization/dep-graph-visualization-server';
+import { GraphDagreRenderer } from './visualization/graph-dagre-renderer';
 import { GraphDotRenderer } from './visualization/graph-dot-renderer';
 
 export class YaniceExecutor {
@@ -19,6 +20,7 @@ export class YaniceExecutor {
     private changedProjects: string[] = [];
     private depGraph: IDirectedGraph | null = null;
     private affectedProjects: string[] = [];
+    private affectedProjectsUnfiltered: string[] = [];
     private responsibles: string[] = [];
 
     public loadConfiguration(): YaniceExecutor {
@@ -96,6 +98,7 @@ export class YaniceExecutor {
                 this.affectedProjects = this.yaniceConfig.projects.map(project => project.projectName);
             }
         }
+        this.affectedProjectsUnfiltered = this.affectedProjects;
         return this;
     }
 
@@ -139,8 +142,16 @@ export class YaniceExecutor {
     }
 
     public visualizeDepGraphIfInVisualizationMode(): YaniceExecutor {
-        if (this.yaniceArgs && this.yaniceArgs.visualizeDepGraph && this.depGraph) {
-            DepGraphVisualizationServer.serveDotRenderedGraph(GraphDotRenderer.getDotRepresentation(this.depGraph));
+        if (this.yaniceArgs && this.yaniceArgs.visualizeDepGraph && this.depGraph && this.yaniceConfig) {
+            // TODO Add option to choose between dagre/vizJS
+            DepGraphVisualizationServer.serveDagreGraph(
+                this.depGraph,
+                this.yaniceConfig,
+                this.yaniceArgs,
+                this.affectedProjectsUnfiltered,
+                this.changedFiles
+            );
+            // DepGraphVisualizationServer.serveDotVizJsGraph(this.depGraph);
         }
         return this;
     }
