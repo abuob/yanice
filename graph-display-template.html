@@ -37,9 +37,37 @@
     <g/>
 </svg>
 <script>
-    var render = dagreD3.render();
-    var dagreGraph = graphlibDot.read('INSERT_DOT_REPRESENTATION_OF_GRAPH_HERE');
-    var svg = d3.select("svg"),
+
+    // {
+    //     projectName: string;
+    //     edgesTo: string[];
+    //     responsibles: string[];
+    //     affectedFiles: string[];
+    //     isAffected: boolean
+    // }
+
+    const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
+    // graphData corresponds to IYaniceGraphNodeInfo[] (see graph-dagre-renderer.ts)
+    const graphData = JSON.parse('INSERT-GRAPH-DATA-STRINGIFIED-HERE');
+
+    function getNodeStyle(data) {
+        var styleStr = "stroke-width: 2px;";
+        if(!data.hasCommandForScope) {
+            styleStr = styleStr.concat("stroke-dasharray: 5, 5;");
+        }
+        if(data.isAffected) {
+            styleStr = styleStr.concat("fill: #d0172791;")
+        }
+        return styleStr.length > 0 ? {style: styleStr} : {};
+    }
+
+    graphData.forEach(data => {
+        dagreGraph.setNode(data.projectName, getNodeStyle(data));
+        data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {curve: d3.curveBasis}));
+    });
+
+
+    const svg = d3.select("svg"),
         inner = d3.select("svg g"),
         zoom = d3.zoom().on("zoom", function() {
             inner.attr("transform", d3.event.transform);
@@ -58,11 +86,11 @@
 
     dagre.layout(dagreGraph);
 
-    console.log(dagreGraph.graph());
+    const render = dagreD3.render();
     render(d3.select("svg g"), dagreGraph);
 
-    var svgHeight = dagreGraph.graph().height;
-    var svgWidth = dagreGraph.graph().width;
+    const svgHeight = dagreGraph.graph().height;
+    const svgWidth = dagreGraph.graph().width;
     document.getElementById('svg-id').setAttribute("height", svgHeight * 1.2);
     document.getElementById('svg-id').setAttribute("width", svgWidth * 1.2);
 </script>
