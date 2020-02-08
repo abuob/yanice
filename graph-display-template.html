@@ -31,11 +31,18 @@
         stroke-width: 1.5px;
         fill: none;
     }
-</style>
 
-<svg id="svg-id" height="450" width="800" style="margin: auto; display: block">
-    <g/>
-</svg>
+    .tooltip-content {
+        position: absolute;
+        z-index: 10;
+        display: block;
+    }
+</style>
+<div class="svg-container">
+    <svg id="svg-id" height="450" width="800" style="margin: auto; display: block">
+        <g/>
+    </svg>
+</div>
 <script>
 
     // {
@@ -46,41 +53,38 @@
     //     isAffected: boolean
     // }
 
+    // Initialize an empty graph
     const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
+
     // graphData corresponds to IYaniceGraphNodeInfo[] (see graph-dagre-renderer.ts)
     const graphData = JSON.parse('INSERT-GRAPH-DATA-STRINGIFIED-HERE');
 
-    function getNodeStyle(data) {
-        var styleStr = "stroke-width: 2px;";
-        if(!data.hasCommandForScope) {
-            styleStr = styleStr.concat("stroke-dasharray: 5, 5;");
-        }
-        if(data.isAffected) {
-            styleStr = styleStr.concat("fill: #d0172791;")
-        }
-        return styleStr.length > 0 ? {style: styleStr} : {};
-    }
-
+    // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
+    // is available: See e.g. "dagreGraph.node(d)"-usages below
     graphData.forEach(data => {
-        dagreGraph.setNode(data.projectName, getNodeStyle(data));
+        data.label = data.projectName;
+        data.style = getNodeStyle(data);
+        dagreGraph.setNode(data.projectName, data);
         data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {curve: d3.curveBasis}));
     });
 
 
+    // Enable zoom
     const svg = d3.select("svg"),
         inner = d3.select("svg g"),
-        zoom = d3.zoom().on("zoom", function() {
+        zoom = d3.zoom().on("zoom", function () {
             inner.attr("transform", d3.event.transform);
         });
     svg.call(zoom);
 
+    // Add some margins (otherwise the graph looks a bit cut-off at the borders)
     if (!dagreGraph.graph().hasOwnProperty("marginx") &&
         !dagreGraph.graph().hasOwnProperty("marginy")) {
         dagreGraph.graph().marginx = 20;
         dagreGraph.graph().marginy = 20;
     }
 
-    dagreGraph.graph().transition = function(selection) {
+    dagreGraph.graph().transition = function (selection) {
         return selection.transition().duration(500);
     };
 
@@ -89,8 +93,49 @@
     const render = dagreD3.render();
     render(d3.select("svg g"), dagreGraph);
 
-    const svgHeight = dagreGraph.graph().height;
-    const svgWidth = dagreGraph.graph().width;
-    document.getElementById('svg-id').setAttribute("height", svgHeight * 1.2);
-    document.getElementById('svg-id').setAttribute("width", svgWidth * 1.2);
+    const svgHeight = dagreGraph.graph().height * 1.2;
+    const svgWidth = dagreGraph.graph().width * 1.2;
+    document.getElementById('svg-id').setAttribute("height", svgHeight + "px");
+    document.getElementById('svg-id').setAttribute("width", svgWidth + "px");
+
+    const tooltip = d3.select(".svg-container")
+        .append("div")
+        .attr("class", "tooltip-content")
+        .style("visibility", "hidden")
+        .style("border", "solid")
+        .style("width", "230px")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("background-color", "white");
+
+    const mouseover = function (d) {
+        const nodeData = dagreGraph.node(d);
+        tooltip
+            .style("visibility", "visible")
+            .html(nodeData.projectName) // TODO: Add additional info into tooltip
+            .style("left", nodeData.x + "px")
+            .style("top", (nodeData.y + 50) + "px");
+    };
+    const mouseout = function (d) {
+        tooltip
+            .style("visibility", "hidden");
+    };
+
+    d3.selectAll('g.node')
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout);
+
+    // =========== UTILITIES ==============
+
+    function getNodeStyle(data) {
+        var styleStr = "stroke-width: 2px;";
+        if (!data.hasCommandForScope) {
+            styleStr = styleStr.concat("stroke-dasharray: 5, 5;");
+        }
+        if (data.isAffected) {
+            styleStr = styleStr.concat("fill: #d0172791;")
+        }
+        return styleStr;
+    }
 </script>
