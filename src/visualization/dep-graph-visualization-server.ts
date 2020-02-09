@@ -22,7 +22,16 @@ export class DepGraphVisualizationServer {
     ): void {
         const templateHtml = DepGraphVisualizationServer.getTemplateHtml();
         const graphData = GraphDagreRenderer.getGraphData(depGraph, yaniceConfig, yaniceArgs, affectedProjects, changedFiles);
-        const actualHtml = templateHtml.replace('INSERT-GRAPH-DATA-STRINGIFIED-HERE', JSON.stringify(graphData));
+        const actualHtml = templateHtml
+            .replace('INSERT_GRAPH_DATA_OBJECT_HERE', JSON.stringify(graphData))
+            .replace(
+                'INSERT_GIT_REVISION',
+                yaniceArgs.diffTarget.branch ||
+                    yaniceArgs.diffTarget.commit ||
+                    yaniceArgs.diffTarget.rev ||
+                    'None provided (use e.g. --rev=HEAD)'
+            )
+            .replace('INSERT_SCOPE', yaniceArgs.givenScope);
         DepGraphVisualizationServer.startServer(actualHtml);
     }
 

@@ -143,15 +143,20 @@ export class YaniceExecutor {
 
     public visualizeDepGraphIfInVisualizationMode(): YaniceExecutor {
         if (this.yaniceArgs && this.yaniceArgs.visualizeDepGraph && this.depGraph && this.yaniceConfig) {
-            // TODO Add option to choose between dagre/vizJS
-            DepGraphVisualizationServer.serveDagreGraph(
-                this.depGraph,
-                this.yaniceConfig,
-                this.yaniceArgs,
-                this.affectedProjectsUnfiltered,
-                this.changedFiles
-            );
-            // DepGraphVisualizationServer.serveDotVizJsGraph(this.depGraph);
+            switch (this.yaniceArgs.graphRenderer) {
+                case 'DAGREJS':
+                    DepGraphVisualizationServer.serveDagreGraph(
+                        this.depGraph,
+                        this.yaniceConfig,
+                        this.yaniceArgs,
+                        this.affectedProjectsUnfiltered,
+                        this.changedFiles
+                    );
+                    break;
+                case 'VIZJS':
+                    DepGraphVisualizationServer.serveDotVizJsGraph(this.depGraph);
+                    break;
+            }
         }
         return this;
     }
