@@ -2,7 +2,7 @@
 
 Yanice (_yet another incremental command executor_) takes care of change detection and incremental builds/command execution within a git-based monorepository.
 It lets you define various dependency graphs for different "scopes" (e.g. build, test, lint...) to model the dependencies between your projects,
-detects changes between the current working tree and another commit, and lets you execute commands depending on those changes and the dependency graphs you defined.
+detects changes between the current working tree and e.g. another commit, and lets you execute commands depending on those changes and the dependency graphs you defined.
 
 For example, a repository with two projects and two libraries might be modeled as follows:
 
@@ -10,21 +10,21 @@ For example, a repository with two projects and two libraries might be modeled a
   <img alt="yanice-visualization-example" src="https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png">
 </p>
 
-###Assumptions & Caveats:
-* The dependencies between the projects inside the repository can be modeled as a directed acyclic graph (DAG)
+### Assumptions & Caveats:
+* The dependencies between the projects inside the repository can be modeled as a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG)
 * This DAG is known and is described in a `yanice.json`-file
-* Yanice will not read any file inside the repository (except its configuration - the aforementioned `yanice.json`)
-* Yanice will therefore _not_ automatically detect dependencies via, for example, detecting imports
+* Yanice will _not_ read any file inside the repository (except its configuration - the aforementioned `yanice.json`)
+* Yanice will therefore _not_ automatically detect dependencies via, for example, detecting imports. Enabling this via optional plugins is on the roadmap though (see below)
 * Yanice works best for small- to medium-sized repositories (<50 projects), the dependencies between the projects have to be defined manually, 
 which _can_ get cumbersome with increasing size
 * Due to the design philosophy of not reading/touching any files inside the repository, 
-yanice can technically be used for any kind of repository, no matter the technology/languages used.
-* In it's current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a given git-ref (commitSHA, HEAD, branch...). 
-Metadata about last command executions are _not_ stored or considered in any other way (see roadmap below). To achieve incremental builds for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare to that.
+yanice can technically be used for any kind of repository, no matter the technology/languages used
+* In its current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a given git-ref (commitSHA, HEAD, branch...). 
+Metadata about last command executions are _not_ stored or considered in any other way. To achieve incremental builds for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare to that
 
 
 ## Example
-###Configuration
+### Configuration
 The complete version of the `yanice.json` used for this example can be found here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/config/__test/fixtures/readme-example-yanice.json)
 
 The example corresponds to the graph in the picture above. `project-A` for example is defined as follows:
@@ -35,21 +35,21 @@ The example corresponds to the graph in the picture above. `project-A` for examp
   "pathGlob": "project-A/**",
   "commands": {
     "lint": {
-      "command": "npm run lint-project-B",
+      "command": "npm run lint-project-A",
       "cwd": "./"
     },
     "test": {
-      "command": "npm run test-project-B"
+      "command": "npm run test-project-A"
     }
   },
   "responsibles": ["Bob", "Bill"]
 }
 ```
-Every file in the repository that matches the given pathGlob (you can also use pathRegExp if preferred) will be part of the project.
-Note that the glob allows you to match any specific file or even no file at all: If you neither define the pathGlob nor the pathRegExp,
+Every file in the repository that matches the given `pathGlob` (you can also use `pathRegExp` if preferred, or both) will be part of the project.
+Note that the glob allows you to match any file or even no file at all: If you neither define the pathGlob nor the pathRegExp,
 all files in the repository will match. Projects such as "all-js-files" or "ci-relevant-files" can easily be modeled.
 
-A Command will be executed in the given `cwd`. A command corresponds to a scope (here: test, lint), for which a dependency graph is defined further below. E.g. for test, the dependencies
+A Command will be executed in the given `cwd`. A command corresponds to a scope (here: test, lint), for which a dependency graph is defined in the `yanice.json`. E.g. for test, the dependencies
 are modeled as such: 
 
 ```
@@ -61,14 +61,14 @@ are modeled as such:
 }
 ```
 
-###Commands
+### Commands
 In general, commands have the following base structure: `yanice <scope> --(rev|branch|commit)=<git-rev>`
 
 Per default, yanice will execute all commands of the selected scope along the dependency graph in topological order. The following options exist:
 
 | Option  | Default | Effect |
 | :------------------------------------ |----------| ------------- |
-| `--rev=<git-revision>`, `--branch=<git-branch>`, `--commit=<commitSHA>` | | git-revision with which the current working tree (w/o uncommitted changed, see below) will be compared. `--rev=<..>` accepts anything that `git rev-parse` can turn into a commit-SHA. Under the hood, yanice uses `git diff --name-only` in combination with `git merge-base --octopus` to determine the changed files. Therefore, yanice needs to know the corresponding refs/git-history, this is especially relevant with regards to shallow-clone.  |
+| `--rev=<git-revision>`, `--branch=<git-branch>`, `--commit=<commitSHA>` | | git-revision with which the current working tree (w/o uncommitted changes, see below) will be compared. `--rev=<..>` accepts anything that `git rev-parse` can turn into a commit-SHA. Under the hood, yanice uses `git diff --name-only` in combination with `git merge-base --octopus` to determine the changed files. Therefore, yanice needs to know the corresponding refs/git-history, this is especially relevant with regards to shallow-clone.  |
 | `--output-only`, `outputOnly=false/true` | `false` | Will not execute the commands, only outputs which projects have changed/commands would be executed on.  |
 | `--all` |  | Ignore all change detection and just assume every project has changed.|
 | `--concurrency=n` | `1` | Will execute `n` commands in parallel |

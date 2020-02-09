@@ -11,11 +11,11 @@
       "pathGlob": "project-A/**",
       "commands": {
         "lint": {
-          "command": "npm run lint-project-B",
+          "command": "npm run lint-project-A",
           "cwd": "./"
         },
         "test": {
-          "command": "npm run test-project-B"
+          "command": "npm run test-project-A"
         }
       },
       "responsibles": ["Bob", "Bill"]
