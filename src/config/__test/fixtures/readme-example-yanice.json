@@ -1,105 +1,67 @@
 {
   "$schema": "./node_modules/yanice/schema.json",
   "schemaVersion": 1,
+  "options": {
+    "outputFilters": [],
+    "commandOutput": "ignore"
+  },
   "projects": [
     {
-      "projectName": "P1",
-      "pathGlob": "path/to/dir/P1/**",
+      "projectName": "project-A",
+      "pathGlob": "project-A/**",
       "commands": {
         "lint": {
-          "command": "npm run lint-P1"
+          "command": "npm run lint-project-B",
+          "cwd": "./"
         },
         "test": {
-          "command": "npm run test-P1",
-          "cwd": "path/to/dir/P1"
+          "command": "npm run test-project-B"
         }
       },
-      "responsibles": [
-        "Alice"
-      ]
+      "responsibles": ["Bob", "Bill"]
     },
     {
-      "projectName": "P2",
-      "pathGlob": "path/to/dir/P2/**",
-      "pathRegExp": "path/to/dir/P2",
+      "projectName": "project-B",
+      "pathGlob": "project-B/**",
       "commands": {
         "lint": {
-          "command": "npm run lint-P2",
-          "cwd": "path/to/dir/P2"
+          "command": "npm run lint-project-B",
+          "cwd": "./project-B"
         }
       },
-      "responsibles": [
-        "Bob"
-      ]
+      "responsibles": ["Bob"]
     },
     {
-      "projectName": "P3",
-      "pathRegExp": "path/to/dir/P3",
+      "projectName": "lib-1",
+      "pathGlob": "libs/lib-1/**",
       "commands": {
-        "lint": {
-          "command": "npm run lint-P2",
-          "cwd": "path/to/dir/P2"
-        }
-      },
-      "responsibles": [
-        "Harry"
-      ]
-    },
-    {
-      "projectName": "lib-123",
-      "pathRegExp": "libs/lib-123",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-123"
-        },
         "test": {
-          "command": "npm run test-lib-123",
-          "cwd": "libs/lib-123"
+          "command": "npm run lint-lib-1"
         }
       },
-      "responsibles": [
-        "David"
-      ]
+      "responsibles": ["Frank", "Harry"]
     },
     {
-      "projectName": "lib-12",
-      "pathRegExp": "libs/lib-12",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-lib-12"
-        },
-        "test": {
-          "command": "npm run test-lib-12",
-          "cwd": "libs/lib-12"
-        }
-      },
-      "responsibles": [
-        "Alice",
-        "Bob",
-        "Harry"
-      ]
+      "projectName": "lib-2",
+      "pathGlob": "libs/lib-2/**"
+    },
+    {
+      "projectName": "important-repo-files",
+      "pathGlob": "+(package.json|yanice.json|some-ci-config.file)"
     }
   ],
   "dependencyScopes": {
-    "test": {
-      "P1": [
-        "lib-123", "lib-12"
-      ],
-      "P2": [
-        "lib-123", "lib-12"
-      ],
-      "P3": [
-        "lib-123"
-      ],
-      "lib-123": [],
-      "lib-12": []
-    },
     "lint": {
-      "P1": [],
-      "P2": [],
-      "P3": [],
-      "lib-123": [],
-      "lib-12": []
+      "project-A": ["important-repo-files"],
+      "project-B": ["important-repo-files"],
+      "lib-1": ["important-repo-files"],
+      "lib-2": ["important-repo-files"]
+    },
+    "test": {
+      "project-A": ["lib-1", "lib-2", "important-repo-files"],
+      "project-B": ["lib-2", "important-repo-files"],
+      "lib-1": ["important-repo-files"],
+      "lib-2": ["important-repo-files"]
     }
   }
 }

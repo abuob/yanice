@@ -1,157 +1,97 @@
 # Yanice
 
 Yanice (_yet another incremental command executor_) takes care of change detection and incremental builds/command execution within a git-based monorepository.
+It lets you define various dependency graphs for different "scopes" (e.g. build, test, lint...) to model the dependencies between your projects,
+detects changes between the current working tree and another commit, and lets you execute commands depending on those changes and the dependency graphs you defined.
 
-In it's current form, yanice offers the following functionalities: 
+For example, a repository with two projects and two libraries might be modeled as follows:
 
-* Definition of projects within the repository (entire directories, certain files, certain file types...)
-* Definition of dependency trees for various 'scopes' (e.g. test, e2e, linting, build...)
-* Change detection between working tree and a given branch
-* Automatic execution of commands on changed projects and all projects that are affected by those changes, as defined
-by dependency graphs
-* Responsibles: E.g. for review purposes, define responsibles per project/repo-part. Yanice can calculate all responsibles
-that are affected by changes.
+<p align="center">
+  <img alt="yanice-visualization-example" src="https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png">
+</p>
 
-Assumptions:
+###Assumptions & Caveats:
 * The dependencies between the projects inside the repository can be modeled as a directed acyclic graph (DAG)
 * This DAG is known and is described in a `yanice.json`-file
+* Yanice will not read any file inside the repository (except its configuration - the aforementioned `yanice.json`)
+* Yanice will therefore _not_ automatically detect dependencies via, for example, detecting imports
+* Yanice works best for small- to medium-sized repositories (<50 projects), the dependencies between the projects have to be defined manually, 
+which _can_ get cumbersome with increasing size
+* Due to the design philosophy of not reading/touching any files inside the repository, 
+yanice can technically be used for any kind of repository, no matter the technology/languages used.
+* In it's current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a given git-ref (commitSHA, HEAD, branch...). 
+Metadata about last command executions are _not_ stored or considered in any other way (see roadmap below). To achieve incremental builds for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare to that.
 
-### Example
-Say your repository consists of three projects P1, P2, P3 and two libraries, lib-123 which is used by P1, P2, P3;
-and lib-12 which is only used by P1, P2. 
 
-Let's assume there is a `yanice.json`-file at the root of the repository as provided at the end of this file. A few example commands:
-* `yanice lint --branch=master --includeUncommitted=true --concurrency=3`: Run all lint-commands of all projects that have changed compared to the master branch,
-include uncommitted changes, run 3 commands in parallel (default: 1). If a file in P1 is changed, only P1 is linted as defined by the lint-scope.
-* `yanice lint --branch=master --includeUncommitted=true --outputOnly=true`: Same as above, but instead of running the commands, the projects
-on which lint-commands would be executed are printed to the console
-* `yanice lint --branch=master --includeUncommitted=true --responsibles`: Print all responsibles. Note that we have to provide a scope (here: lint)
-in order to create the dependency graph. In this case, as per definition of the lint-scope, only responsibles of directly changed projects will be included.
-If you want to e.g. include responsibles of dependent projects (e.g. to approve changes in a library that they consume), this can be achieved
-by providing a different scope.
-* `yanice test --branch=master --includeUncommitted=true --concurrency=3`: Let's assume there is a changed file in lib-123. Since P1, P2, P3 all depend on lib-123
-as defined in the test-scope, test-commands would be executed on all of these. However, there is no 'test'-command defined for P2/P3, these are therefore
-skipped.
-* `yanice test --branch=master --includeUncommitted=true --outputOnly=true --includeCommandSupportedOnly=false`: Only output the projects,
-and also include affected projects that do not actually support the 'test'-command. "--includeCommandSupportedOnly=false" has only an effect
-in combination with "--outputOnly=true".
+## Example
+###Configuration
+The complete version of the `yanice.json` used for this example can be found here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/config/__test/fixtures/readme-example-yanice.json)
 
-### Upcoming features:
-* Currently, yanice can only detect changes between the current HEAD (or the working tree including uncommitted changes).
-Add "main-branch" (e.g. develop, master) support: Add options to incrementally detect changes on "main-branches" to reduce CI-overhead (incremental builds).
-Not sure yet if/how this can be achieved - one idea is to add git-notes to commits with metadeta about run commands. 
+The example corresponds to the graph in the picture above. `project-A` for example is defined as follows:
 
-### Example yanice.json:
-A few words on the structure:
-* Projects are defined by a glob and/or a regExp. Both are applied to any changed file to determine if it's part of the project. If the glob/regExp
-is not provided, it matches any file (i.e., if you do not provide either, a project consists of all files in the repo).
-* Files can be part of multiple projects
-* Commands and responsibles are optional. Commands have an optional "cwd"-property, if it is provided the command will be executed in that
-directory, otherwise in the same directory as the yanice.json.
 ```
 {
-  "$schema": "./node_modules/yanice/schema.json",
-  "projects": [
-    {
-      "projectName": "P1",
-      "pathGlob": "path/to/dir/P1/**",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-P1"
-        },
-        "test": {
-          "command": "npm run test-P1",
-          "cwd": "path/to/dir/P1"
-        }
-      },
-      "responsibles": [
-        "Alice"
-      ]
-    },
-    {
-      "projectName": "P2",
-      "pathGlob": "path/to/dir/P2/**",
-      "pathRegExp": "path/to/dir/P2",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-P2",
-          "cwd": "path/to/dir/P2"
-        }
-      },
-      "responsibles": [
-        "Bob"
-      ]
-    },
-    {
-      "projectName": "P3",
-      "pathRegExp": "path/to/dir/P3",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-P2",
-          "cwd": "path/to/dir/P2"
-        }
-      },
-      "responsibles": [
-        "Harry"
-      ]
-    },
-    {
-      "projectName": "lib-123",
-      "pathRegExp": "libs/lib-123",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-123"
-        },
-        "test": {
-          "command": "npm run test-lib-123",
-          "cwd": "libs/lib-123"
-        }
-      },
-      "responsibles": [
-        "David"
-      ]
-    },
-    {
-      "projectName": "lib-12",
-      "pathRegExp": "libs/lib-12",
-      "commands": {
-        "lint": {
-          "command": "npm run lint-lib-12"
-        },
-        "test": {
-          "command": "npm run test-lib-12",
-          "cwd": "libs/lib-12"
-        }
-      },
-      "responsibles": [
-        "Alice",
-        "Bob",
-        "Harry"
-      ]
-    }
-  ],
-  "dependencyScopes": {
-    "test": {
-      "P1": [
-        "lib-123", "lib-12"
-      ],
-      "P2": [
-        "lib-123", "lib-12"
-      ],
-      "P3": [
-        "lib-123"
-      ],
-      "lib-123": [],
-      "lib-12": []
-    },
+  "projectName": "project-A",
+  "pathGlob": "project-A/**",
+  "commands": {
     "lint": {
-      "P1": [],
-      "P2": [],
-      "P3": [],
-      "lib-123": [],
-      "lib-12": []
+      "command": "npm run lint-project-B",
+      "cwd": "./"
+    },
+    "test": {
+      "command": "npm run test-project-B"
     }
-  }
+  },
+  "responsibles": ["Bob", "Bill"]
 }
+```
+Every file in the repository that matches the given pathGlob (you can also use pathRegExp if preferred) will be part of the project.
+Note that the glob allows you to match any specific file or even no file at all: If you neither define the pathGlob nor the pathRegExp,
+all files in the repository will match. Projects such as "all-js-files" or "ci-relevant-files" can easily be modeled.
+
+A Command will be executed in the given `cwd`. A command corresponds to a scope (here: test, lint), for which a dependency graph is defined further below. E.g. for test, the dependencies
+are modeled as such: 
 
 ```
+"test": {
+  "project-A": ["lib-1", "lib-2", "important-repo-files"],
+  "project-B": ["lib-2", "important-repo-files"],
+  "lib-1": ["important-repo-files"],
+  "lib-2": ["important-repo-files"]
+}
+```
+
+###Commands
+In general, commands have the following base structure: `yanice <scope> --(rev|branch|commit)=<git-rev>`
+
+Per default, yanice will execute all commands of the selected scope along the dependency graph in topological order. The following options exist:
+
+| Option  | Default | Effect |
+| :------------------------------------ |----------| ------------- |
+| `--rev=<git-revision>`, `--branch=<git-branch>`, `--commit=<commitSHA>` | | git-revision with which the current working tree (w/o uncommitted changed, see below) will be compared. `--rev=<..>` accepts anything that `git rev-parse` can turn into a commit-SHA. Under the hood, yanice uses `git diff --name-only` in combination with `git merge-base --octopus` to determine the changed files. Therefore, yanice needs to know the corresponding refs/git-history, this is especially relevant with regards to shallow-clone.  |
+| `--output-only`, `outputOnly=false/true` | `false` | Will not execute the commands, only outputs which projects have changed/commands would be executed on.  |
+| `--all` |  | Ignore all change detection and just assume every project has changed.|
+| `--concurrency=n` | `1` | Will execute `n` commands in parallel |
+| `--responsibles` | | Will print all responsibles of all projects that are affected by changes as per given scope. This might be useful for determining who should e.g. review a pull request |
+| `--include-uncommitted`, `--includeUncommitted=true/false` | `true` | Whether to include uncommitted changes. Per default, uncommitted changes are considered, otherwise `HEAD` will be used for comparison|
+| `--includeCommandSupportedOnly=true/false` | `true` | Works only in combination with `--output-only`. Per default, projects for which a command is not specified will not be part of the output even if they are dependents of a changed project (e.g. a project that imports something from a changed library but does not have any tests and therefore no test-command)|
+| `--visualize` | | Will create a visualization of the graph, e.g. as in the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png)|
+| `--renderer=dagre/vizjs` | `dagre` | Only works in combination with `--visualize`. Will choose the renderer, available are [dagre](https://github.com/dagrejs/dagre) and [vizjs](https://github.com/mdaines/viz.js). |
+
+
+
+With the [configuration from above](https://github.com/abuob/yanice/blob/master/src/config/__test/fixtures/readme-example-yanice.json), we could run the following commands:
+* `yanice test --visualize --rev=HEAD`: Will create a visualization of the graph like in the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png).
+* `yanice lint --branch=master --concurrency=3`: Run all lint-commands of all projects that have changed compared to the master branch,
+include uncommitted changes (default), run 3 commands in parallel (default: 1).
+* `yanice lint --branch=master --outputOnly=true`: Same as above, but instead of running the commands, the projects
+on which lint-commands would be executed are printed to the console. 
+* `yanice test --branch=master --responsibles`: Print all responsibles. Note that we have to provide a scope (here: test)
+in order to create the dependency graph. 
+Yanice will collect all responsibles of the projects that are either directly changed or affected by changes, and log them to the console.
+
+### Roadmap:
+* Currently, maintenance/setup of the `yanice.json` can get cumbersome by an increasing/changing amount of projects inside the repository. Optional plugins that are able to detect project-dependencies
+by parsing import-statements and enforce boundaries could alleviate that.
+* Built-in incremental change-detection: Currently, if you run the same yanice-command twice (e.g. test), yanice will execute all commands again, even if there are no changes
+compared to the previous run. Store metadata about the last execution so that yanice will not run obviously redundant commands.

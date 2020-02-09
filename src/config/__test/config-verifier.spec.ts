@@ -25,7 +25,7 @@ describe('ConfigVerifier', () => {
         it('should return true for a valid yanice.json', () => {
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson1)).to.equal(true);
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson2 as any)).to.equal(true);
-            expect(ConfigVerifier.verifyDependencyScopeProjectNames(readmeYaniceJson)).to.equal(true);
+            expect(ConfigVerifier.verifyDependencyScopeProjectNames(readmeYaniceJson as any)).to.equal(true);
         });
         it('should return false for invalid yanice.json that uses projectNames under dependencyScopes which are not defined', () => {
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(invalidChildYaniceJson)).to.equal(false);
