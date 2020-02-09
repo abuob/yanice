@@ -2,6 +2,9 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "schemaVersion": {
+      "type": "number"
+    },
     "options": {
       "type": "object",
       "properties": {
@@ -84,6 +87,7 @@
     }
   },
   "required": [
+    "schemaVersion",
     "projects",
     "dependencyScopes"
   ]

@@ -220,6 +220,10 @@ export class YaniceExecutor {
             ConfigVerifier.printErrorOnVerifyYaniceJsonWithSchemaFailure(yaniceConfigJson);
             this.exitYanice(1, 'yanice.json does not conform to json-schema, please make sure your yanice.json is valid!');
         }
+        if (!ConfigVerifier.verifySchemaVersion(yaniceConfigJson)) {
+            ConfigVerifier.printErrorOnVerifySchemaVersionFailure(yaniceConfigJson);
+            this.exitYanice(1, null);
+        }
         if (!ConfigVerifier.verifyDependencyScopeProjectNames(yaniceConfigJson)) {
             ConfigVerifier.printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfigJson);
             this.exitYanice(

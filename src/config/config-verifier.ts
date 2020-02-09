@@ -27,6 +27,22 @@ export class ConfigVerifier {
         validator.validate(yaniceJson, schemaJson, { allowUnknownAttributes: false, throwError: true });
     }
 
+    public static verifySchemaVersion(yaniceJson: IYaniceJson): boolean {
+        const versionNumberOrUndefined: number = yaniceJson.schemaVersion;
+        return this.SUPPORTED_VERSIONS.includes(versionNumberOrUndefined);
+    }
+
+    public static printErrorOnVerifySchemaVersionFailure(yaniceJson: IYaniceJson): void {
+        const versionNumber: number = yaniceJson.schemaVersion;
+        log(
+            `schemaVersion ${
+                yaniceJson.schemaVersion
+            } is not or no longer supported! This version of yanice currently supports the following versions: ${this.SUPPORTED_VERSIONS.join(
+                ', '
+            )}`
+        );
+    }
+
     // ========= verifyDependencyScopeProjectNames
 
     public static verifyDependencyScopeProjectNames(yaniceConfig: IYaniceJson): boolean {
@@ -61,4 +77,8 @@ export class ConfigVerifier {
             });
         });
     }
+
+    // ========= verifySchemaVersion
+
+    private static readonly SUPPORTED_VERSIONS = [1];
 }

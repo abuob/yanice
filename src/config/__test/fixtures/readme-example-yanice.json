@@ -1,5 +1,6 @@
 {
   "$schema": "../../../../schema.json",
+  "schemaVersion": 1,
   "projects": [
     {
       "projectName": "P1",

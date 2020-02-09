@@ -11,6 +11,7 @@ export interface IYaniceJson {
         commandOutput?: commandOutputOptionsType;
         outputFilters?: commandOutputFilterType[];
     };
+    schemaVersion: number;
     projects: Array<{
         projectName: string;
         pathRegExp?: string;

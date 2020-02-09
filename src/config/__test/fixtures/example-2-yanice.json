@@ -1,5 +1,6 @@
 {
   "$schema": "../../../../schema.json",
+  "schemaVersion": 1,
   "options": {
     "commandOutput": "append-at-end",
     "outputFilters": ["npmError"]
