@@ -37,7 +37,62 @@
         z-index: 10;
         display: block;
     }
+
+    .legend {
+        background: lightgrey;
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .legend .legend-item {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        padding: 5px;
+    }
+
+    .legend .legend-rectangle {
+        width: 60px;
+        height: 20px;
+        border: 1.5px solid;
+        margin: 5px;
+    }
+
+    .legend .dashed-border {
+        border: 1.5px dashed;
+    }
+
+    .legend .red-border {
+        border: 1.5px solid #ff0000;
+    }
+
+    .legend .red-fill {
+        background: #ff0000;
+    }
+
+
 </style>
+<div class="legend">
+    <div class="legend-item">
+        <span><strong>Scope: </strong>INSERT_SCOPE</span>
+    </div>
+    <div class="legend-item">
+        <span><strong>git-revision to compare to: </strong>INSERT_GIT_REVISION</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-rectangle dashed-border"></div>
+        <span>Dashed border: Has no command to execute corresponding to the scope of the graph</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-rectangle red-border"></div>
+        <span>Red border: A dependency has changed compared to the given git-revision</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-rectangle red-border red-fill"></div>
+        <span>Red background: File(s) of this project have changed compared to the given git-revision</span>
+    </div>
+</div>
 <div class="svg-container">
     <svg id="svg-id" height="450" width="800" style="margin: auto; display: block">
         <g/>
@@ -45,19 +100,23 @@
 </div>
 <script>
 
-    // {
-    //     projectName: string;
-    //     edgesTo: string[];
-    //     responsibles: string[];
-    //     affectedFiles: string[];
-    //     isAffected: boolean
-    // }
-
     // Initialize an empty graph
     const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
 
-    // graphData corresponds to IYaniceGraphNodeInfo[] (see graph-dagre-renderer.ts)
-    const graphData = JSON.parse('INSERT-GRAPH-DATA-STRINGIFIED-HERE');
+    // graphData corresponds to IYaniceGraphNodeInfo[] (see graph-dagre-renderer.ts), an array of:
+    // {
+    //     projectName: string;
+    //     scope: string;
+    //     edgesTo: string[];
+    //     responsibles: string[];
+    //     changedFiles: string[];
+    //     isAffected: boolean;
+    //     command: IYaniceCommand | null;
+    //     pathGlob: string;
+    //     pathRegExp: string;
+    // }
+    const graphData = INSERT_GRAPH_DATA_OBJECT_HERE;
+    console.log(graphData);
 
     // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
     // is available: See e.g. "dagreGraph.node(d)"-usages below
@@ -98,12 +157,14 @@
     document.getElementById('svg-id').setAttribute("height", svgHeight + "px");
     document.getElementById('svg-id').setAttribute("width", svgWidth + "px");
 
+    // Attach tooltip-div. Note that there is only one such div, which will be rendered depending on which
+    // graph-node (project) is currently being hovered. If none is hovered, the tooltip-div is hidden
     const tooltip = d3.select(".svg-container")
         .append("div")
         .attr("class", "tooltip-content")
         .style("visibility", "hidden")
         .style("border", "solid")
-        .style("width", "230px")
+        .style("min-width", "600px")
         .style("border-width", "2px")
         .style("border-radius", "5px")
         .style("padding", "5px")
@@ -113,9 +174,10 @@
         const nodeData = dagreGraph.node(d);
         tooltip
             .style("visibility", "visible")
-            .html(nodeData.projectName) // TODO: Add additional info into tooltip
+            .html(getProjectInfoTable(nodeData))
             .style("left", nodeData.x + "px")
-            .style("top", (nodeData.y + 50) + "px");
+            .style("top", (nodeData.y + 50) + "px"); // the +50 takes makes the tooltip appear below the node
+        // TODO: Take zoom into account - zooming currently breaks tooltip-positioning
     };
     const mouseout = function (d) {
         tooltip
@@ -130,12 +192,84 @@
 
     function getNodeStyle(data) {
         var styleStr = "stroke-width: 2px;";
-        if (!data.hasCommandForScope) {
+        // If there is no command, the graph-node has dashed borders
+        if (!data.command) {
             styleStr = styleStr.concat("stroke-dasharray: 5, 5;");
         }
+        // If a project itself or one of its dependencies changed, outline is red
         if (data.isAffected) {
-            styleStr = styleStr.concat("fill: #d0172791;")
+            styleStr = styleStr.concat("stroke: #ff0000;")
+        }
+        // If the project changed directly (changed files), color entire node red
+        if (data.changedFiles.length > 0) {
+            styleStr = styleStr.concat("fill: #ff0000;")
         }
         return styleStr;
+    }
+
+    function getProjectInfoTable(nodeData) {
+        let table = ' <table style="width:100%">';
+
+        // Add basic info: Caption (project-name), pathGlob, pathRegExp
+        table = table.concat(
+            '<caption><strong>' + nodeData.projectName + '<strong></strong></caption>' +
+            '<tr>' +
+            '  <td>pathGlob:</td>' +
+            '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' + nodeData.pathGlob + '</td>' +
+            '</tr>' +
+            '<tr>' +
+            '  <td>pathRegExp:</td>' +
+            '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' + nodeData.pathRegExp + '</td>' +
+            '</tr>'
+        );
+
+        // Add responsibles, if there are any
+        if(nodeData.responsibles.length > 0) {
+            table = table.concat(
+                '<tr>' +
+                '  <td>responsibles:</td>' +
+                '  <td>' + nodeData.responsibles.join(', ') + '</td>' +
+                '</tr>'
+            );
+        }
+
+        // Add command if defined, add command-cwd if it's not the root directory
+        if (nodeData.command) {
+            table = table.concat(
+                '<tr>' +
+                '  <td><span style="font-family: courier; font-size: small;white-space: nowrap">' + nodeData.scope + '</span> command:</td>' +
+                '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' + nodeData.command.command + '</td>' +
+                '</tr>'
+            );
+            if (nodeData.command.cwd && nodeData.command.cwd !== './') {
+                table = table.concat(
+                    '<tr>' +
+                    '  <td style="white-space:nowrap">command directory:</td>' +
+                    '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' + nodeData.command.cwd + '</td>' +
+                    '</tr>'
+                );
+            }
+        }
+
+        // Add dependents if there are any
+        if (nodeData.edgesTo.length > 0) {
+            table = table.concat(
+                '<tr>' +
+                '  <td>Dependents:</td>' +
+                '  <td>' + nodeData.edgesTo.join(', ') + '</td>' +
+                '</tr>'
+            )
+        }
+
+        // If there are changed files, list them
+        if (nodeData.changedFiles.length > 0) {
+            table = table.concat(
+                '  <tr>' +
+                '    <td style="white-space:nowrap">Changed files:</td>' +
+                '    <td><ul style="font-family: courier; font-size: x-small;white-space:nowrap;list-style:none;padding:0;margin:0";>' + nodeData.changedFiles.map(f => '<li>' + f + '</li>').join('') + '</ul></td>' +
+                '  </tr>'
+            )
+        }
+        return table + '</table>';
     }
 </script>

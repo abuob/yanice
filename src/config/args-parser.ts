@@ -13,6 +13,7 @@ export interface IYaniceArgs {
     outputOnly: boolean;
     outputResponsibles: boolean;
     visualizeDepGraph: boolean;
+    graphRenderer: 'DAGREJS' | 'VIZJS';
     concurrency: number;
 }
 
@@ -35,6 +36,7 @@ export class ArgsParser {
             outputOnly: false,
             outputResponsibles: false,
             visualizeDepGraph: false,
+            graphRenderer: 'DAGREJS',
             concurrency: 1
         };
         argv.slice(1).forEach(arg => {
@@ -92,6 +94,14 @@ export class ArgsParser {
             }
             if (/^--visualize$/.test(arg)) {
                 resultArgs.visualizeDepGraph = true;
+                return;
+            }
+            if (/^--renderer=dagre$/.test(arg)) {
+                resultArgs.graphRenderer = 'DAGREJS';
+                return;
+            }
+            if (/^--renderer=vizjs$/.test(arg)) {
+                resultArgs.graphRenderer = 'VIZJS';
                 return;
             }
             if (/^--all$/.test(arg)) {
