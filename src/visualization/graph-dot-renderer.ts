@@ -14,7 +14,8 @@ export class GraphDotRenderer {
     private static getAllEdgeDeclarations(directedGraph: IDirectedGraph): string {
         return directedGraph.nodes
             .map(ancestor =>
-                ancestor.edgesTo
+                ancestor
+                    .getConnectedNodes()
                     .map(
                         child =>
                             `${GraphDotRenderer.getDotConformNodeName(ancestor.name)} -> ${GraphDotRenderer.getDotConformNodeName(

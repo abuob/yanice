@@ -1,10 +1,23 @@
-interface IDirectedGraphNode {
-    name: string;
-    edgesTo: IDirectedGraphNode[];
+export class DirectedGraphNode {
+    public readonly name: string;
+    private edgesTo: DirectedGraphNode[];
+
+    constructor(name: string) {
+        this.name = name;
+        this.edgesTo = [];
+    }
+
+    public getConnectedNodes(): DirectedGraphNode[] {
+        return this.edgesTo;
+    }
+
+    public addEdgeTowards(node: DirectedGraphNode): void {
+        this.edgesTo.push(node);
+    }
 }
 
 export interface IDirectedGraph {
-    nodes: IDirectedGraphNode[];
+    nodes: DirectedGraphNode[];
 }
 
 export class DirectedGraphUtil {
@@ -13,7 +26,7 @@ export class DirectedGraphUtil {
     }
 
     public static hasCycle(graph: IDirectedGraph): boolean {
-        let visitedAlready: IDirectedGraphNode[] = [];
+        let visitedAlready: DirectedGraphNode[] = [];
         let result = false;
         graph.nodes.forEach(node => {
             if (this.hasCycleRecursive(node, visitedAlready, [])) {
@@ -74,19 +87,22 @@ export class DirectedGraphUtil {
         return this.getNodeAndTransitiveChildrenNames(graph, ancestor).includes(descendant);
     }
 
-    private static getNodeAndTransitiveChildren(node: IDirectedGraphNode): IDirectedGraphNode[] {
-        if (node.edgesTo.length === 0) {
+    private static getNodeAndTransitiveChildren(node: DirectedGraphNode): DirectedGraphNode[] {
+        if (node.getConnectedNodes().length === 0) {
             return [node];
         }
         return this.removeDupliateEntries(
-            node.edgesTo.map(n => this.getNodeAndTransitiveChildren(n)).reduce((prev, curr) => prev.concat(curr), [node])
+            node
+                .getConnectedNodes()
+                .map(n => this.getNodeAndTransitiveChildren(n))
+                .reduce((prev, curr) => prev.concat(curr), [node])
         );
     }
 
     private static hasCycleRecursive(
-        node: IDirectedGraphNode,
-        visitedAlready: IDirectedGraphNode[],
-        nodesInDfsTraversal: IDirectedGraphNode[]
+        node: DirectedGraphNode,
+        visitedAlready: DirectedGraphNode[],
+        nodesInDfsTraversal: DirectedGraphNode[]
     ): boolean {
         if (visitedAlready.includes(node)) {
             return false;
@@ -94,12 +110,13 @@ export class DirectedGraphUtil {
         if (nodesInDfsTraversal.includes(node)) {
             return true;
         }
-        return node.edgesTo
+        return node
+            .getConnectedNodes()
             .map(connectedNode => this.hasCycleRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
             .reduce((prev, curr) => prev || curr, false);
     }
 
-    private static getNodeByName(graph: IDirectedGraph, name: string): IDirectedGraphNode | null {
+    private static getNodeByName(graph: IDirectedGraph, name: string): DirectedGraphNode | null {
         const givenNode = graph.nodes.find(n => n.name === name);
         if (!givenNode) {
             return null;
@@ -122,7 +139,7 @@ class DirectedGraphBuilder {
         if (this.graph.nodes.map(n => n.name).includes(name)) {
             throw Error(`Cannot add a node with name "${name}" to the graph, such a node already exists!`);
         }
-        this.graph.nodes = this.graph.nodes.concat({ name, edgesTo: [] });
+        this.graph.nodes = this.graph.nodes.concat(new DirectedGraphNode(name));
         return this;
     }
 
@@ -132,7 +149,7 @@ class DirectedGraphBuilder {
         if (!fromNode || !toNode) {
             return this;
         }
-        fromNode.edgesTo = fromNode.edgesTo.concat(toNode);
+        fromNode.addEdgeTowards(toNode);
         return this;
     }
 

@@ -41,52 +41,47 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph when given example-1-yanice.json with test-scope', () => {
-            expect(ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'lint')).to.deep.equal({nodes: [
-                    {name: 'A', edgesTo: []},
-                    {name: 'B', edgesTo: []},
-                    {name: 'C', edgesTo: []},
-                    {name: 'D', edgesTo: []},
-                    {name: 'E', edgesTo: []},
-                ]});
+            const actualGraph = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'lint');
+            expect(actualGraph!.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
         });
 
         it('should properly create a directed graph when given example-2-yanice.json with test-scope', () => {
             const actualGraph = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any), 'test');
             expect(actualGraph).to.not.equal(null);
-            expect(actualGraph!.nodes.find(n => n.name === 'project-A')!.edgesTo.map(n => n.name)).to.have.same.members([]);
-            expect(actualGraph!.nodes.find(n => n.name === 'lib-1')!.edgesTo.map(n => n.name)).to.have.same.members(['project-A']);
+            expect(actualGraph!.nodes.find(n => n.name === 'project-A')!.getConnectedNodes().map(n => n.name)).to.have.same.members([]);
+            expect(actualGraph!.nodes.find(n => n.name === 'lib-1')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['project-A']);
             expect(DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(actualGraph!, ['lib-1'])).to.have.same.members(['project-A', 'lib-1']);
         });
 
         it('should properly create a directed graph when given a scope-definition', () => {
             const actualGraphForTestScope = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'test');
             expect(actualGraphForTestScope).to.not.equal(null);
-            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'A')!.edgesTo.map(n => n.name)).to.have.same.members([]);
-            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'B')!.edgesTo.map(n => n.name)).to.have.same.members(['A']);
-            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'C')!.edgesTo.map(n => n.name)).to.have.same.members(['A']);
-            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'D')!.edgesTo.map(n => n.name)).to.have.same.members(['C', 'B']);
-            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'E')!.edgesTo.map(n => n.name)).to.have.same.members(['D']);
+            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'A')!.getConnectedNodes().map(n => n.name)).to.have.same.members([]);
+            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'B')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['A']);
+            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'C')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['A']);
+            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'D')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['C', 'B']);
+            expect(actualGraphForTestScope!.nodes.find(n => n.name === 'E')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['D']);
             expect(DirectedGraphUtil.hasCycle(actualGraphForTestScope!)).to.equal(false);
         });
 
         it('should properly create a directed graph even when given a scope-definition containing an illegal cycle', () => {
             const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson1), 'illegalCycle');
             expect(actualGraphForIllegalCycleScope).to.not.equal(null);
-            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'A')!.edgesTo.map(n => n.name)).to.have.same.members(['E']);
-            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'B')!.edgesTo.map(n => n.name)).to.have.same.members(['A']);
-            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'C')!.edgesTo.map(n => n.name)).to.have.same.members(['B']);
-            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'D')!.edgesTo.map(n => n.name)).to.have.same.members(['C']);
-            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'E')!.edgesTo.map(n => n.name)).to.have.same.members(['D']);
+            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'A')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['E']);
+            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'B')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['A']);
+            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'C')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['B']);
+            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'D')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['C']);
+            expect(actualGraphForIllegalCycleScope!.nodes.find(n => n.name === 'E')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['D']);
             expect(DirectedGraphUtil.hasCycle(actualGraphForIllegalCycleScope!)).to.equal(true);
         });
 
         it('should create nodes for projects even if they are not explicitly listed in the dependency scope', () => {
-            expect(ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any), 'build-some')).to.deep.equal({nodes: [
-                    {name: 'project-A', edgesTo: []},
-                    {name: 'project-B', edgesTo: []},
-                    {name: 'lib-1', edgesTo: [{name: 'project-A', edgesTo: []}]},
-                    {name: 'lib-2', edgesTo: [{name: 'project-B', edgesTo: []}]},
-                ]});
+            const actualGraph = ConfigParser.getDepGraphFromConfigByScope(ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any), 'build-some');
+            expect(actualGraph!.nodes.map(n => n.name)).to.have.same.members(['project-A', 'project-B', 'lib-1', 'lib-2']);
+            expect(actualGraph!.nodes.find(n => n.name === 'project-A')!.getConnectedNodes().map(n => n.name)).to.have.same.members([]);
+            expect(actualGraph!.nodes.find(n => n.name === 'project-B')!.getConnectedNodes().map(n => n.name)).to.have.same.members([]);
+            expect(actualGraph!.nodes.find(n => n.name === 'lib-1')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['project-A']);
+            expect(actualGraph!.nodes.find(n => n.name === 'lib-2')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['project-B']);
         });
     });
 });

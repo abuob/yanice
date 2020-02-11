@@ -216,25 +216,23 @@ describe('DirectedGraphUtil', () => {
 
     describe('directedGraphBuilder', () => {
         it('should create the graphs correctly', () => {
-            expect(DirectedGraphUtil.directedGraphBuilder
+            const graph1 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
                 .addNode('B')
                 .addNode('C')
-                .build()).to.deep.equal({nodes: [
-                    {name: 'A', edgesTo: []},
-                    {name: 'B', edgesTo: []},
-                    {name: 'C', edgesTo: []},
-                ]});
-            expect(DirectedGraphUtil.directedGraphBuilder
+                .build();
+            const graph2 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
                 .addNode('B')
                 .addNode('C')
                 .createDirectedEdge('A', 'B')
-                .build()).to.deep.equal({nodes: [
-                    {name: 'A', edgesTo: [{name: 'B', edgesTo: []}]},
-                    {name: 'B', edgesTo: []},
-                    {name: 'C', edgesTo: []},
-                ]});
+                .createDirectedEdge('A', 'C')
+                .createDirectedEdge('B', 'C')
+                .build();
+            expect(graph1.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C']);
+            expect(graph2.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C']);
+            expect(graph2.nodes.find(n => n.name === 'A')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['B', 'C']);
+            expect(graph2.nodes.find(n => n.name === 'B')!.getConnectedNodes().map(n => n.name)).to.have.same.members(['C']);
         });
 
         it('should throw an error when trying to add another node with the same name', () => {
