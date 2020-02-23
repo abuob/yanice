@@ -6,14 +6,6 @@ export class FindFileUtil {
         return this.findFileInParentDirsRecursively(initialDir, fileName);
     }
 
-    /**
-     * @deprecated
-     * TODO Remove
-     */
-    public static findFileInParentDirs(fileName: string): string | null {
-        return this.findFileInParentDirsRecursively(process.cwd(), fileName);
-    }
-
     private static findFileInParentDirsRecursively(currentDir: string, fileName: string): string | null {
         if (this.isFilePathValid(`${currentDir}/${fileName}`)) {
             // We found the file!

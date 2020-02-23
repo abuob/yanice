@@ -9,8 +9,6 @@ import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
 import { DepGraphVisualizationServer } from './visualization/dep-graph-visualization-server';
-import { GraphDagreRenderer } from './visualization/graph-dagre-renderer';
-import { GraphDotRenderer } from './visualization/graph-dot-renderer';
 
 export class YaniceExecutor {
     private baseDirectory: string | null = null;
@@ -24,7 +22,7 @@ export class YaniceExecutor {
     private responsibles: string[] = [];
 
     public loadConfiguration(): YaniceExecutor {
-        const yaniceConfigPath = FindFileUtil.findFileInParentDirs('yanice.json');
+        const yaniceConfigPath = FindFileUtil.findFileInParentDirsFromInitialDir('yanice.json', process.cwd());
         if (!yaniceConfigPath) {
             this.exitYanice(1, 'yanice.json not found!');
             return this;
