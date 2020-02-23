@@ -9,7 +9,7 @@ describe('YaniceExecutor', () => {
     beforeEach(() => {
         yaniceExecutor = new YaniceExecutor();
         (yaniceExecutor as any).baseDirectory = process.cwd();
-        (yaniceExecutor as any).yaniceConfig = ConfigParser.getConfigFromYaniceJson(yaniceJson);
+        (yaniceExecutor as any).yaniceConfig = ConfigParser.getConfigFromYaniceJson(yaniceJson as any);
         (yaniceExecutor as any).changedFiles = [
             "path/to/dir/A/some-A-file",
             "path/to/dir/B/some-B-file",
