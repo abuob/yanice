@@ -8,7 +8,7 @@ import { execucteInParallelLimited, ICommandExecutionResult } from './util/execu
 import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
-import { DepGraphVisualizationServer } from './visualization/dep-graph-visualization-server';
+import { DepGraphVisualization } from './visualization/dep-graph-visualization';
 
 export class YaniceExecutor {
     private baseDirectory: string | null = null;
@@ -140,20 +140,29 @@ export class YaniceExecutor {
     }
 
     public visualizeDepGraphIfInVisualizationMode(): YaniceExecutor {
-        if (this.yaniceArgs && this.yaniceArgs.visualizeDepGraph && this.depGraph && this.yaniceConfig) {
-            switch (this.yaniceArgs.graphRenderer) {
-                case 'DAGREJS':
-                    DepGraphVisualizationServer.serveDagreGraph(
-                        this.depGraph,
-                        this.yaniceConfig,
-                        this.yaniceArgs,
-                        this.affectedProjectsUnfiltered,
-                        this.changedFiles
-                    );
-                    break;
-                case 'VIZJS':
-                    DepGraphVisualizationServer.serveDotVizJsGraph(this.depGraph);
-                    break;
+        if (
+            this.yaniceArgs &&
+            (this.yaniceArgs.visualizeDepGraph || this.yaniceArgs.saveDepGraphVisualization) &&
+            this.depGraph &&
+            this.yaniceConfig &&
+            this.baseDirectory
+        ) {
+            const html: string = DepGraphVisualization.createVisualizationHtml(
+                this.depGraph,
+                this.yaniceConfig,
+                this.yaniceArgs,
+                this.affectedProjectsUnfiltered,
+                this.changedFiles
+            );
+            if (this.yaniceArgs.visualizeDepGraph) {
+                DepGraphVisualization.startServer(html, this.yaniceConfig.options.port);
+            } else {
+                DepGraphVisualization.saveTemplateFile(
+                    this.baseDirectory,
+                    this.yaniceConfig.options.outputFolder,
+                    `dependency-graph.${this.yaniceArgs.givenScope}.html`,
+                    html
+                );
             }
         }
         return this;
@@ -161,7 +170,12 @@ export class YaniceExecutor {
 
     public executeCommands(): YaniceExecutor {
         // TODO Refactor: Make execution of commands/output-only/visualization independent. They should not be aware of each other.
-        if (this.yaniceConfig && this.yaniceArgs && this.baseDirectory && !this.yaniceArgs.visualizeDepGraph) {
+        if (
+            this.yaniceConfig &&
+            this.yaniceArgs &&
+            this.baseDirectory &&
+            !(this.yaniceArgs.visualizeDepGraph || this.yaniceArgs.saveDepGraphVisualization)
+        ) {
             const scope = this.yaniceArgs.givenScope;
             const commands: IYaniceCommand[] = this.yaniceConfig.projects
                 .filter(project => this.affectedProjects.includes(project.projectName))

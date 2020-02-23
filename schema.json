@@ -16,8 +16,15 @@
           "items": {
             "enum": ["npmError", "karmaProgressSuccess", "ignoreStderr", "ignoreStdout"]
           }
+        },
+        "outputFolder": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "projects": {
       "type": "array",

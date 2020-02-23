@@ -3,7 +3,9 @@
   "schemaVersion": 1,
   "options": {
     "commandOutput": "append-at-end",
-    "outputFilters": ["npmError"]
+    "outputFilters": ["npmError"],
+    "outputFolder": "./.yanice-graph-output",
+    "port": 7777
   },
   "projects": [
     {

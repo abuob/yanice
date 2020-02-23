@@ -10,12 +10,16 @@ describe('ConfigParser', () => {
             const actualYaniceConfig1 = ConfigParser.getConfigFromYaniceJson(yaniceJson1 as any);
             expect(actualYaniceConfig1.options.outputFilters).to.have.same.members([]);
             expect(actualYaniceConfig1.options.commandOutput).to.equal('ignore');
+            expect(actualYaniceConfig1.options.outputFolder).to.equal('./.yanice-output');
+            expect(actualYaniceConfig1.options.port).to.equal(4567);
         });
 
         it('should set the options to the values specified in the yaniceJson', () => {
             const actualYaniceConfig2 = ConfigParser.getConfigFromYaniceJson(yaniceJson2 as any);
             expect(actualYaniceConfig2.options.outputFilters).to.have.same.members(['npmError']);
             expect(actualYaniceConfig2.options.commandOutput).to.equal('append-at-end');
+            expect(actualYaniceConfig2.options.outputFolder).to.equal('./.yanice-graph-output');
+            expect(actualYaniceConfig2.options.port).to.equal(7777);
         });
     });
 

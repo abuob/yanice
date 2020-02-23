@@ -1,5 +1,7 @@
 import { log } from '../util/log';
 
+export type graphRendererType = 'DAGREJS' | 'VIZJS';
+
 export interface IYaniceArgs {
     givenScope: string;
     diffTarget: {
@@ -13,7 +15,8 @@ export interface IYaniceArgs {
     outputOnly: boolean;
     outputResponsibles: boolean;
     visualizeDepGraph: boolean;
-    graphRenderer: 'DAGREJS' | 'VIZJS';
+    saveDepGraphVisualization: boolean;
+    graphRenderer: graphRendererType;
     concurrency: number;
 }
 
@@ -36,6 +39,7 @@ export class ArgsParser {
             outputOnly: false,
             outputResponsibles: false,
             visualizeDepGraph: false,
+            saveDepGraphVisualization: false,
             graphRenderer: 'DAGREJS',
             concurrency: 1
         };
@@ -94,6 +98,10 @@ export class ArgsParser {
             }
             if (/^--visualize$/.test(arg)) {
                 resultArgs.visualizeDepGraph = true;
+                return;
+            }
+            if (/^--save-visualization$/.test(arg)) {
+                resultArgs.saveDepGraphVisualization = true;
                 return;
             }
             if (/^--renderer=dagre$/.test(arg)) {

@@ -13,6 +13,7 @@ describe('ArgsParser', () => {
             const actualArgs7 = ArgsParser.parseArgs(["lint", "--rev=HEAD~1"]);
             const actualArgs8 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=dagre", "--branch=master"]);
             const actualArgs9 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=vizjs"]);
+            const actualArgs10 = ArgsParser.parseArgs(["lint", "--save-visualization", "--renderer=vizjs", "--branch=master"]);
 
             const args: IYaniceArgs = {
                 givenScope: 'lint',
@@ -27,6 +28,7 @@ describe('ArgsParser', () => {
                 outputOnly: false,
                 outputResponsibles: false,
                 visualizeDepGraph: false,
+                saveDepGraphVisualization: false,
                 graphRenderer: 'DAGREJS',
                 concurrency: 1
             };
@@ -92,6 +94,11 @@ describe('ArgsParser', () => {
                     rev: null
                 },
                 visualizeDepGraph: true,
+                graphRenderer: 'VIZJS'
+            });
+            expect(actualArgs10).to.deep.equal({
+                ...args,
+                saveDepGraphVisualization: true,
                 graphRenderer: 'VIZJS'
             });
         });

@@ -10,6 +10,8 @@ export interface IYaniceJson {
     options?: {
         commandOutput?: commandOutputOptionsType;
         outputFilters?: commandOutputFilterType[];
+        outputFolder?: string;
+        port?: number;
     };
     schemaVersion: number;
     projects: Array<{
@@ -54,6 +56,8 @@ export interface IYaniceConfig {
     options: {
         commandOutput: commandOutputOptionsType;
         outputFilters: commandOutputFilterType[];
+        outputFolder: string;
+        port: number;
     };
     projects: IYaniceProject[];
     dependencyScopes: {
@@ -69,7 +73,9 @@ export class ConfigParser {
         return {
             options: {
                 commandOutput: yaniceJson.options && yaniceJson.options.commandOutput ? yaniceJson.options.commandOutput : 'ignore',
-                outputFilters: yaniceJson.options && yaniceJson.options.outputFilters ? yaniceJson.options.outputFilters : []
+                outputFilters: yaniceJson.options && yaniceJson.options.outputFilters ? yaniceJson.options.outputFilters : [],
+                outputFolder: yaniceJson.options && yaniceJson.options.outputFolder ? yaniceJson.options.outputFolder : './.yanice-output',
+                port: yaniceJson.options && yaniceJson.options.port ? yaniceJson.options.port : 4567
             },
             projects: yaniceJson.projects.map(
                 (project): IYaniceProject => {
