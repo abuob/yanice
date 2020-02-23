@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
     "schemaVersion": {
@@ -34,26 +34,7 @@
           "pathRegExp": {
             "type": "string"
           },
-          "commands": {
-            "type": "object",
-            "patternProperties": {
-              "^[a-zA-Z][0-9a-zA-Z-]*$": {
-                "type": "object",
-                "properties": {
-                  "command": {
-                    "type": "string"
-                  },
-                  "cwd": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "command"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
+          "commands": { "$ref":  "#commands"},
           "responsibles": {
             "type": "array",
             "items": {
@@ -80,7 +61,8 @@
                 "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
               }
             }
-          }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -90,5 +72,28 @@
     "schemaVersion",
     "projects",
     "dependencyScopes"
-  ]
+  ],
+  "definitions": {
+    "commands": {
+      "$id": "#commands",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][0-9a-zA-Z-]*$": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string"
+            },
+            "cwd": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "command"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  }
 }

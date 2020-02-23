@@ -34,9 +34,9 @@
   "homepage": "https://github.com/abuob/yanice#readme",
   "dependencies": {
     "async": "^3.1.0",
-    "jsonschema": "^1.2.5",
     "minimatch": "^3.0.4",
-    "open": "^7.0.2"
+    "open": "^7.0.2",
+    "ajv": "^6.12.0"
   },
   "devDependencies": {
     "@types/async": "^3.0.2",

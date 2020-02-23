@@ -1,8 +1,7 @@
+import Ajv from 'ajv';
 import schemaJson from '../../schema.json';
 import { log } from '../util/log';
 import { IYaniceJson } from './config-parser';
-
-const jsonschemaValidator = require('jsonschema').Validator;
 
 /**
  * Concept: Each verification-method has a corresponding "printErrorOn<verification>Failure"-method, which will be called
@@ -16,16 +15,25 @@ export class ConfigVerifier {
         if (!yaniceJson) {
             return false;
         }
-        const validator = new jsonschemaValidator();
-        const validationResult = validator.validate(yaniceJson, schemaJson, { allowUnknownAttributes: false, throwError: false });
-        return validationResult.valid;
+        const ajv = new Ajv();
+        const validate = ajv.compile(schemaJson);
+        const validationResult = validate(yaniceJson);
+        return !!validationResult;
     }
 
     public static printErrorOnVerifyYaniceJsonWithSchemaFailure(yaniceJson: any): void {
         log('The yanice.json file does not conform to the json schema! Detected Error:');
-        const validator = new jsonschemaValidator();
-        validator.validate(yaniceJson, schemaJson, { allowUnknownAttributes: false, throwError: true });
+        const ajv = new Ajv();
+        const validate = ajv.compile(schemaJson);
+        const validationResult = validate(yaniceJson);
+
+        // Due to terrible ajv-api: The errors of the validation are stored on the validate-object
+        if (!validationResult && validate.errors) {
+            log(validate.errors);
+        }
     }
+
+    // ========= verifySchemaVersion
 
     public static verifySchemaVersion(yaniceJson: IYaniceJson): boolean {
         const versionNumberOrUndefined: number = yaniceJson.schemaVersion;
@@ -77,8 +85,6 @@ export class ConfigVerifier {
             });
         });
     }
-
-    // ========= verifySchemaVersion
 
     private static readonly SUPPORTED_VERSIONS = [1];
 }
