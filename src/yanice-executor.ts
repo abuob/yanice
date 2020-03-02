@@ -196,8 +196,8 @@ export class YaniceExecutor {
                     }
                 },
                 (commandsExecutionResults: ICommandExecutionResult[]) => {
-                    if (this.yaniceConfig) {
-                        LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, commandsExecutionResults);
+                    if (this.yaniceConfig && this.yaniceArgs) {
+                        LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, this.yaniceArgs, commandsExecutionResults);
                     }
                     if (commandsExecutionResults.some(result => result.exitCode !== 0)) {
                         this.exitYanice(1, null);

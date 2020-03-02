@@ -4,16 +4,18 @@ import { expect } from 'chai';
 describe('ArgsParser', () => {
     describe('parseArgs', () => {
         it('should parse valid arguments correctly', () => {
-            const actualArgs1 = ArgsParser.parseArgs(["lint", "--branch=master", "--includeUncommitted=true"]);
-            const actualArgs2 = ArgsParser.parseArgs(["test", "--branch=master", "--includeUncommitted=false", "--concurrency=123"]);
-            const actualArgs3 = ArgsParser.parseArgs(["build", "--commit=1234567", "--concurrency=3"]);
-            const actualArgs4 = ArgsParser.parseArgs(["build", "--all", "--responsibles"]);
-            const actualArgs5 = ArgsParser.parseArgs(["lint", "--branch=master", "--include-uncommitted", "--output-only"]);
-            const actualArgs6 = ArgsParser.parseArgs(["lint", "--branch=master", "--outputOnly=false"]);
-            const actualArgs7 = ArgsParser.parseArgs(["lint", "--rev=HEAD~1"]);
-            const actualArgs8 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=dagre", "--branch=master"]);
-            const actualArgs9 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=vizjs"]);
+            const actualArgs01 = ArgsParser.parseArgs(["lint", "--branch=master", "--includeUncommitted=true"]);
+            const actualArgs02 = ArgsParser.parseArgs(["test", "--branch=master", "--includeUncommitted=false", "--concurrency=123"]);
+            const actualArgs03 = ArgsParser.parseArgs(["build", "--commit=1234567", "--concurrency=3"]);
+            const actualArgs04 = ArgsParser.parseArgs(["build", "--all", "--responsibles"]);
+            const actualArgs05 = ArgsParser.parseArgs(["lint", "--branch=master", "--include-uncommitted", "--output-only"]);
+            const actualArgs06 = ArgsParser.parseArgs(["lint", "--branch=master", "--outputOnly=false"]);
+            const actualArgs07 = ArgsParser.parseArgs(["lint", "--rev=HEAD~1"]);
+            const actualArgs08 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=dagre", "--branch=master"]);
+            const actualArgs09 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=vizjs"]);
             const actualArgs10 = ArgsParser.parseArgs(["lint", "--save-visualization", "--renderer=vizjs", "--branch=master"]);
+            const actualArgs11 = ArgsParser.parseArgs(["lint", "--branch=master", "--output-mode=append-at-end-on-error"]);
+            const actualArgs12 = ArgsParser.parseArgs(["lint", "--branch=master", "--output-mode=ignore"]);
 
             const args: IYaniceArgs = {
                 givenScope: 'lint',
@@ -30,20 +32,21 @@ describe('ArgsParser', () => {
                 visualizeDepGraph: false,
                 saveDepGraphVisualization: false,
                 graphRenderer: 'DAGREJS',
+                commandOutputMode: null,
                 concurrency: 1
             };
 
-            expect(actualArgs1).to.deep.equal({
+            expect(actualArgs01).to.deep.equal({
                 ...args,
                 includeUncommitted: true
             });
-            expect(actualArgs2).to.deep.equal({
+            expect(actualArgs02).to.deep.equal({
                 ...args,
                 givenScope: 'test',
                 concurrency: 123,
                 includeUncommitted: false
             });
-            expect(actualArgs3).to.deep.equal({
+            expect(actualArgs03).to.deep.equal({
                 ...args,
                 givenScope: 'build',
                 diffTarget: {
@@ -53,7 +56,7 @@ describe('ArgsParser', () => {
                 },
                 concurrency: 3
             });
-            expect(actualArgs4).to.deep.equal({
+            expect(actualArgs04).to.deep.equal({
                 ...args,
                 givenScope: 'build',
                 diffTarget: {
@@ -66,15 +69,15 @@ describe('ArgsParser', () => {
                 outputResponsibles: true,
                 concurrency: 1
             });
-            expect(actualArgs5).to.deep.equal({
+            expect(actualArgs05).to.deep.equal({
                 ...args,
                 includeCommandSupportedOnly: true,
                 outputOnly: true
             });
-            expect(actualArgs6).to.deep.equal({
+            expect(actualArgs06).to.deep.equal({
                 ...args
             });
-            expect(actualArgs7).to.deep.equal({
+            expect(actualArgs07).to.deep.equal({
                 ...args,
                 diffTarget: {
                     branch: null,
@@ -82,11 +85,11 @@ describe('ArgsParser', () => {
                     rev: 'HEAD~1'
                 }
             });
-            expect(actualArgs8).to.deep.equal({
+            expect(actualArgs08).to.deep.equal({
                 ...args,
                 visualizeDepGraph: true
             });
-            expect(actualArgs9).to.deep.equal({
+            expect(actualArgs09).to.deep.equal({
                 ...args,
                 diffTarget: {
                     branch: null,
@@ -100,6 +103,14 @@ describe('ArgsParser', () => {
                 ...args,
                 saveDepGraphVisualization: true,
                 graphRenderer: 'VIZJS'
+            });
+            expect(actualArgs11).to.deep.equal({
+                ...args,
+                commandOutputMode: 'append-at-end-on-error'
+            });
+            expect(actualArgs12).to.deep.equal({
+                ...args,
+                commandOutputMode: 'ignore'
             });
         });
     });

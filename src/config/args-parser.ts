@@ -1,4 +1,5 @@
 import { log } from '../util/log';
+import { commandOutputOptionsType } from './config-parser';
 
 export type graphRendererType = 'DAGREJS' | 'VIZJS';
 
@@ -18,6 +19,7 @@ export interface IYaniceArgs {
     saveDepGraphVisualization: boolean;
     graphRenderer: graphRendererType;
     concurrency: number;
+    commandOutputMode: commandOutputOptionsType | null;
 }
 
 export class ArgsParser {
@@ -41,6 +43,7 @@ export class ArgsParser {
             visualizeDepGraph: false,
             saveDepGraphVisualization: false,
             graphRenderer: 'DAGREJS',
+            commandOutputMode: null,
             concurrency: 1
         };
         argv.slice(1).forEach(arg => {
@@ -110,6 +113,18 @@ export class ArgsParser {
             }
             if (/^--renderer=vizjs$/.test(arg)) {
                 resultArgs.graphRenderer = 'VIZJS';
+                return;
+            }
+            if (/^--output-mode=ignore$/.test(arg)) {
+                resultArgs.commandOutputMode = 'ignore';
+                return;
+            }
+            if (/^--output-mode=append-at-end$/.test(arg)) {
+                resultArgs.commandOutputMode = 'append-at-end';
+                return;
+            }
+            if (/^--output-mode=append-at-end-on-error$/.test(arg)) {
+                resultArgs.commandOutputMode = 'append-at-end-on-error';
                 return;
             }
             if (/^--all$/.test(arg)) {
