@@ -80,7 +80,7 @@ Per default, yanice will execute all commands of the selected scope along the de
 
 
 
-With the [configuration from above](https://github.com/abuob/yanice/blob/master/src/config/__test/fixtures/readme-example-yanice.json), we could run the following commands:
+With the [configuration from above](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json), we could run the following commands:
 * `yanice test --visualize --rev=HEAD`: Will create a visualization of the graph like in the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png).
 * `yanice lint --branch=master --concurrency=3`: Run all lint-commands of all projects that have changed compared to the master branch,
 include uncommitted changes (default), run 3 commands in parallel (default: 1).

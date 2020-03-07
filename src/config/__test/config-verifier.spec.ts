@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { ConfigVerifier } from '../config-verifier'
-import yaniceJson1 from './fixtures/example-1-yanice.json';
-import yaniceJson2 from './fixtures/example-2-yanice.json';
-import readmeYaniceJson from './fixtures/readme-example-yanice.json';
-import invalidChildYaniceJson from './fixtures/invalid-child-project-name.yanice.json';
-import invalidParentYaniceJson from './fixtures/invalid-parent-project-name.yanice.json';
+import yaniceJson1 from '../../__fixtures/valid-2.yanice.json';
+import yaniceJson2 from '../../__fixtures/valid-3.yanice.json';
+import readmeYaniceJson from '../../__fixtures/readme-example-yanice.json';
+import invalidChildYaniceJson from '../../__fixtures/invalid/invalid-child-project-name.yanice.json';
+import invalidParentYaniceJson from '../../__fixtures/invalid/invalid-parent-project-name.yanice.json';
 
 describe('ConfigVerifier', () => {
     describe('verifyYaniceJsonWithSchema', () => {

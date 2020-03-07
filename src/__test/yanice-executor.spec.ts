@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { YaniceExecutor } from '../yanice-executor';
-import yaniceJson from './fixtures/example-1-yanice.json';
+import yaniceJson from '../__fixtures/valid-1.yanice.json';
 import { ConfigParser } from '../config/config-parser'
 
 describe('YaniceExecutor', () => {

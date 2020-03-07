@@ -1,5 +1,5 @@
-import yaniceJson1 from './fixtures/example-1-yanice.json';
-import yaniceJson2 from './fixtures/example-2-yanice.json';
+import yaniceJson1 from '../../__fixtures/valid-2.yanice.json';
+import yaniceJson2 from '../../__fixtures/valid-3.yanice.json';
 import { ConfigParser } from '../config-parser'
 import { expect } from 'chai';
 import { DirectedGraphUtil } from '../../dep-graph/directed-graph'
