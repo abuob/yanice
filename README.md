@@ -25,7 +25,7 @@ Metadata about last command executions are _not_ stored or considered in any oth
 
 ## Example
 ### Configuration
-The complete version of the `yanice.json` used for this example can be found here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/config/__test/fixtures/readme-example-yanice.json)
+The complete version of the `yanice.json` used for this example can be found here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json)
 
 The example corresponds to the graph in the picture above. `project-A` for example is defined as follows:
 
