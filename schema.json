@@ -5,27 +5,7 @@
     "schemaVersion": {
       "type": "number"
     },
-    "options": {
-      "type": "object",
-      "properties": {
-        "commandOutput": {
-          "enum": ["ignore", "append-at-end", "append-at-end-on-error"]
-        },
-        "outputFilters": {
-          "type": "array",
-          "items": {
-            "enum": ["npmError", "karmaProgressSuccess", "ignoreStderr", "ignoreStdout"]
-          }
-        },
-        "outputFolder": {
-          "type": "string"
-        },
-        "port": {
-          "type": "number"
-        }
-      },
-      "additionalProperties": false
-    },
+    "options": { "$ref":  "#options"},
     "projects": {
       "type": "array",
       "items": {
@@ -101,6 +81,28 @@
           "additionalProperties": false
         }
       }
+    },
+    "options": {
+      "$id": "#options",
+      "type": "object",
+      "properties": {
+        "commandOutput": {
+          "enum": ["ignore", "append-at-end", "append-at-end-on-error"]
+        },
+        "outputFilters": {
+          "type": "array",
+          "items": {
+            "enum": ["npmError", "karmaProgressSuccess", "ignoreStderr", "ignoreStdout"]
+          }
+        },
+        "outputFolder": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }
