@@ -5,7 +5,9 @@
     "schemaVersion": {
       "type": "number"
     },
-    "options": { "$ref":  "#options"},
+    "options": {
+      "$ref": "#options"
+    },
     "projects": {
       "type": "array",
       "items": {
@@ -21,7 +23,9 @@
           "pathRegExp": {
             "type": "string"
           },
-          "commands": { "$ref":  "#commands"},
+          "commands": {
+            "$ref": "#commands"
+          },
           "responsibles": {
             "type": "array",
             "items": {
@@ -39,17 +43,7 @@
       "type": "object",
       "patternProperties": {
         "^[a-zA-Z][0-9a-zA-Z-]*$": {
-          "type": "object",
-          "patternProperties": {
-            "^[a-zA-Z][0-9a-zA-Z-]*$": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
-              }
-            }
-          },
-          "additionalProperties": false
+          "$ref": "#dependencies"
         }
       },
       "additionalProperties": false
@@ -87,12 +81,21 @@
       "type": "object",
       "properties": {
         "commandOutput": {
-          "enum": ["ignore", "append-at-end", "append-at-end-on-error"]
+          "enum": [
+            "ignore",
+            "append-at-end",
+            "append-at-end-on-error"
+          ]
         },
         "outputFilters": {
           "type": "array",
           "items": {
-            "enum": ["npmError", "karmaProgressSuccess", "ignoreStderr", "ignoreStdout"]
+            "enum": [
+              "npmError",
+              "karmaProgressSuccess",
+              "ignoreStderr",
+              "ignoreStdout"
+            ]
           }
         },
         "outputFolder": {
@@ -100,6 +103,20 @@
         },
         "port": {
           "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "dependencies": {
+      "$id": "#dependencies",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z][0-9a-zA-Z-]*$": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+          }
         }
       },
       "additionalProperties": false
