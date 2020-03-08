@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { ChangedProjects } from '../changed-projects'
-import { IYaniceProject } from '../../config/config-parser'
+import { IYaniceProject } from '../../config/config.interface'
 
 describe('ChangedProjects', () => {
     describe('getChangedProjectsRaw', () => {

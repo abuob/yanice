@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import schemaJson from '../../schema.json';
 import { log } from '../util/log';
-import { IYaniceJson } from './config-parser';
+import { IYaniceJson } from './config.interface';
 
 /**
  * Concept: Each verification-method has a corresponding "printErrorOn<verification>Failure"-method, which will be called
@@ -53,15 +53,13 @@ export class ConfigVerifier {
 
     // ========= verifyDependencyScopeProjectNames
 
-    public static verifyDependencyScopeProjectNames(yaniceConfig: IYaniceJson): boolean {
-        const allProjectNames = yaniceConfig.projects.map(project => project.projectName);
-        return !Object.keys(yaniceConfig.dependencyScopes).some(scope =>
-            Object.keys(yaniceConfig.dependencyScopes[scope]).some(
-                dependentChild =>
-                    !allProjectNames.includes(dependentChild) ||
-                    yaniceConfig.dependencyScopes[scope][dependentChild].some(
-                        parentDependency => !allProjectNames.includes(parentDependency)
-                    )
+    public static verifyDependencyScopeProjectNames(yaniceJson: IYaniceJson): boolean {
+        const allProjectNames = yaniceJson.projects.map(project => project.projectName);
+        return !Object.keys(yaniceJson.dependencyScopes).some(scope =>
+            Object.keys(yaniceJson.dependencyScopes[scope].dependencies).some(
+                project =>
+                    !allProjectNames.includes(project) ||
+                    yaniceJson.dependencyScopes[scope].dependencies[project].some(dependency => !allProjectNames.includes(dependency))
             )
         );
     }
@@ -69,16 +67,16 @@ export class ConfigVerifier {
     public static printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfig: IYaniceJson): void {
         const allProjectNames = yaniceConfig.projects.map(project => project.projectName);
         Object.keys(yaniceConfig.dependencyScopes).forEach(scope => {
-            Object.keys(yaniceConfig.dependencyScopes[scope]).forEach(dependentChild => {
-                if (!allProjectNames.includes(dependentChild)) {
+            Object.keys(yaniceConfig.dependencyScopes[scope].dependencies).forEach(project => {
+                if (!allProjectNames.includes(project)) {
                     log(
-                        `Within scope "${scope}": There is no project with projectName "${dependentChild}" defined; only defined projects are allowed.`
+                        `Within scope "${scope}": There is no project with projectName "${project}" defined; only defined projects are allowed.`
                     );
                 }
-                yaniceConfig.dependencyScopes[scope][dependentChild].forEach(parentDependency => {
-                    if (!allProjectNames.includes(parentDependency)) {
+                yaniceConfig.dependencyScopes[scope].dependencies[project].forEach(projectDependency => {
+                    if (!allProjectNames.includes(projectDependency)) {
                         log(
-                            `Within scope "${scope}": For project "${dependentChild}": There is no project with projectName "${parentDependency}" defined; only defined projects are allowed.`
+                            `Within scope "${scope}": For project "${project}": There is no project with projectName "${projectDependency}" defined; only defined projects are allowed.`
                         );
                     }
                 });
@@ -86,5 +84,5 @@ export class ConfigVerifier {
         });
     }
 
-    private static readonly SUPPORTED_VERSIONS = [1];
+    private static readonly SUPPORTED_VERSIONS = [2];
 }

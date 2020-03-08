@@ -1,5 +1,5 @@
 {
-  "$schema": "./node_modules/yanice/schema.json",
+  "$schema": "../../schema.json",
   "schemaVersion": 1,
   "options": {
     "outputFilters": [],
@@ -52,16 +52,24 @@
   ],
   "dependencyScopes": {
     "lint": {
-      "project-A": ["important-repo-files"],
-      "project-B": ["important-repo-files"],
-      "lib-1": ["important-repo-files"],
-      "lib-2": ["important-repo-files"]
+      "options": {
+        "commandOutput": "append-at-end-on-error",
+        "outputFilters": ["npmError"]
+      },
+      "dependencies": {
+        "project-A": ["important-repo-files"],
+        "project-B": ["important-repo-files"],
+        "lib-1": ["important-repo-files"],
+        "lib-2": ["important-repo-files"]
+      }
     },
     "test": {
-      "project-A": ["lib-1", "lib-2", "important-repo-files"],
-      "project-B": ["lib-2", "important-repo-files"],
-      "lib-1": ["important-repo-files"],
-      "lib-2": ["important-repo-files"]
+      "dependencies": {
+        "project-A": ["lib-1", "lib-2", "important-repo-files"],
+        "project-B": ["lib-2", "important-repo-files"],
+        "lib-1": ["important-repo-files"],
+        "lib-2": ["important-repo-files"]
+      }
     }
   }
 }

@@ -1,5 +1,4 @@
-import { IYaniceArgs } from '../config/args-parser';
-import { commandOutputOptionsType, IYaniceCommand, IYaniceConfig } from '../config/config-parser';
+import { IYaniceCommand, IYaniceConfig } from '../config/config.interface';
 import { ICommandExecutionResult } from './execute-in-parallel-limited';
 import { log } from './log';
 import { commandOutputFilterType, OutputFilter } from './output-filter';
@@ -18,16 +17,13 @@ export class LogUtil {
 
     public static printOutputFormattedAfterAllCommandsCompleted(
         yaniceConfig: IYaniceConfig,
-        yaniceArgs: IYaniceArgs,
         commandExecutionResults: ICommandExecutionResult[]
     ): void {
         const allSelectedFilters = LogUtil.getAllSelectedOutputFilters(yaniceConfig.options.outputFilters);
         const ignoreStdout: boolean = yaniceConfig.options.outputFilters.includes('ignoreStdout');
         const ignoreStderr: boolean = yaniceConfig.options.outputFilters.includes('ignoreStderr');
 
-        const actualCommandOutputMode: commandOutputOptionsType = yaniceArgs.commandOutputMode || yaniceConfig.options.commandOutput;
-
-        switch (actualCommandOutputMode) {
+        switch (yaniceConfig.options.commandOutput) {
             case 'ignore':
                 return;
             case 'append-at-end':

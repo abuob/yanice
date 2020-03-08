@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { IYaniceArgs } from '../config/args-parser';
-import { IYaniceConfig } from '../config/config-parser';
+import { IYaniceConfig } from '../config/config.interface';
 import { IDirectedGraph } from '../dep-graph/directed-graph';
 import { FindFileUtil } from '../util/find-file';
 import { log } from '../util/log';

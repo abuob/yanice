@@ -1,17 +1,18 @@
 import { ArgsParser, IYaniceArgs } from './config/args-parser';
-import { ConfigParser, IYaniceCommand, IYaniceConfig } from './config/config-parser';
+import { ConfigParser } from './config/config-parser';
 import { ConfigVerifier } from './config/config-verifier';
+import { IYaniceCommand, IYaniceConfig, IYaniceJson } from './config/config.interface';
 import { DirectedGraphUtil, IDirectedGraph } from './dep-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
 import { execucteInParallelLimited, ICommandExecutionResult } from './util/execute-in-parallel-limited';
-import { FindFileUtil } from './util/find-file';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
 import { DepGraphVisualization } from './visualization/dep-graph-visualization';
 
 export class YaniceExecutor {
     private baseDirectory: string | null = null;
+    private yaniceJson: IYaniceJson | null = null;
     private yaniceConfig: IYaniceConfig | null = null;
     private yaniceArgs: IYaniceArgs | null = null;
     private changedFiles: string[] = [];
@@ -21,26 +22,13 @@ export class YaniceExecutor {
     private affectedProjectsUnfiltered: string[] = [];
     private responsibles: string[] = [];
 
-    public loadConfiguration(): YaniceExecutor {
-        const yaniceConfigPath = FindFileUtil.findFileInParentDirsFromInitialDir('yanice.json', process.cwd());
-        if (!yaniceConfigPath) {
-            this.exitYanice(1, 'yanice.json not found!');
-            return this;
-        }
-        this.baseDirectory = yaniceConfigPath.replace(/yanice\.json/, '');
-        const yaniceConfigJson = require(yaniceConfigPath);
-        this.validateYaniceJson(yaniceConfigJson);
-        this.yaniceConfig = ConfigParser.getConfigFromYaniceJson(yaniceConfigJson);
-        return this;
-    }
-
-    public parseArgs(args: string[]): YaniceExecutor {
-        if (!this.yaniceConfig) {
-            return this;
-        }
-        this.verifyScopeParam(args, this.yaniceConfig);
-        this.yaniceArgs = ArgsParser.parseArgs(args);
-        return this;
+    public loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: IYaniceJson): YaniceExecutor {
+        this.baseDirectory = baseDirectory;
+        this.yaniceJson = yaniceJson;
+        return this.validateYaniceJson(yaniceJson)
+            .parseArgs(args)
+            .verifyArgs()
+            .parseYaniceJson();
     }
 
     public calculateChangedFiles(): YaniceExecutor {
@@ -69,8 +57,8 @@ export class YaniceExecutor {
     }
 
     public calculateDepGraphForGivenScope(): YaniceExecutor {
-        if (this.yaniceConfig && this.yaniceArgs) {
-            this.depGraph = ConfigParser.getDepGraphFromConfigByScope(this.yaniceConfig, this.yaniceArgs.givenScope);
+        if (this.yaniceConfig) {
+            this.depGraph = ConfigParser.getDepGraphFromConfigByScope(this.yaniceConfig);
         }
         return this;
     }
@@ -196,8 +184,8 @@ export class YaniceExecutor {
                     }
                 },
                 (commandsExecutionResults: ICommandExecutionResult[]) => {
-                    if (this.yaniceConfig && this.yaniceArgs) {
-                        LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, this.yaniceArgs, commandsExecutionResults);
+                    if (this.yaniceConfig) {
+                        LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, commandsExecutionResults);
                     }
                     if (commandsExecutionResults.some(result => result.exitCode !== 0)) {
                         this.exitYanice(1, null);
@@ -208,9 +196,33 @@ export class YaniceExecutor {
         return this;
     }
 
-    private verifyScopeParam(args: string[], yaniceConfig: IYaniceConfig): void {
-        const scopeParam: string | undefined = args[0];
-        const scopes = Object.keys(yaniceConfig.dependencyScopes);
+    private loadYaniceJson(yaniceJson: IYaniceJson): YaniceExecutor {
+        this.yaniceJson = yaniceJson;
+        this.validateYaniceJson(this.yaniceJson);
+        return this;
+    }
+
+    private parseArgs(args: string[]): YaniceExecutor {
+        this.yaniceArgs = ArgsParser.parseArgs(args);
+        return this;
+    }
+
+    private verifyArgs(): YaniceExecutor {
+        if (this.yaniceArgs && this.yaniceJson) {
+            this.verifyScopeParam(this.yaniceArgs.givenScope, this.yaniceJson);
+        }
+        return this;
+    }
+
+    private parseYaniceJson(): YaniceExecutor {
+        if (this.yaniceJson && this.yaniceArgs) {
+            this.yaniceConfig = ConfigParser.getYaniceConfig(this.yaniceJson, this.yaniceArgs);
+        }
+        return this;
+    }
+
+    private verifyScopeParam(scopeParam: string, yaniceJson: IYaniceJson): void {
+        const scopes = Object.keys(yaniceJson.dependencyScopes);
         if (!scopeParam) {
             this.exitYanice(
                 1,
@@ -220,14 +232,14 @@ export class YaniceExecutor {
         if (!scopes.includes(scopeParam)) {
             this.exitYanice(
                 1,
-                `"${scopeParam}" is not a defined scope! Please select one of the following scopes as first input parameter: ${scopes.join(
+                `"${scopeParam}" is not a defined scope in the yanice.json! Please select one of the following scopes as first input parameter: ${scopes.join(
                     ', '
                 )}`
             );
         }
     }
 
-    private validateYaniceJson(yaniceConfigJson: any): void {
+    private validateYaniceJson(yaniceConfigJson: any): YaniceExecutor {
         if (!ConfigVerifier.verifyYaniceJsonWithSchema(yaniceConfigJson)) {
             ConfigVerifier.printErrorOnVerifyYaniceJsonWithSchemaFailure(yaniceConfigJson);
             this.exitYanice(1, 'yanice.json does not conform to json-schema, please make sure your yanice.json is valid!');
@@ -243,6 +255,7 @@ export class YaniceExecutor {
                 'yanice.json contains projectNames under dependencyScopes that are not defined as projects! Make sure your dependency trees are defined correctly.'
             );
         }
+        return this;
     }
 
     private exitYanice(exitCode: number, message: string | null): void {

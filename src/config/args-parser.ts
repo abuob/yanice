@@ -1,5 +1,5 @@
 import { log } from '../util/log';
-import { commandOutputOptionsType } from './config-parser';
+import { commandOutputOptionsType } from './config.interface';
 
 export type graphRendererType = 'DAGREJS' | 'VIZJS';
 

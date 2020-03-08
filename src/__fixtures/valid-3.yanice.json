@@ -1,6 +1,6 @@
 {
   "$schema": "../../schema.json",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "options": {
     "commandOutput": "append-at-end",
     "outputFilters": ["npmError"],
@@ -28,14 +28,22 @@
   ],
   "dependencyScopes": {
     "test": {
-      "project-A": ["lib-1"],
-      "project-B": ["lib-2"],
-      "lib-1": [],
-      "lib-2": []
+      "options": {
+        "port": 8888,
+        "commandOutput": "append-at-end-on-error"
+      },
+      "dependencies": {
+        "project-A": ["lib-1"],
+        "project-B": ["lib-2"],
+        "lib-1": [],
+        "lib-2": []
+      }
     },
     "build-some": {
-      "project-A": ["lib-1"],
-      "project-B": ["lib-2"]
+      "dependencies": {
+        "project-A": ["lib-1"],
+        "project-B": ["lib-2"]
+      }
     }
   }
 }

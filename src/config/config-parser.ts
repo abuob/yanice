@@ -1,82 +1,21 @@
 import { DirectedGraphUtil, IDirectedGraph } from '../dep-graph/directed-graph';
-import { commandOutputFilterType } from '../util/output-filter';
-
-export type commandOutputOptionsType = 'ignore' | 'append-at-end' | 'append-at-end-on-error';
-
-// This is the interface describing the content of the 'yanice.json'-file. It should adhere and is validated against
-// jsonschema (schema.json). This interface is only used for when we initially read the config-file; later, we only want to work
-// with the IYaniceConfig, where all options etc. are set to default if undefined.
-export interface IYaniceJson {
-    options?: {
-        commandOutput?: commandOutputOptionsType;
-        outputFilters?: commandOutputFilterType[];
-        outputFolder?: string;
-        port?: number;
-    };
-    schemaVersion: number;
-    projects: Array<{
-        projectName: string;
-        pathRegExp?: string;
-        pathGlob?: string;
-        commands?: {
-            [scope: string]: {
-                command: string;
-                cwd?: string;
-            };
-        };
-        responsibles?: string[];
-    }>;
-    dependencyScopes: {
-        [name: string]: IYaniceDependencyScope;
-    };
-}
-
-export interface IYaniceProject {
-    projectName: string;
-    pathRegExp: RegExp;
-    pathGlob: string;
-    commands: ICommandPerScope;
-    responsibles: string[];
-}
-
-export interface IYaniceDependencyScope {
-    [project: string]: string[];
-}
-
-export interface IYaniceCommand {
-    command: string;
-    cwd: string;
-}
-
-export interface ICommandPerScope {
-    [scope: string]: IYaniceCommand;
-}
-
-export interface IYaniceConfig {
-    options: {
-        commandOutput: commandOutputOptionsType;
-        outputFilters: commandOutputFilterType[];
-        outputFolder: string;
-        port: number;
-    };
-    projects: IYaniceProject[];
-    dependencyScopes: {
-        [name: string]: IYaniceDependencyScope;
-    };
-}
+import { IYaniceArgs } from './args-parser';
+import { ICommandPerScope, IYaniceConfig, IYaniceConfigOptions, IYaniceJson, IYaniceProject } from './config.interface';
 
 export class ConfigParser {
+    public static readonly DEFAULT_CONFIG_OPTIONS: IYaniceConfigOptions = {
+        commandOutput: 'ignore',
+        outputFilters: [],
+        outputFolder: './.yanice-output',
+        port: 4567
+    };
+
     /**
      * Ensure that a valid yaniceJson is entered here (jsonschema-verified).
      */
-    public static getConfigFromYaniceJson(yaniceJson: IYaniceJson): IYaniceConfig {
+    public static getYaniceConfig(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfig {
         return {
-            options: {
-                commandOutput: yaniceJson.options && yaniceJson.options.commandOutput ? yaniceJson.options.commandOutput : 'ignore',
-                outputFilters: yaniceJson.options && yaniceJson.options.outputFilters ? yaniceJson.options.outputFilters : [],
-                outputFolder: yaniceJson.options && yaniceJson.options.outputFolder ? yaniceJson.options.outputFolder : './.yanice-output',
-                port: yaniceJson.options && yaniceJson.options.port ? yaniceJson.options.port : 4567
-            },
+            options: this.getConfigOptions(yaniceJson, yaniceArgs),
             projects: yaniceJson.projects.map(
                 (project): IYaniceProject => {
                     // TODO Check if we can simplify this.
@@ -107,7 +46,7 @@ export class ConfigParser {
                     };
                 }
             ),
-            dependencyScopes: yaniceJson.dependencyScopes
+            dependencies: yaniceJson.dependencyScopes[yaniceArgs.givenScope].dependencies
         };
     }
 
@@ -116,22 +55,34 @@ export class ConfigParser {
         return !!yaniceProject && Object.keys(yaniceProject.commands).includes(scope);
     }
 
-    public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig, scope: string): IDirectedGraph | null {
-        const depScope: IYaniceDependencyScope = yaniceConfig.dependencyScopes[scope];
-        if (!depScope) {
-            return null;
-        }
+    public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig): IDirectedGraph | null {
+        const dependencies = yaniceConfig.dependencies;
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
             .map(p => p.projectName)
             .forEach(projectName => {
                 graphBuilder.addNode(projectName);
             });
-        Object.keys(depScope).forEach(projectName => {
-            depScope[projectName].forEach(dependentProject => {
+        Object.keys(dependencies).forEach(projectName => {
+            dependencies[projectName].forEach(dependentProject => {
                 graphBuilder.createDirectedEdge(dependentProject, projectName);
             });
         });
         return graphBuilder.build();
+    }
+
+    private static getConfigOptions(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfigOptions {
+        const scopeOptions = yaniceJson.dependencyScopes[yaniceArgs.givenScope].options;
+        const yaniceConfigOptions: IYaniceConfigOptions = {
+            port: scopeOptions?.port || yaniceJson.options?.port || this.DEFAULT_CONFIG_OPTIONS.port,
+            commandOutput:
+                yaniceArgs.commandOutputMode ||
+                scopeOptions?.commandOutput ||
+                yaniceJson.options?.commandOutput ||
+                this.DEFAULT_CONFIG_OPTIONS.commandOutput,
+            outputFolder: scopeOptions?.outputFolder || yaniceJson.options?.outputFolder || this.DEFAULT_CONFIG_OPTIONS.outputFolder,
+            outputFilters: scopeOptions?.outputFilters || yaniceJson.options?.outputFilters || this.DEFAULT_CONFIG_OPTIONS.outputFilters
+        };
+        return yaniceConfigOptions;
     }
 }

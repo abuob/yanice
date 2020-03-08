@@ -14,8 +14,7 @@
         "type": "object",
         "properties": {
           "projectName": {
-            "type": "string",
-            "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+            "$ref": "#projectNamePatternString"
           },
           "pathGlob": {
             "type": "string"
@@ -43,7 +42,22 @@
       "type": "object",
       "patternProperties": {
         "^[a-zA-Z][0-9a-zA-Z-]*$": {
-          "$ref": "#dependencies"
+          "type": "object",
+          "properties": {
+            "extends": {
+              "$ref": "#projectNamePatternString"
+            },
+            "dependencies": {
+              "$ref": "#dependencies"
+            },
+            "options": {
+              "$ref": "#options"
+            }
+          },
+          "required": [
+            "dependencies"
+          ],
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -55,6 +69,11 @@
     "dependencyScopes"
   ],
   "definitions": {
+    "projectNamePatternString": {
+      "$id": "#projectNamePatternString",
+      "type": "string",
+      "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+    },
     "commands": {
       "$id": "#commands",
       "type": "object",
@@ -114,8 +133,7 @@
         "^[a-zA-Z][0-9a-zA-Z-]*$": {
           "type": "array",
           "items": {
-            "type": "string",
-            "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+            "$ref": "#projectNamePatternString"
           }
         }
       },

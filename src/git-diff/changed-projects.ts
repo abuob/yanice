@@ -1,4 +1,5 @@
-import { IYaniceProject } from '../config/config-parser';
+import { IYaniceProject } from '../config/config.interface';
+
 const minimatch = require('minimatch');
 
 export class ChangedProjects {

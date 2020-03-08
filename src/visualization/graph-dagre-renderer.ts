@@ -1,5 +1,5 @@
 import { IYaniceArgs } from '../config/args-parser';
-import { IYaniceCommand, IYaniceConfig } from '../config/config-parser';
+import { IYaniceCommand, IYaniceConfig } from '../config/config.interface';
 import { IDirectedGraph } from '../dep-graph/directed-graph';
 import { ChangedProjects } from '../git-diff/changed-projects';
 

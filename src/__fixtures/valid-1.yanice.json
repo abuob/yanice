@@ -1,6 +1,6 @@
 {
   "$schema": "../../schema.json",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "projects": [
     {
       "projectName": "A",
@@ -58,18 +58,22 @@
   ],
   "dependencyScopes": {
     "lint": {
-      "A": [],
-      "B": [],
-      "C": [],
-      "D": [],
-      "E": []
+      "dependencies": {
+        "A": [],
+        "B": [],
+        "C": [],
+        "D": [],
+        "E": []
+      }
     },
     "test": {
-      "A": ["B", "C"],
-      "B": ["D"],
-      "C": ["D"],
-      "D": ["E"],
-      "E": []
+      "dependencies": {
+        "A": ["B", "C"],
+        "B": ["D"],
+        "C": ["D"],
+        "D": ["E"],
+        "E": []
+      }
     }
   }
 }

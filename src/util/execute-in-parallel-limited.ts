@@ -1,5 +1,5 @@
 import { ExecException } from 'child_process';
-import { IYaniceCommand } from '../config/config-parser';
+import { IYaniceCommand } from '../config/config.interface';
 
 const async = require('async');
 const exec = require('child_process').exec;
