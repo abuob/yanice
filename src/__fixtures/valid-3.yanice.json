@@ -50,6 +50,9 @@
       "dependencies": {
         "lib-1": ["lib-2"]
       }
+    },
+    "empty-deps": {
+      "dependencies": {}
     }
   }
 }

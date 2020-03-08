@@ -67,6 +67,5 @@ export interface IYaniceConfigOptions {
 export interface IYaniceConfig {
     options: IYaniceConfigOptions;
     projects: IYaniceProject[];
-    extendsDependencies: IProjectDependencies;
     dependencies: IProjectDependencies;
 }

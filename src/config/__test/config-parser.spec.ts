@@ -53,21 +53,24 @@ describe('ConfigParser', () => {
             expect(actualConfigForTest.options.commandOutput).to.equal('ignore');
         });
 
-        it('should load the dependencies of the scope which is extended', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {
-                ...args,
-                givenScope: 'extended-scope',
-                commandOutputMode: 'ignore'
-            });
+        it('should have empty dependencies if there are none listed (treat empty array same as undefined)', () => {
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'empty-deps'});
             expect(actualConfigForTest.dependencies).to.deep.equal({
-                "lib-1": ["lib-2"]
+                "project-A": [],
+                "project-B": [],
+                "lib-1": [],
+                "lib-2": []
+            })
+        });
+
+        it('should load the dependencies of the scope which is extended', () => {
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'extended-scope'});
+            expect(actualConfigForTest.dependencies).to.deep.equal({
+                "lib-1": ["lib-2"],
+                "lib-2": [],
+                "project-A": ["lib-1"],
+                "project-B": ["lib-2"]
             });
-            expect(actualConfigForTest.extendsDependencies).to.deep.equal(
-                {
-                    "project-A": ["lib-1"],
-                    "project-B": ["lib-2"]
-                }
-            );
         });
 
         it('should properly map command-cwd', () => {
@@ -79,6 +82,7 @@ describe('ConfigParser', () => {
                 cwd: 'path/to/dir/A'
             });
             expect(yaniceProject1!.commands.test).to.equal(undefined);
+            expect(yaniceProject1!.commands).to.have.same.keys('lint');
             expect(yaniceProject2!.commands.lint).to.deep.equal({
                 command: 'lint B',
                 cwd: './'

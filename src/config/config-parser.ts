@@ -23,38 +23,12 @@ export class ConfigParser {
     public static getYaniceConfig(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfig {
         return {
             options: this.getConfigOptions(yaniceJson, yaniceArgs),
-            projects: yaniceJson.projects.map(
-                (project): IYaniceProject => {
-                    // TODO Check if we can simplify this.
-                    // Looks complicated (sorry for that) but essentially we're just ensuring that:
-                    // * commands is never undefined; if no commands are declared in the yanice.json, commands is an empty object
-                    // * if for a command no cwd is given, use './' as default (cwd is never undefined on IYaniceConfig).
-                    const commands = project.commands
-                        ? Object.keys(project.commands).reduce((prev: ICommandPerScope, curr: string): ICommandPerScope => {
-                              if (!project.commands || !project.commands[curr]) {
-                                  return prev;
-                              }
-                              const cwd: string =
-                                  project.commands[curr] && project.commands[curr].cwd ? (project.commands[curr].cwd as string) : './';
-                              prev[curr] = {
-                                  command: project.commands[curr].command,
-                                  cwd
-                              };
-                              return prev;
-                          }, {})
-                        : {};
-
-                    return {
-                        projectName: project.projectName,
-                        commands,
-                        pathGlob: project.pathGlob ? project.pathGlob : '**',
-                        pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/,
-                        responsibles: project.responsibles ? project.responsibles : []
-                    };
-                }
-            ),
-            dependencies: yaniceJson.dependencyScopes[yaniceArgs.givenScope].dependencies,
-            extendsDependencies: this.getExtendedDependencies(yaniceJson, yaniceArgs.givenScope)
+            projects: this.getProjects(yaniceJson),
+            dependencies: {
+                ...this.getEmptyDependencies(yaniceJson),
+                ...this.getExtendedDependencies(yaniceJson, yaniceArgs.givenScope),
+                ...this.getDirectDependencies(yaniceJson, yaniceArgs.givenScope)
+            }
         };
     }
 
@@ -64,10 +38,7 @@ export class ConfigParser {
     }
 
     public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig): IDirectedGraph | null {
-        const dependencies: IProjectDependencies = {
-            ...yaniceConfig.extendsDependencies,
-            ...yaniceConfig.dependencies
-        };
+        const dependencies = yaniceConfig.dependencies;
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
             .map(p => p.projectName)
@@ -80,6 +51,28 @@ export class ConfigParser {
             });
         });
         return graphBuilder.build();
+    }
+
+    private static getProjects(yaniceJson: IYaniceJson): IYaniceProject[] {
+        return yaniceJson.projects.map(
+            (project): IYaniceProject => {
+                const commandsRaw = project.commands || {};
+                const commands: ICommandPerScope = {};
+                Object.keys(commandsRaw).forEach(scope => {
+                    commands[scope] = {
+                        command: commandsRaw[scope].command,
+                        cwd: commandsRaw[scope].cwd || './'
+                    };
+                });
+                return {
+                    projectName: project.projectName,
+                    pathGlob: project.pathGlob ? project.pathGlob : '**',
+                    pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/,
+                    responsibles: project.responsibles ? project.responsibles : [],
+                    commands
+                };
+            }
+        );
     }
 
     private static getConfigOptions(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfigOptions {
@@ -97,11 +90,27 @@ export class ConfigParser {
         return yaniceConfigOptions;
     }
 
+    // Creates an object with all projects depending on nothing. Use this to treat unlisted projects equal as listed projects with no dependencies;
+    // i.e.: "dependencies: {}" is equal to "dependencies: { "A": []}"
+    private static getEmptyDependencies(yaniceJson: IYaniceJson): IProjectDependencies {
+        const emptyDependencies: IProjectDependencies = {};
+        yaniceJson.projects
+            .map(p => p.projectName)
+            .forEach(projectName => {
+                emptyDependencies[projectName] = [];
+            });
+        return emptyDependencies;
+    }
+
     private static getExtendedDependencies(yaniceJson: IYaniceJson, givenScope: string): IProjectDependencies {
         const extendedScope: string | undefined = yaniceJson.dependencyScopes[givenScope].extends;
         if (!extendedScope) {
             return {};
         }
         return yaniceJson.dependencyScopes[extendedScope].dependencies;
+    }
+
+    private static getDirectDependencies(yaniceJson: IYaniceJson, givenScope: string): IProjectDependencies {
+        return yaniceJson.dependencyScopes[givenScope].dependencies;
     }
 }
