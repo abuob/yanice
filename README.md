@@ -18,7 +18,7 @@ For example, a repository with two projects and two libraries might be modeled a
 * Yanice works best for small- to medium-sized repositories (<50 projects), the dependencies between the projects have to be defined manually, 
 which _can_ get cumbersome with increasing size
 * Due to the design philosophy of not reading/touching any files inside the repository, 
-yanice can technically be used for any kind of repository, no matter the technology/languages used
+yanice can technically be used for any kind of repository, no matter the technology/languages used (node/git must be available)
 * In its current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a given git-ref (commitSHA, HEAD, branch...). 
 Metadata about last command executions are _not_ stored or considered in any other way. To achieve incremental builds for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare to that
 
@@ -50,7 +50,7 @@ The example corresponds to the graph in the picture above. `project-A` for examp
 }
 ```
 Every file in the repository that matches the given `pathGlob` (you can also use `pathRegExp` if preferred, or both) will be part of the project.
-Note that the glob allows you to match any file or even no file at all: If you neither define the pathGlob nor the pathRegExp,
+Note that this allows you to match any file or even no file at all: If you neither define the pathGlob nor the pathRegExp,
 all files in the repository will match. Projects such as "all-js-files" or "ci-relevant-files" can easily be modeled.
 
 A Command will be executed in the given `cwd`. A command corresponds to a scope (here: build, test, lint), for which a dependency graph is defined in the `yanice.json`. E.g. for test, the dependencies
@@ -71,7 +71,7 @@ are modeled as such:
 ```
 
 A scope can extend another scope, but currently, only one level of extension is allowed. 
-If a scope is extended, all dependencies are the same as of the extended scope - except for those that are overridden (in the given example, `project-A` and `lib-1` override dependencies inherited from `build`).
+If a scope is extended, all dependencies are the same as of the extended scope - except for those that are overridden (in the given example, `project-A` and `lib-1` have overridden dependencies inherited from `build`).
 
 ### Commands
 In general, commands have the following base structure: `yanice <scope> --(rev|branch|commit)=<git-rev>`
@@ -104,14 +104,7 @@ in order to create the dependency graph.
 Yanice will collect all responsibles of the projects that are either directly changed or affected by changes, and log them to the console.
 
 ### Options
-Options are defined in the yanice.json and can be defined as global defaults and on a per-scope-basis, see e.g. [here](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json):
-```
-"options": {
-  "outputFilters": [],
-  "commandOutput": "append-at-end-on-error"
-}
-```
-
+Options are defined in the yanice.json and can be defined as global defaults and on a per-scope-basis.
 <table>
     <tr>
         <th>Options</th>
