@@ -44,6 +44,12 @@
         "project-A": ["lib-1"],
         "project-B": ["lib-2"]
       }
+    },
+    "extended-scope": {
+      "extends": "build-some",
+      "dependencies": {
+        "lib-1": ["lib-2"]
+      }
     }
   }
 }

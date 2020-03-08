@@ -1,6 +1,13 @@
 import { DirectedGraphUtil, IDirectedGraph } from '../dep-graph/directed-graph';
 import { IYaniceArgs } from './args-parser';
-import { ICommandPerScope, IYaniceConfig, IYaniceConfigOptions, IYaniceJson, IYaniceProject } from './config.interface';
+import {
+    ICommandPerScope,
+    IProjectDependencies,
+    IYaniceConfig,
+    IYaniceConfigOptions,
+    IYaniceJson,
+    IYaniceProject
+} from './config.interface';
 
 export class ConfigParser {
     public static readonly DEFAULT_CONFIG_OPTIONS: IYaniceConfigOptions = {
@@ -46,7 +53,8 @@ export class ConfigParser {
                     };
                 }
             ),
-            dependencies: yaniceJson.dependencyScopes[yaniceArgs.givenScope].dependencies
+            dependencies: yaniceJson.dependencyScopes[yaniceArgs.givenScope].dependencies,
+            extendsDependencies: this.getExtendedDependencies(yaniceJson, yaniceArgs.givenScope)
         };
     }
 
@@ -56,7 +64,10 @@ export class ConfigParser {
     }
 
     public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig): IDirectedGraph | null {
-        const dependencies = yaniceConfig.dependencies;
+        const dependencies: IProjectDependencies = {
+            ...yaniceConfig.extendsDependencies,
+            ...yaniceConfig.dependencies
+        };
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
             .map(p => p.projectName)
@@ -84,5 +95,13 @@ export class ConfigParser {
             outputFilters: scopeOptions?.outputFilters || yaniceJson.options?.outputFilters || this.DEFAULT_CONFIG_OPTIONS.outputFilters
         };
         return yaniceConfigOptions;
+    }
+
+    private static getExtendedDependencies(yaniceJson: IYaniceJson, givenScope: string): IProjectDependencies {
+        const extendedScope: string | undefined = yaniceJson.dependencyScopes[givenScope].extends;
+        if (!extendedScope) {
+            return {};
+        }
+        return yaniceJson.dependencyScopes[extendedScope].dependencies;
     }
 }

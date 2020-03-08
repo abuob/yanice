@@ -255,6 +255,10 @@ export class YaniceExecutor {
                 'yanice.json contains projectNames under dependencyScopes that are not defined as projects! Make sure your dependency trees are defined correctly.'
             );
         }
+        if (!ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceConfigJson)) {
+            ConfigVerifier.printErrorOnVerifyMaxOneLevelGraphExtension(yaniceConfigJson);
+            this.exitYanice(1, null);
+        }
         return this;
     }
 

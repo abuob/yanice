@@ -61,6 +61,19 @@
         "D": ["E"],
         "E": ["A"]
       }
+    },
+    "scope-1": {
+      "dependencies": {
+        "A": ["B", "C"],
+        "B": ["D"]
+      }
+    },
+    "scope-2": {
+      "extends": "scope-1",
+      "dependencies": {
+        "B": ["C"],
+        "C": ["D"]
+      }
     }
   }
 }

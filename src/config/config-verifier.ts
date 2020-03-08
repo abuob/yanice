@@ -55,11 +55,11 @@ export class ConfigVerifier {
 
     public static verifyDependencyScopeProjectNames(yaniceJson: IYaniceJson): boolean {
         const allProjectNames = yaniceJson.projects.map(project => project.projectName);
-        return !Object.keys(yaniceJson.dependencyScopes).some(scope =>
-            Object.keys(yaniceJson.dependencyScopes[scope].dependencies).some(
+        return Object.keys(yaniceJson.dependencyScopes).every(scope =>
+            Object.keys(yaniceJson.dependencyScopes[scope].dependencies).every(
                 project =>
-                    !allProjectNames.includes(project) ||
-                    yaniceJson.dependencyScopes[scope].dependencies[project].some(dependency => !allProjectNames.includes(dependency))
+                    allProjectNames.includes(project) &&
+                    yaniceJson.dependencyScopes[scope].dependencies[project].every(dependency => allProjectNames.includes(dependency))
             )
         );
     }
@@ -81,6 +81,46 @@ export class ConfigVerifier {
                     }
                 });
             });
+        });
+    }
+
+    // ========= verifyMaxOneLevelGraphExtension
+
+    // A graph can only extend a graph that does not extend another graph (maximum one level of extension)
+    public static verifyMaxOneLevelGraphExtension(yaniceJson: IYaniceJson): boolean {
+        return Object.keys(yaniceJson.dependencyScopes).every(scope => {
+            const extendsOrUndefined = yaniceJson.dependencyScopes[scope].extends;
+            if (!extendsOrUndefined) {
+                return true;
+            } else {
+                const extendedScope = yaniceJson.dependencyScopes[extendsOrUndefined];
+                if (!extendedScope) {
+                    return false;
+                } else {
+                    // The extended graph is not allowed to extend another graph itself
+                    return extendedScope.extends === undefined;
+                }
+            }
+        });
+    }
+
+    public static printErrorOnVerifyMaxOneLevelGraphExtension(yaniceJson: IYaniceJson): void {
+        Object.keys(yaniceJson.dependencyScopes).forEach(scope => {
+            const extendsOrUndefined = yaniceJson.dependencyScopes[scope].extends;
+            if (!extendsOrUndefined) {
+                return;
+            } else {
+                const extendedScope = yaniceJson.dependencyScopes[extendsOrUndefined];
+                if (!extendedScope) {
+                    log(`yanice.json: "${scope}" extends "${extendsOrUndefined}", but there is no such scope defined!`);
+                } else {
+                    if (extendedScope.extends) {
+                        log(
+                            `yanice.json: "${scope}" extends "${extendsOrUndefined}", but that scope already extends "${extendedScope.extends}" - currently, only one level of extension is allowed. Sorry :(`
+                        );
+                    }
+                }
+            }
         });
     }
 

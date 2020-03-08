@@ -5,6 +5,7 @@ import yaniceJson2 from '../../__fixtures/valid-3.yanice.json';
 import readmeYaniceJson from '../../__fixtures/readme-example-yanice.json';
 import invalidChildYaniceJson from '../../__fixtures/invalid/invalid-child-project-name.yanice.json';
 import invalidParentYaniceJson from '../../__fixtures/invalid/invalid-parent-project-name.yanice.json';
+import invalidMultiExtension from '../../__fixtures/invalid/invalid-multi-extension.yanice.json';
 
 describe('ConfigVerifier', () => {
     describe('verifyYaniceJsonWithSchema', () => {
@@ -27,9 +28,22 @@ describe('ConfigVerifier', () => {
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson2 as any)).to.equal(true);
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(readmeYaniceJson as any)).to.equal(true);
         });
+
         it('should return false for invalid yanice.json that uses projectNames under dependencyScopes which are not defined', () => {
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(invalidChildYaniceJson)).to.equal(false);
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(invalidParentYaniceJson)).to.equal(false);
         });
-    })
+    });
+
+    describe('verifyMaxOneLevelGraphExtension', () => {
+        it('should return true for a valid yanice.json', () => {
+            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceJson1)).to.equal(true);
+            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceJson2 as any)).to.equal(true);
+            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(readmeYaniceJson as any)).to.equal(true);
+        });
+
+        it('should return false for an invalid yanice.json where scope-extension occurs over more than one level', () => {
+            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(invalidMultiExtension)).to.equal(false);
+        });
+    });
 });
