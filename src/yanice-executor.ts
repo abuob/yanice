@@ -79,7 +79,7 @@ export class YaniceExecutor {
         if (this.depGraph && this.changedProjects && this.yaniceArgs && this.yaniceConfig) {
             if (!this.yaniceArgs.includeAllProjects) {
                 const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(this.depGraph, this.changedProjects);
-                this.affectedProjects = DirectedGraphUtil.sortTopologically(this.depGraph, affected);
+                this.affectedProjects = DirectedGraphUtil.getTopologicallySorted(this.depGraph, affected);
             } else {
                 this.affectedProjects = this.yaniceConfig.projects.map(project => project.projectName);
             }
