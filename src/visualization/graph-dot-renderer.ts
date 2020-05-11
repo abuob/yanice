@@ -1,4 +1,4 @@
-import { IDirectedGraph } from '../dep-graph/directed-graph';
+import { IDirectedGraph } from '../directed-graph/directed-graph';
 
 export class GraphDotRenderer {
     public static getDotRepresentation(directedGraph: IDirectedGraph): string {

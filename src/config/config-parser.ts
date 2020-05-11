@@ -1,4 +1,4 @@
-import { DirectedGraphUtil, IDirectedGraph } from '../dep-graph/directed-graph';
+import { DirectedGraphUtil, IDirectedGraph } from '../directed-graph/directed-graph';
 import { IYaniceArgs } from './args-parser';
 import {
     ICommandPerScope,

@@ -2,7 +2,7 @@ import { ArgsParser, IYaniceArgs } from './config/args-parser';
 import { ConfigParser } from './config/config-parser';
 import { ConfigVerifier } from './config/config-verifier';
 import { IYaniceCommand, IYaniceConfig, IYaniceJson } from './config/config.interface';
-import { DirectedGraphUtil, IDirectedGraph } from './dep-graph/directed-graph';
+import { DirectedGraphUtil, IDirectedGraph } from './directed-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
 import { execucteInParallelLimited, ICommandExecutionResult } from './util/execute-in-parallel-limited';

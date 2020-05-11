@@ -3,7 +3,7 @@ import yaniceJson3 from '../../__fixtures/valid-3.yanice.json';
 import { ConfigParser } from '../config-parser'
 import { expect } from 'chai';
 import { IYaniceArgs } from '../args-parser'
-import { DirectedGraphUtil, IDirectedGraph } from '../../dep-graph/directed-graph'
+import { DirectedGraphUtil, IDirectedGraph } from '../../directed-graph/directed-graph'
 
 describe('ConfigParser', () => {
     const args: IYaniceArgs = {
