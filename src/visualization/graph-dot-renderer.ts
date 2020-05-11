@@ -15,7 +15,7 @@ export class GraphDotRenderer {
         return directedGraph.nodes
             .map(ancestor =>
                 ancestor
-                    .getConnectedNodes()
+                    .getChildren()
                     .map(
                         child =>
                             `${GraphDotRenderer.getDotConformNodeName(ancestor.name)} -> ${GraphDotRenderer.getDotConformNodeName(

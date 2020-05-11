@@ -74,6 +74,11 @@
         "D": ["E"],
         "E": []
       }
+    },
+    "d-depends-on-a": {
+      "dependencies": {
+        "D": ["A"]
+      }
     }
   }
 }

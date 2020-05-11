@@ -37,7 +37,7 @@ export class ConfigParser {
         return !!yaniceProject && Object.keys(yaniceProject.commands).includes(scope);
     }
 
-    public static getDepGraphFromConfigByScope(yaniceConfig: IYaniceConfig): IDirectedGraph | null {
+    public static getDepGraphFromConfig(yaniceConfig: IYaniceConfig): IDirectedGraph | null {
         const dependencies = yaniceConfig.dependencies;
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
@@ -46,8 +46,8 @@ export class ConfigParser {
                 graphBuilder.addNode(projectName);
             });
         Object.keys(dependencies).forEach(projectName => {
-            dependencies[projectName].forEach(dependentProject => {
-                graphBuilder.createDirectedEdge(dependentProject, projectName);
+            dependencies[projectName].forEach(dependencyName => {
+                graphBuilder.createDirectedEdge(projectName, dependencyName);
             });
         });
         return graphBuilder.build();

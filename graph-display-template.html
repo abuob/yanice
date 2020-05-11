@@ -52,11 +52,16 @@
         padding: 5px;
     }
 
+    .legend .legend-arrow {
+        font-size: medium;
+        margin-left: 7px;
+        margin-right: 7px;
+    }
+
     .legend .legend-rectangle {
         width: 60px;
         height: 20px;
         border: 1.5px solid;
-        margin: 5px;
     }
 
     .legend .dashed-border {
@@ -71,6 +76,10 @@
         background: #ff0000;
     }
 
+    .legend-table-padding {
+        padding-left: 8px;
+    }
+
 
 </style>
 <div class="legend">
@@ -80,18 +89,24 @@
     <div class="legend-item">
         <span><strong>git-revision to compare to: </strong>INSERT_GIT_REVISION</span>
     </div>
-    <div class="legend-item">
-        <div class="legend-rectangle dashed-border"></div>
-        <span>Dashed border: Has no command to execute corresponding to the scope of the graph</span>
-    </div>
-    <div class="legend-item">
-        <div class="legend-rectangle red-border"></div>
-        <span>Red border: A dependency has changed compared to the given git-revision</span>
-    </div>
-    <div class="legend-item">
-        <div class="legend-rectangle red-border red-fill"></div>
-        <span>Red background: File(s) of this project have changed compared to the given git-revision</span>
-    </div>
+    <table style="margin-left: 5px">
+        <tr>
+            <td>A<span class="legend-arrow">&#10230;</span>B</td>
+            <td class="legend-table-padding">Project A depends on project B</td>
+        </tr>
+        <tr>
+            <td><div class="legend-rectangle dashed-border"></div></td>
+            <td class="legend-table-padding">Dashed border: Has no command to execute corresponding to the scope of the graph</td>
+        </tr>
+        <tr>
+            <td><div class="legend-rectangle red-border"></div></td>
+            <td class="legend-table-padding">Red border: A dependency has changed compared to the given git-revision</td>
+        </tr>
+        <tr>
+            <td><div class="legend-rectangle red-border red-fill"></div></td>
+            <td class="legend-table-padding">Red background: File(s) of this project have changed compared to the given git-revision</td>
+        </tr>
+    </table>
 </div>
 <div class="svg-container">
     <svg id="svg-id" height="450" width="800" style="display: block">
@@ -124,7 +139,10 @@
         data.label = data.projectName;
         data.style = getNodeStyle(data);
         dagreGraph.setNode(data.projectName, data);
-        data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {curve: d3.curveBasis}));
+        data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {
+            curve: d3.curveBasis,
+            style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
+        }));
     });
 
 
@@ -142,6 +160,8 @@
         dagreGraph.graph().marginx = 20;
         dagreGraph.graph().marginy = 20;
     }
+    // Graph direction
+    dagreGraph.graph().rankdir = 'BT';
 
     dagreGraph.graph().transition = function (selection) {
         return selection.transition().duration(500);
@@ -203,6 +223,14 @@
         // If the project changed directly (changed files), color entire node red
         if (data.changedFiles.length > 0) {
             styleStr = styleStr.concat("fill: #ff0000;")
+        }
+        return styleStr;
+    }
+
+    function getEdgeStyle(nodeFromData, nodeToData) {
+        var styleStr = "";
+        if(nodeToData.isAffected) {
+            styleStr = styleStr.concat("stroke: #ff0000;");
         }
         return styleStr;
     }

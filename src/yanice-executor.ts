@@ -58,7 +58,7 @@ export class YaniceExecutor {
 
     public calculateDepGraphForGivenScope(): YaniceExecutor {
         if (this.yaniceConfig) {
-            this.depGraph = ConfigParser.getDepGraphFromConfigByScope(this.yaniceConfig);
+            this.depGraph = ConfigParser.getDepGraphFromConfig(this.yaniceConfig);
         }
         return this;
     }
@@ -75,21 +75,20 @@ export class YaniceExecutor {
         return this;
     }
 
-    public calculateAffectedProjects(): YaniceExecutor {
+    public calculateAffectedProjectsUnfiltered(): YaniceExecutor {
         if (this.depGraph && this.changedProjects && this.yaniceArgs && this.yaniceConfig) {
             if (!this.yaniceArgs.includeAllProjects) {
-                const affected = DirectedGraphUtil.getTransitiveChildrenNamesIncludingAncestors(this.depGraph, this.changedProjects);
-                this.affectedProjects = DirectedGraphUtil.getTopologicallySorted(this.depGraph, affected);
+                const affected = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(this.depGraph, this.changedProjects);
+                this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySorted(this.depGraph, affected);
             } else {
-                this.affectedProjects = this.yaniceConfig.projects.map(project => project.projectName);
+                this.affectedProjectsUnfiltered = this.yaniceConfig.projects.map(project => project.projectName);
             }
         }
-        this.affectedProjectsUnfiltered = this.affectedProjects;
         return this;
     }
 
     public filterOutUnsupportedProjectsIfNeeded(): YaniceExecutor {
-        this.affectedProjects = this.affectedProjects.filter(projectName => {
+        this.affectedProjects = this.affectedProjectsUnfiltered.filter(projectName => {
             if (!this.yaniceArgs || !this.yaniceConfig) {
                 return true;
             }

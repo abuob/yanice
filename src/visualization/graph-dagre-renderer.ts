@@ -29,7 +29,7 @@ export class GraphDagreRenderer {
                 return {
                     projectName: node.name,
                     scope: yaniceArgs.givenScope,
-                    edgesTo: node.getConnectedNodes().map(e => e.name),
+                    edgesTo: node.getChildren().map(e => e.name),
                     responsibles: projectOrUndefined ? projectOrUndefined.responsibles : [],
                     changedFiles: projectOrUndefined
                         ? changedFiles.filter(filePath => ChangedProjects.isFilePathPartOfProject(projectOrUndefined, filePath))

@@ -1,18 +1,28 @@
 export class DirectedGraphNode {
     public readonly name: string;
-    private edgesTo: DirectedGraphNode[];
+    private children: DirectedGraphNode[];
+    private parents: DirectedGraphNode[];
 
     constructor(name: string) {
         this.name = name;
-        this.edgesTo = [];
+        this.children = [];
+        this.parents = [];
     }
 
-    public getConnectedNodes(): DirectedGraphNode[] {
-        return this.edgesTo;
+    public getChildren(): DirectedGraphNode[] {
+        return this.children;
     }
 
-    public addEdgeTowards(node: DirectedGraphNode): void {
-        this.edgesTo.push(node);
+    public getParents(): DirectedGraphNode[] {
+        return this.parents;
+    }
+
+    public addChild(node: DirectedGraphNode): void {
+        this.children.push(node);
+    }
+
+    public addParent(node: DirectedGraphNode): void {
+        this.parents.push(node);
     }
 }
 
@@ -20,6 +30,10 @@ export interface IDirectedGraph {
     nodes: DirectedGraphNode[];
 }
 
+/**
+ * For terminology, see: https://en.wikipedia.org/wiki/Tree_(data_structure)#Terminology_used_in_trees
+ * (Not everywhere consequentially used yet)
+ */
 export class DirectedGraphUtil {
     public static get directedGraphBuilder(): DirectedGraphBuilder {
         return new DirectedGraphBuilder();
@@ -37,35 +51,66 @@ export class DirectedGraphUtil {
         return result;
     }
 
-    public static getTransitiveChildrenNames(graph: IDirectedGraph, ancestorNames: string[]): string[] {
+    public static getAncestorsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
         return this.removeDupliateEntries(
-            ancestorNames
+            nodeNames
                 .map(ancestorName => {
                     const givenNode = this.getNodeByName(graph, ancestorName);
                     if (!givenNode) {
                         return [];
                     }
-                    const setOfChildren: Set<string> = this.getNodeAndTransitiveChildrenNames(graph, ancestorName).reduce(
+                    const setOfAncestors: Set<string> = this.getAncestorsAndSelfForSingleNode(graph, ancestorName).reduce(
                         (prev, curr) => prev.add(curr),
                         new Set<string>()
                     );
-                    setOfChildren.delete(ancestorName);
-                    return Array.from(setOfChildren);
+                    setOfAncestors.delete(ancestorName);
+                    return Array.from(setOfAncestors);
                 })
                 .reduce((prev, curr) => prev.concat(curr), [])
         );
     }
 
-    public static getTransitiveChildrenNamesIncludingAncestors(graph: IDirectedGraph, ancestorNames: string[]): string[] {
-        return this.removeDupliateEntries(this.getTransitiveChildrenNames(graph, ancestorNames).concat(ancestorNames));
+    public static getDescendantsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+        return this.removeDupliateEntries(
+            nodeNames
+                .map(ancestorName => {
+                    const givenNode = this.getNodeByName(graph, ancestorName);
+                    if (!givenNode) {
+                        return [];
+                    }
+                    const setOfDescendants: Set<string> = this.getDescendantsAndSelfForSingleNode(graph, ancestorName).reduce(
+                        (prev, curr) => prev.add(curr),
+                        new Set<string>()
+                    );
+                    setOfDescendants.delete(ancestorName);
+                    return Array.from(setOfDescendants);
+                })
+                .reduce((prev, curr) => prev.concat(curr), [])
+        );
     }
 
-    public static getNodeAndTransitiveChildrenNames(graph: IDirectedGraph, name: string): string[] {
-        const givenNode = this.getNodeByName(graph, name);
+    public static getAncestorsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+        return this.removeDupliateEntries(this.getAncestorsOfMultipleNodes(graph, nodeNames).concat(nodeNames));
+    }
+
+    public static getDescendantsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+        return this.removeDupliateEntries(this.getDescendantsOfMultipleNodes(graph, nodeNames).concat(nodeNames));
+    }
+
+    public static getAncestorsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
+        const givenNode = this.getNodeByName(graph, nodeName);
         if (!givenNode) {
             return [];
         }
-        return this.getNodeAndTransitiveChildren(givenNode).map(n => n.name);
+        return this.getAncestorsAndSelfOfSingleNodeRecursively(givenNode).map(n => n.name);
+    }
+
+    public static getDescendantsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
+        const givenNode = this.getNodeByName(graph, nodeName);
+        if (!givenNode) {
+            return [];
+        }
+        return this.getDescendantsAndSelfOfSingleNodeRecursively(givenNode).map(n => n.name);
     }
 
     public static getTopologicallySorted(graph: IDirectedGraph, nodeNames: string[]): string[] {
@@ -84,17 +129,29 @@ export class DirectedGraphUtil {
         if (ancestor === descendant) {
             return allowReflexive;
         }
-        return this.getNodeAndTransitiveChildrenNames(graph, ancestor).includes(descendant);
+        return this.getAncestorsAndSelfForSingleNode(graph, descendant).includes(ancestor);
     }
 
-    private static getNodeAndTransitiveChildren(node: DirectedGraphNode): DirectedGraphNode[] {
-        if (node.getConnectedNodes().length === 0) {
+    private static getAncestorsAndSelfOfSingleNodeRecursively(node: DirectedGraphNode): DirectedGraphNode[] {
+        if (node.getParents().length === 0) {
             return [node];
         }
         return this.removeDupliateEntries(
             node
-                .getConnectedNodes()
-                .map(n => this.getNodeAndTransitiveChildren(n))
+                .getParents()
+                .map(n => this.getAncestorsAndSelfOfSingleNodeRecursively(n))
+                .reduce((prev, curr) => prev.concat(curr), [node])
+        );
+    }
+
+    private static getDescendantsAndSelfOfSingleNodeRecursively(node: DirectedGraphNode): DirectedGraphNode[] {
+        if (node.getChildren().length === 0) {
+            return [node];
+        }
+        return this.removeDupliateEntries(
+            node
+                .getChildren()
+                .map(n => this.getDescendantsAndSelfOfSingleNodeRecursively(n))
                 .reduce((prev, curr) => prev.concat(curr), [node])
         );
     }
@@ -111,7 +168,7 @@ export class DirectedGraphUtil {
             return true;
         }
         return node
-            .getConnectedNodes()
+            .getChildren()
             .map(connectedNode => this.hasCycleRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
             .reduce((prev, curr) => prev || curr, false);
     }
@@ -143,13 +200,14 @@ class DirectedGraphBuilder {
         return this;
     }
 
-    public createDirectedEdge(fromNodeWithName: string, toNodeWithName: string): DirectedGraphBuilder {
-        const fromNode = this.graph.nodes.find(node => node.name === fromNodeWithName);
-        const toNode = this.graph.nodes.find(node => node.name === toNodeWithName);
-        if (!fromNode || !toNode) {
+    public createDirectedEdge(parentName: string, childName: string): DirectedGraphBuilder {
+        const parentNode = this.graph.nodes.find(node => node.name === parentName);
+        const childNode = this.graph.nodes.find(node => node.name === childName);
+        if (!parentNode || !childNode) {
             return this;
         }
-        fromNode.addEdgeTowards(toNode);
+        parentNode.addChild(childNode);
+        childNode.addParent(parentNode);
         return this;
     }
 
