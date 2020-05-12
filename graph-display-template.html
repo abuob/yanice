@@ -80,6 +80,13 @@
         padding-left: 8px;
     }
 
+    .options {
+        background: lightgrey;
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+    }
+
 
 </style>
 <div class="legend">
@@ -91,22 +98,41 @@
     </div>
     <table style="margin-left: 5px">
         <tr>
-            <td>A<span class="legend-arrow">&#10230;</span>B</td>
-            <td class="legend-table-padding">Project A depends on project B</td>
+            <td><label for="graphEdgeDirectionSelect">A<span class="legend-arrow">&#10230;</span>B</label></td>
+            <td class="legend-table-padding">
+                <select onchange="graphEdgeDirectionSelectCallback(this)" id="graphEdgeDirectionSelect">
+                    <option value="A_DEPENDS_ON_B">Project A depends on project B</option>
+                    <option value="A_IMPORTS_B">Project A imports project B</option>
+                </select>
+            </td>
         </tr>
         <tr>
-            <td><div class="legend-rectangle dashed-border"></div></td>
-            <td class="legend-table-padding">Dashed border: Has no command to execute corresponding to the scope of the graph</td>
+            <td>
+                <div class="legend-rectangle dashed-border"></div>
+            </td>
+            <td class="legend-table-padding">Dashed border: Has no command to execute corresponding to the scope of the
+                graph
+            </td>
         </tr>
         <tr>
-            <td><div class="legend-rectangle red-border"></div></td>
-            <td class="legend-table-padding">Red border: A dependency has changed compared to the given git-revision</td>
+            <td>
+                <div class="legend-rectangle red-border"></div>
+            </td>
+            <td class="legend-table-padding">Red border: A dependency has changed compared to the given git-revision
+            </td>
         </tr>
         <tr>
-            <td><div class="legend-rectangle red-border red-fill"></div></td>
-            <td class="legend-table-padding">Red background: File(s) of this project have changed compared to the given git-revision</td>
+            <td>
+                <div class="legend-rectangle red-border red-fill"></div>
+            </td>
+            <td class="legend-table-padding">Red background: File(s) of this project have changed compared to the given
+                git-revision
+            </td>
         </tr>
     </table>
+</div>
+<div class="options">
+
 </div>
 <div class="svg-container">
     <svg id="svg-id" height="450" width="800" style="display: block">
@@ -114,6 +140,36 @@
     </svg>
 </div>
 <script>
+
+    const DEFAULT_DISPLAY_OPTIONS = {
+        graphRenderDirection: 'TB', // TB | BT | LR | RL
+        graphEdgeDirection: 'A_DEPENDS_ON_B', // A_DEPENDS_ON_B | A_IMPORTS_B
+    };
+
+    function getOptionsFromSessionStorageOrDefault() {
+        const optionsFromSessionStorage = sessionStorage.getItem('graphDisplayOptions');
+        return optionsFromSessionStorage ? JSON.parse(optionsFromSessionStorage) : DEFAULT_DISPLAY_OPTIONS;
+    }
+
+    function writeOptionsToSessionStorageAndReload(graphDisplayOptions) {
+        sessionStorage.setItem('graphDisplayOptions', JSON.stringify(graphDisplayOptions));
+        window.location.reload();
+    }
+
+    function graphEdgeDirectionSelectCallback(selectElement) {
+        const options = getOptionsFromSessionStorageOrDefault();
+        const newOptions = {
+            ...options,
+            graphEdgeDirection: selectElement.value
+        };
+        writeOptionsToSessionStorageAndReload(newOptions);
+    }
+
+    const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
+    console.log('RENDER_OPTIONS', RENDER_OPTIONS);
+
+    // Set selects
+    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_DEPENDS_ON_B' ? 0 : 1].selected = true;
 
     // Initialize an empty graph
     const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
@@ -139,10 +195,20 @@
         data.label = data.projectName;
         data.style = getNodeStyle(data);
         dagreGraph.setNode(data.projectName, data);
-        data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {
-            curve: d3.curveBasis,
-            style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
-        }));
+        switch (RENDER_OPTIONS.graphEdgeDirection) {
+            case 'A_DEPENDS_ON_B':
+                data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {
+                    curve: d3.curveBasis,
+                    style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
+                }));
+                break;
+            case 'A_IMPORTS_B':
+                data.edgesTo.forEach(e => dagreGraph.setEdge(e, data.projectName, {
+                    curve: d3.curveBasis,
+                    style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
+                }));
+                break;
+        }
     });
 
 
@@ -211,7 +277,7 @@
     // =========== UTILITIES ==============
 
     function getNodeStyle(data) {
-        var styleStr = "stroke-width: 2px;";
+        let styleStr = "stroke-width: 2px;";
         // If there is no command, the graph-node has dashed borders
         if (!data.command) {
             styleStr = styleStr.concat("stroke-dasharray: 5, 5;");
@@ -228,8 +294,8 @@
     }
 
     function getEdgeStyle(nodeFromData, nodeToData) {
-        var styleStr = "";
-        if(nodeToData.isAffected) {
+        let styleStr = "";
+        if (nodeToData.isAffected) {
             styleStr = styleStr.concat("stroke: #ff0000;");
         }
         return styleStr;
@@ -252,7 +318,7 @@
         );
 
         // Add responsibles, if there are any
-        if(nodeData.responsibles.length > 0) {
+        if (nodeData.responsibles.length > 0) {
             table = table.concat(
                 '<tr>' +
                 '  <td>responsibles:</td>' +
