@@ -7,6 +7,7 @@ interface IYaniceGraphNodeInfo {
     projectName: string;
     scope: string;
     edgesTo: string[];
+    edgesFrom: string[];
     responsibles: string[];
     changedFiles: string[];
     isAffected: boolean;
@@ -30,6 +31,7 @@ export class GraphDagreRenderer {
                     projectName: node.name,
                     scope: yaniceArgs.givenScope,
                     edgesTo: node.getChildren().map(e => e.name),
+                    edgesFrom: node.getParents().map(e => e.name),
                     responsibles: projectOrUndefined ? projectOrUndefined.responsibles : [],
                     changedFiles: projectOrUndefined
                         ? changedFiles.filter(filePath => ChangedProjects.isFilePathPartOfProject(projectOrUndefined, filePath))

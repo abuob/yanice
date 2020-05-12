@@ -104,7 +104,11 @@
     }
 
     .options .options-label {
-        width: 250px;
+        width: 200px;
+    }
+
+    .svg-container {
+        margin: 30px;
     }
 
 
@@ -167,6 +171,14 @@
                 </select>
             </div>
         </div>
+        <div class="options-row">
+            <div class="options-label"><label for="graphFocusSelect">Focus project</label></div>
+            <div>
+                <select id="graphFocusSelect" onchange="graphFocusSelectCallback(this)">
+                    <option value="-----">-----</option>
+                </select>
+            </div>
+        </div>
     </div>
 </div>
 <div class="svg-container">
@@ -176,9 +188,29 @@
 </div>
 <script>
 
+    /**
+     * graphData corresponds to IYaniceGraphNodeInfo[] (see graph-dagre-renderer.ts), an array of:
+     * {
+     *   projectName: string;
+     *   scope: string;
+     *   edgesTo: string[];
+     *   edgesFrom: string[];
+     *   responsibles: string[];
+     *   changedFiles: string[];
+     *   isAffected: boolean;
+     *   command: IYaniceCommand | null;
+     *   pathGlob: string;
+     *   pathRegExp: string;
+     * }
+     */
+    const graphData = INSERT_GRAPH_DATA_OBJECT_HERE;
+
+    const GRAPH_FOCUS_DEFAULT = '-----';
+
     const DEFAULT_DISPLAY_OPTIONS = {
         graphRenderDirection: 'TB', // TB | BT | LR | RL
-        graphEdgeDirection: 'A_DEPENDS_ON_B', // A_DEPENDS_ON_B | A_IMPORTS_B
+        graphEdgeDirection: 'A_DEPENDS_ON_B', // A_DEPENDS_ON_B | A_IMPORTS_B,
+        graphFocus: GRAPH_FOCUS_DEFAULT // ----- is nothing focused, otherwise name of the project
     };
 
     const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
@@ -192,43 +224,44 @@
                 RENDER_OPTIONS.graphRenderDirection === 'LR' ? 2 :
                     RENDER_OPTIONS.graphRenderDirection === 'RL' ? 3 : 0
         ].selected = true;
+    graphData.forEach(data => {
+        const select = document.querySelector('#graphFocusSelect');
+        select.options[select.options.length] = new Option(
+            data.projectName,
+            data.projectName,
+            RENDER_OPTIONS.graphFocus === data.projectName,
+            RENDER_OPTIONS.graphFocus === data.projectName
+        );
+    });
 
     // Initialize an empty graph
     const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
 
-    // graphData corresponds to IYaniceGraphNodeInfo[] (see graph-dagre-renderer.ts), an array of:
-    // {
-    //     projectName: string;
-    //     scope: string;
-    //     edgesTo: string[];
-    //     responsibles: string[];
-    //     changedFiles: string[];
-    //     isAffected: boolean;
-    //     command: IYaniceCommand | null;
-    //     pathGlob: string;
-    //     pathRegExp: string;
-    // }
-    const graphData = INSERT_GRAPH_DATA_OBJECT_HERE;
-    console.log(graphData);
-
     // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
     // is available: See e.g. "dagreGraph.node(d)"-usages below
-    graphData.forEach(data => {
+    graphData
+        .filter(data => getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus).includes(data.projectName))
+        .forEach(data => {
         data.label = data.projectName;
         data.style = getNodeStyle(data);
+
         dagreGraph.setNode(data.projectName, data);
         switch (RENDER_OPTIONS.graphEdgeDirection) {
             case 'A_DEPENDS_ON_B':
-                data.edgesTo.forEach(e => dagreGraph.setEdge(data.projectName, e, {
-                    curve: d3.curveBasis,
-                    style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
-                }));
+                data.edgesTo
+                    .filter(e => getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus).includes(e))
+                    .forEach(e => dagreGraph.setEdge(data.projectName, e, {
+                        curve: d3.curveBasis,
+                        style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
+                    }));
                 break;
             case 'A_IMPORTS_B':
-                data.edgesTo.forEach(e => dagreGraph.setEdge(e, data.projectName, {
-                    curve: d3.curveBasis,
-                    style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
-                }));
+                data.edgesTo
+                    .filter(e => getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus).includes(e))
+                    .forEach(e => dagreGraph.setEdge(e, data.projectName, {
+                        curve: d3.curveBasis,
+                        style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
+                    }));
                 break;
         }
     });
@@ -316,6 +349,15 @@
         writeOptionsToSessionStorageAndReload(newOptions);
     }
 
+    function graphFocusSelectCallback(selectElement) {
+        const options = getOptionsFromSessionStorageOrDefault();
+        const newOptions = {
+            ...options,
+            graphFocus: selectElement.value
+        };
+        writeOptionsToSessionStorageAndReload(newOptions);
+    }
+
     // =========== UTILITIES ==============
 
     function getOptionsFromSessionStorageOrDefault() {
@@ -326,6 +368,15 @@
     function writeOptionsToSessionStorageAndReload(graphDisplayOptions) {
         sessionStorage.setItem('graphDisplayOptions', JSON.stringify(graphDisplayOptions));
         window.location.reload();
+    }
+
+    function getProjectsThatNeedRendering(pGraphData, graphFocusSelection) {
+        const allProjects = pGraphData.map(d => d.projectName);
+        if(graphFocusSelection === GRAPH_FOCUS_DEFAULT) {
+            return allProjects;
+        }
+        const projectData = pGraphData.find(d => d.projectName === graphFocusSelection);
+        return Array.from(new Set([projectData.projectName, ...projectData.edgesTo, ...projectData.edgesFrom]));
     }
 
     function getNodeStyle(data) {
