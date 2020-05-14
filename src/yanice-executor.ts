@@ -79,7 +79,7 @@ export class YaniceExecutor {
         if (this.depGraph && this.changedProjects && this.yaniceArgs && this.yaniceConfig) {
             if (!this.yaniceArgs.includeAllProjects) {
                 const affected = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(this.depGraph, this.changedProjects);
-                this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySorted(this.depGraph, affected);
+                this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySortedReverse(this.depGraph, affected);
             } else {
                 this.affectedProjectsUnfiltered = this.yaniceConfig.projects.map(project => project.projectName);
             }

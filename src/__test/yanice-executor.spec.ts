@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { YaniceExecutor } from '../yanice-executor';
 import validYaniceJson1 from '../__fixtures/valid-1.yanice.json';
 import validYaniceJson4 from '../__fixtures/valid-4.yanice.json';
+import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
 import { IYaniceJson } from '../config/config.interface'
 
 describe('YaniceExecutor', () => {
@@ -9,6 +10,7 @@ describe('YaniceExecutor', () => {
     const baseDirectory = process.cwd();
     const yaniceJson1: IYaniceJson = validYaniceJson1 as any;
     const yaniceJson4: IYaniceJson = validYaniceJson4 as any;
+    const readmeYaniceJson: IYaniceJson = validReadmeYaniceJson as any;
 
     describe('some changed projects', () => {
         beforeEach(() => {
@@ -113,6 +115,8 @@ describe('YaniceExecutor', () => {
                 .filterOutUnsupportedProjectsIfNeeded();
             expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
             expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['B', 'C', 'D']);
+            // D must be before B/C (topologically sorted):
+            expect((yaniceExecutor as any).affectedProjects[0]).to.equal('D');
         });
 
         it('should calculate responsibles correctly', () => {
@@ -175,7 +179,7 @@ describe('YaniceExecutor', () => {
             expect((yaniceExecutor as any).changedProjects).to.have.same.members(['D']);
             expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['D']);
             expect((yaniceExecutor as any).affectedProjects).to.have.same.members([]);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members([]);
+            expect((yaniceExecutor as any).responsibles).to.have.same.ordered.members([]);
         });
 
         it('should calculate affected projects for a scope with some dependencies properly when just one project changed', () => {
@@ -209,7 +213,7 @@ describe('YaniceExecutor', () => {
                     .calculateResponsibles();
                 expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['A']);
                 expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.members(['A']);
+                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['A']);
             });
             it('should handle changes in project B for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
@@ -224,7 +228,7 @@ describe('YaniceExecutor', () => {
                     .calculateResponsibles();
                 expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['B']);
                 expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.members(['A', 'B']);
+                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['B', 'A']);
             });
             it('should handle changes in project C for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
@@ -239,7 +243,7 @@ describe('YaniceExecutor', () => {
                     .calculateResponsibles();
                 expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['C']);
                 expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.members(['A', 'B', 'C']);
+                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['C', 'B', 'A']);
             });
         });
         describe('scope-2', () => {
@@ -271,7 +275,7 @@ describe('YaniceExecutor', () => {
                     .calculateResponsibles();
                 expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['B']);
                 expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['A', 'B']);
+                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['B', 'A']);
             });
             it('should handle changes in project C for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
@@ -301,7 +305,42 @@ describe('YaniceExecutor', () => {
                     .calculateResponsibles();
                 expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['D']);
                 expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['A', 'B', 'D']);
+                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['D', 'B', 'A']);
+            });
+        });
+    });
+
+    describe('readmeYaniceJson', () => {
+        describe('test-scope', () => {
+            it('should test all projects in topologically ordering', () => {
+                const yaniceExecutorReadme = new YaniceExecutor();
+                (yaniceExecutorReadme as any).changedFiles = ['yanice.json'];
+                yaniceExecutorReadme
+                    .loadConfigAndParseArgs(['test'], baseDirectory, readmeYaniceJson)
+                    .calculateChangedProjects()
+                    .calculateDepGraphForGivenScope()
+                    .verifyDepGraphValidity()
+                    .calculateAffectedProjectsUnfiltered()
+                    .filterOutUnsupportedProjectsIfNeeded()
+                    .calculateResponsibles();
+                expect((yaniceExecutorReadme as any).changedProjects).to.have.same.members(['important-repo-files']);
+                expect((yaniceExecutorReadme as any).affectedProjectsUnfiltered).to.have.same.members(['project-A', 'project-B', 'lib-1', 'lib-2', 'important-repo-files']);
+                expect((yaniceExecutorReadme as any).affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
+            });
+            it('should test project-A and lib-1 if lib-1 has changed', () => {
+                const yaniceExecutorReadme = new YaniceExecutor();
+                (yaniceExecutorReadme as any).changedFiles = ['libs/lib-1/some.file'];
+                yaniceExecutorReadme
+                    .loadConfigAndParseArgs(['test'], baseDirectory, readmeYaniceJson)
+                    .calculateChangedProjects()
+                    .calculateDepGraphForGivenScope()
+                    .verifyDepGraphValidity()
+                    .calculateAffectedProjectsUnfiltered()
+                    .filterOutUnsupportedProjectsIfNeeded()
+                    .calculateResponsibles();
+                expect((yaniceExecutorReadme as any).changedProjects).to.have.same.members(['lib-1']);
+                expect((yaniceExecutorReadme as any).affectedProjectsUnfiltered).to.have.same.members(['project-A', 'lib-1']);
+                expect((yaniceExecutorReadme as any).affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
             });
         });
     });

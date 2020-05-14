@@ -153,6 +153,15 @@ describe('DirectedGraphUtil', () => {
         });
     });
 
+    describe('getTopologicallySortedReverse', () => {
+        it('should return node-names topologically sorted', () => {
+            expect(DirectedGraphUtil.getTopologicallySortedReverse(graph1, ['B', 'A'])).to.deep.equal(['B', 'A']);
+            expect(DirectedGraphUtil.getTopologicallySortedReverse(graph2, ['A', 'B', 'C'])).to.deep.equal(['C', 'B', 'A']);
+            expect(DirectedGraphUtil.getTopologicallySortedReverse(graph2, ['B', 'C', 'A'])).to.deep.equal(['C', 'B', 'A']);
+            expect(DirectedGraphUtil.getTopologicallySortedReverse(graph2, ['C', 'B', 'A'])).to.deep.equal(['C', 'B', 'A']);
+        });
+    });
+
     describe('isAncestorOf', () => {
         it('should calculate whether a node is an ancestor of another one or not', () => {
             expect(DirectedGraphUtil.isAncestorOf(graph1, 'A', 'B', false)).to.equal(true);

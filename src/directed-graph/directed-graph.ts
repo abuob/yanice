@@ -113,16 +113,26 @@ export class DirectedGraphUtil {
         return this.getDescendantsAndSelfOfSingleNodeRecursively(givenNode).map(n => n.name);
     }
 
+    /**
+     * Implementation as per https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
+     */
     public static getTopologicallySorted(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return nodeNames.slice(0).sort((a, b) => {
-            if (this.isAncestorOf(graph, a, b, false)) {
-                return -1;
+        const alreadySorted: string[] = [];
+        const tmpMarked = new Set<string>();
+        const permanentMarked = new Set<string>();
+        while (graph.nodes.length !== permanentMarked.size) {
+            const unmarkedNode = graph.nodes.find(node => !permanentMarked.has(node.name));
+            if (unmarkedNode) {
+                this.getTopologicallySortedVisit(graph, unmarkedNode, tmpMarked, permanentMarked, alreadySorted);
+            } else {
+                throw new Error('Cannot establish topological ordering; is your graph indeed a DAG?');
             }
-            if (this.isAncestorOf(graph, b, a, false)) {
-                return 1;
-            }
-            return 0;
-        });
+        }
+        return alreadySorted.filter(n => nodeNames.includes(n));
+    }
+
+    public static getTopologicallySortedReverse(graph: IDirectedGraph, nodeNames: string[]): string[] {
+        return this.getTopologicallySorted(graph, nodeNames).reverse();
     }
 
     public static isAncestorOf(graph: IDirectedGraph, ancestor: string, descendant: string, allowReflexive: boolean): boolean {
@@ -130,6 +140,26 @@ export class DirectedGraphUtil {
             return allowReflexive;
         }
         return this.getAncestorsAndSelfForSingleNode(graph, descendant).includes(ancestor);
+    }
+
+    private static getTopologicallySortedVisit(
+        graph: IDirectedGraph,
+        currentNode: DirectedGraphNode,
+        tmpMarked: Set<string>,
+        permanentMarked: Set<string>,
+        alreadySorted: string[]
+    ): void {
+        if (permanentMarked.has(currentNode.name)) {
+            return;
+        }
+        if (tmpMarked.has(currentNode.name)) {
+            throw new Error('Cannot establish topological ordering; does your graph contain a cycle?');
+        }
+        tmpMarked.add(currentNode.name);
+        currentNode.getChildren().forEach(n => this.getTopologicallySortedVisit(graph, n, tmpMarked, permanentMarked, alreadySorted));
+        tmpMarked.delete(currentNode.name);
+        permanentMarked.add(currentNode.name);
+        alreadySorted.unshift(currentNode.name);
     }
 
     private static getAncestorsAndSelfOfSingleNodeRecursively(node: DirectedGraphNode): DirectedGraphNode[] {
