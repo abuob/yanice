@@ -28,7 +28,7 @@
 
     .edgePath path.path {
         stroke: #333;
-        stroke-width: 1px;
+        stroke-width: 1.5px;
         fill: none;
     }
 
@@ -126,8 +126,8 @@
                 <td><label for="graphEdgeDirectionSelect">A<span class="legend-arrow">&#10230;</span>B</label></td>
                 <td class="legend-table-padding">
                     <select onchange="graphEdgeDirectionSelectCallback(this)" id="graphEdgeDirectionSelect">
-                        <option value="A_IMPORTS_B">Project A imports project B</option>
                         <option value="A_DEPENDS_ON_B">Project A depends on project B</option>
+                        <option value="A_IMPORTS_B">Project A imports project B</option>
                     </select>
                 </td>
             </tr>
@@ -193,8 +193,8 @@
      * {
      *   projectName: string;
      *   scope: string;
-     *   edgesTo: string[];
-     *   edgesFrom: string[];
+     *   parents: string[];
+     *   children: string[];
      *   responsibles: string[];
      *   changedFiles: string[];
      *   isAffected: boolean;
@@ -209,15 +209,16 @@
 
     const DEFAULT_DISPLAY_OPTIONS = {
         graphRenderDirection: 'TB', // TB | BT | LR | RL
-        graphEdgeDirection: 'A_IMPORTS_B', // A_DEPENDS_ON_B | A_IMPORTS_B,
+        graphEdgeDirection: 'A_DEPENDS_ON_B', // A_DEPENDS_ON_B | A_IMPORTS_B,
         graphFocus: GRAPH_FOCUS_DEFAULT // ----- is nothing focused, otherwise name of the project
     };
 
     const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
+    const RENDERED_PROJECTS = getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus);
     console.log('RENDER_OPTIONS', RENDER_OPTIONS);
 
     // Set selects
-    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_IMPORTS_B' ? 0 : 1].selected = true;
+    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_DEPENDS_ON_B' ? 0 : 1].selected = true;
     document.querySelector('#graphRenderOrientationSelect').options[
         RENDER_OPTIONS.graphRenderDirection === 'TB' ? 0 :
             RENDER_OPTIONS.graphRenderDirection === 'BT' ? 1 :
@@ -240,7 +241,7 @@
     // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
     // is available: See e.g. "dagreGraph.node(d)"-usages below
     graphData
-        .filter(data => getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus).includes(data.projectName))
+        .filter(data => RENDERED_PROJECTS.includes(data.projectName))
         .forEach(data => {
         data.label = data.projectName;
         data.style = getNodeStyle(data);
@@ -248,16 +249,16 @@
         dagreGraph.setNode(data.projectName, data);
         switch (RENDER_OPTIONS.graphEdgeDirection) {
             case 'A_DEPENDS_ON_B':
-                data.edgesTo
-                    .filter(e => getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus).includes(e))
+                data.parents
+                    .filter(e => RENDERED_PROJECTS.includes(e))
                     .forEach(e => dagreGraph.setEdge(data.projectName, e, {
                         curve: d3.curveBasis,
                         style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
                     }));
                 break;
             case 'A_IMPORTS_B':
-                data.edgesTo
-                    .filter(e => getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus).includes(e))
+                data.parents
+                    .filter(e => RENDERED_PROJECTS.includes(e))
                     .forEach(e => dagreGraph.setEdge(e, data.projectName, {
                         curve: d3.curveBasis,
                         style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
@@ -376,7 +377,7 @@
             return allProjects;
         }
         const projectData = pGraphData.find(d => d.projectName === graphFocusSelection);
-        return Array.from(new Set([projectData.projectName, ...projectData.edgesTo, ...projectData.edgesFrom]));
+        return Array.from(new Set([projectData.projectName, ...projectData.parents, ...projectData.children]));
     }
 
     function getNodeStyle(data) {
@@ -449,11 +450,11 @@
         }
 
         // Add dependents if there are any
-        if (nodeData.edgesTo.length > 0) {
+        if (nodeData.parents.length > 0) {
             table = table.concat(
                 '<tr>' +
                 '  <td>Dependents:</td>' +
-                '  <td>' + nodeData.edgesTo.join(', ') + '</td>' +
+                '  <td>' + nodeData.parents.join(', ') + '</td>' +
                 '</tr>'
             )
         }

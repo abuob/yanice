@@ -6,8 +6,8 @@ import { ChangedProjects } from '../git-diff/changed-projects';
 interface IYaniceGraphNodeInfo {
     projectName: string;
     scope: string;
-    edgesTo: string[];
-    edgesFrom: string[];
+    parents: string[];
+    children: string[];
     responsibles: string[];
     changedFiles: string[];
     isAffected: boolean;
@@ -30,8 +30,8 @@ export class GraphDagreRenderer {
                 return {
                     projectName: node.name,
                     scope: yaniceArgs.givenScope,
-                    edgesTo: node.getChildren().map(e => e.name),
-                    edgesFrom: node.getParents().map(e => e.name),
+                    parents: node.getParents().map(e => e.name),
+                    children: node.getChildren().map(e => e.name),
                     responsibles: projectOrUndefined ? projectOrUndefined.responsibles : [],
                     changedFiles: projectOrUndefined
                         ? changedFiles.filter(filePath => ChangedProjects.isFilePathPartOfProject(projectOrUndefined, filePath))
