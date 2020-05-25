@@ -126,8 +126,8 @@
                 <td><label for="graphEdgeDirectionSelect">A<span class="legend-arrow">&#10230;</span>B</label></td>
                 <td class="legend-table-padding">
                     <select onchange="graphEdgeDirectionSelectCallback(this)" id="graphEdgeDirectionSelect">
-                        <option value="A_DEPENDS_ON_B">Project A depends on project B</option>
-                        <option value="A_IMPORTS_B">Project A imports project B</option>
+                        <option value="A_IS_DEPENDENCY_OF_B">A is a dependency of B (B imports A)</option>
+                        <option value="A_IMPORTS_B">A depends on B (A imports B)</option>
                     </select>
                 </td>
             </tr>
@@ -209,7 +209,7 @@
 
     const DEFAULT_DISPLAY_OPTIONS = {
         graphRenderDirection: 'TB', // TB | BT | LR | RL
-        graphEdgeDirection: 'A_DEPENDS_ON_B', // A_DEPENDS_ON_B | A_IMPORTS_B,
+        graphEdgeDirection: 'A_IS_DEPENDENCY_OF_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B,
         graphFocus: GRAPH_FOCUS_DEFAULT // ----- is nothing focused, otherwise name of the project
     };
 
@@ -218,7 +218,7 @@
     console.log('RENDER_OPTIONS', RENDER_OPTIONS);
 
     // Set selects
-    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_DEPENDS_ON_B' ? 0 : 1].selected = true;
+    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 0 : 1].selected = true;
     document.querySelector('#graphRenderOrientationSelect').options[
         RENDER_OPTIONS.graphRenderDirection === 'TB' ? 0 :
             RENDER_OPTIONS.graphRenderDirection === 'BT' ? 1 :
@@ -248,7 +248,7 @@
 
         dagreGraph.setNode(data.projectName, data);
         switch (RENDER_OPTIONS.graphEdgeDirection) {
-            case 'A_DEPENDS_ON_B':
+            case 'A_IS_DEPENDENCY_OF_B':
                 data.parents
                     .filter(e => RENDERED_PROJECTS.includes(e))
                     .forEach(e => dagreGraph.setEdge(data.projectName, e, {
@@ -397,9 +397,9 @@
         return styleStr;
     }
 
-    function getEdgeStyle(nodeFromData, nodeToData) {
+    function getEdgeStyle(importerNode, dependencyNode) {
         let styleStr = "";
-        if (nodeToData.isAffected) {
+        if (importerNode.changedFiles.length > 0 && dependencyNode.isAffected) {
             styleStr = styleStr.concat("stroke: #ff0000;");
         }
         return styleStr;

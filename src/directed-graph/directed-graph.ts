@@ -52,49 +52,41 @@ export class DirectedGraphUtil {
     }
 
     public static getAncestorsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return this.removeDupliateEntries(
-            nodeNames
-                .map(ancestorName => {
-                    const givenNode = this.getNodeByName(graph, ancestorName);
-                    if (!givenNode) {
-                        return [];
-                    }
-                    const setOfAncestors: Set<string> = this.getAncestorsAndSelfForSingleNode(graph, ancestorName).reduce(
-                        (prev, curr) => prev.add(curr),
-                        new Set<string>()
-                    );
-                    setOfAncestors.delete(ancestorName);
-                    return Array.from(setOfAncestors);
-                })
-                .reduce((prev, curr) => prev.concat(curr), [])
-        );
+        return nodeNames
+            .map<string[]>(nodeName => {
+                const givenNode = this.getNodeByName(graph, nodeName);
+                if (!givenNode) {
+                    return [];
+                }
+                return this.getAncestorsAndSelfForSingleNode(graph, nodeName).filter(ancestorOrSelf => ancestorOrSelf !== nodeName);
+            })
+            .reduce<string[]>((prev, curr) => prev.concat(curr), [])
+            .reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getDescendantsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return this.removeDupliateEntries(
-            nodeNames
-                .map(ancestorName => {
-                    const givenNode = this.getNodeByName(graph, ancestorName);
-                    if (!givenNode) {
-                        return [];
-                    }
-                    const setOfDescendants: Set<string> = this.getDescendantsAndSelfForSingleNode(graph, ancestorName).reduce(
-                        (prev, curr) => prev.add(curr),
-                        new Set<string>()
-                    );
-                    setOfDescendants.delete(ancestorName);
-                    return Array.from(setOfDescendants);
-                })
-                .reduce((prev, curr) => prev.concat(curr), [])
-        );
+        return nodeNames
+            .map<string[]>(nodeName => {
+                const givenNode = this.getNodeByName(graph, nodeName);
+                if (!givenNode) {
+                    return [];
+                }
+                return this.getDescendantsAndSelfForSingleNode(graph, nodeName).filter(descendantOrSelf => descendantOrSelf !== nodeName);
+            })
+            .reduce<string[]>((prev, curr) => prev.concat(curr), [])
+            .reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getAncestorsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return this.removeDupliateEntries(this.getAncestorsOfMultipleNodes(graph, nodeNames).concat(nodeNames));
+        return this.getAncestorsOfMultipleNodes(graph, nodeNames)
+            .concat(nodeNames)
+            .reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getDescendantsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return this.removeDupliateEntries(this.getDescendantsOfMultipleNodes(graph, nodeNames).concat(nodeNames));
+        return this.getDescendantsOfMultipleNodes(graph, nodeNames)
+            .concat(nodeNames)
+            .reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getAncestorsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
@@ -142,6 +134,9 @@ export class DirectedGraphUtil {
         return this.getAncestorsAndSelfForSingleNode(graph, descendant).includes(ancestor);
     }
 
+    /**
+     * visitor-function for getTopologicallySorted; as per https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
+     */
     private static getTopologicallySortedVisit(
         graph: IDirectedGraph,
         currentNode: DirectedGraphNode,
@@ -166,24 +161,22 @@ export class DirectedGraphUtil {
         if (node.getParents().length === 0) {
             return [node];
         }
-        return this.removeDupliateEntries(
-            node
-                .getParents()
-                .map(n => this.getAncestorsAndSelfOfSingleNodeRecursively(n))
-                .reduce((prev, curr) => prev.concat(curr), [node])
-        );
+        return node
+            .getParents()
+            .map(n => this.getAncestorsAndSelfOfSingleNodeRecursively(n))
+            .reduce<DirectedGraphNode[]>((prev, curr) => prev.concat(curr), [node])
+            .reduce<DirectedGraphNode[]>(this.noDuplicatesAccumulate, []);
     }
 
     private static getDescendantsAndSelfOfSingleNodeRecursively(node: DirectedGraphNode): DirectedGraphNode[] {
         if (node.getChildren().length === 0) {
             return [node];
         }
-        return this.removeDupliateEntries(
-            node
-                .getChildren()
-                .map(n => this.getDescendantsAndSelfOfSingleNodeRecursively(n))
-                .reduce((prev, curr) => prev.concat(curr), [node])
-        );
+        return node
+            .getChildren()
+            .map(n => this.getDescendantsAndSelfOfSingleNodeRecursively(n))
+            .reduce<DirectedGraphNode[]>((prev, curr) => prev.concat(curr), [node])
+            .reduce<DirectedGraphNode[]>(this.noDuplicatesAccumulate, []);
     }
 
     private static hasCycleRecursive(
@@ -204,16 +197,11 @@ export class DirectedGraphUtil {
     }
 
     private static getNodeByName(graph: IDirectedGraph, name: string): DirectedGraphNode | null {
-        const givenNode = graph.nodes.find(n => n.name === name);
-        if (!givenNode) {
-            return null;
-        }
-        return givenNode;
+        return graph.nodes.find(n => n.name === name) || null;
     }
 
-    // poor man's removal of duplicate entries in an array
-    private static removeDupliateEntries<T>(input: T[]): T[] {
-        return Array.from(input.reduce((prev, curr) => prev.add(curr), new Set<T>()));
+    private static noDuplicatesAccumulate<T>(prev: T[], curr: T): T[] {
+        return prev.includes(curr) ? prev : prev.concat([curr]);
     }
 }
 
