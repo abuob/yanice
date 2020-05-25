@@ -42,7 +42,7 @@ export class DirectedGraphUtil {
     public static hasCycle(graph: IDirectedGraph): boolean {
         let visitedAlready: DirectedGraphNode[] = [];
         let result = false;
-        graph.nodes.forEach(node => {
+        graph.nodes.forEach((node) => {
             if (this.hasCycleRecursive(node, visitedAlready, [])) {
                 result = true;
             }
@@ -53,12 +53,12 @@ export class DirectedGraphUtil {
 
     public static getAncestorsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
         return nodeNames
-            .map<string[]>(nodeName => {
+            .map<string[]>((nodeName) => {
                 const givenNode = this.getNodeByName(graph, nodeName);
                 if (!givenNode) {
                     return [];
                 }
-                return this.getAncestorsAndSelfForSingleNode(graph, nodeName).filter(ancestorOrSelf => ancestorOrSelf !== nodeName);
+                return this.getAncestorsAndSelfForSingleNode(graph, nodeName).filter((ancestorOrSelf) => ancestorOrSelf !== nodeName);
             })
             .reduce<string[]>((prev, curr) => prev.concat(curr), [])
             .reduce<string[]>(this.noDuplicatesAccumulate, []);
@@ -66,27 +66,23 @@ export class DirectedGraphUtil {
 
     public static getDescendantsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
         return nodeNames
-            .map<string[]>(nodeName => {
+            .map<string[]>((nodeName) => {
                 const givenNode = this.getNodeByName(graph, nodeName);
                 if (!givenNode) {
                     return [];
                 }
-                return this.getDescendantsAndSelfForSingleNode(graph, nodeName).filter(descendantOrSelf => descendantOrSelf !== nodeName);
+                return this.getDescendantsAndSelfForSingleNode(graph, nodeName).filter((descendantOrSelf) => descendantOrSelf !== nodeName);
             })
             .reduce<string[]>((prev, curr) => prev.concat(curr), [])
             .reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getAncestorsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return this.getAncestorsOfMultipleNodes(graph, nodeNames)
-            .concat(nodeNames)
-            .reduce<string[]>(this.noDuplicatesAccumulate, []);
+        return this.getAncestorsOfMultipleNodes(graph, nodeNames).concat(nodeNames).reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getDescendantsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
-        return this.getDescendantsOfMultipleNodes(graph, nodeNames)
-            .concat(nodeNames)
-            .reduce<string[]>(this.noDuplicatesAccumulate, []);
+        return this.getDescendantsOfMultipleNodes(graph, nodeNames).concat(nodeNames).reduce<string[]>(this.noDuplicatesAccumulate, []);
     }
 
     public static getAncestorsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
@@ -94,7 +90,7 @@ export class DirectedGraphUtil {
         if (!givenNode) {
             return [];
         }
-        return this.getAncestorsAndSelfOfSingleNodeRecursively(givenNode).map(n => n.name);
+        return this.getAncestorsAndSelfOfSingleNodeRecursively(givenNode).map((n) => n.name);
     }
 
     public static getDescendantsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
@@ -102,7 +98,7 @@ export class DirectedGraphUtil {
         if (!givenNode) {
             return [];
         }
-        return this.getDescendantsAndSelfOfSingleNodeRecursively(givenNode).map(n => n.name);
+        return this.getDescendantsAndSelfOfSingleNodeRecursively(givenNode).map((n) => n.name);
     }
 
     /**
@@ -113,14 +109,14 @@ export class DirectedGraphUtil {
         const tmpMarked = new Set<string>();
         const permanentMarked = new Set<string>();
         while (graph.nodes.length !== permanentMarked.size) {
-            const unmarkedNode = graph.nodes.find(node => !permanentMarked.has(node.name));
+            const unmarkedNode = graph.nodes.find((node) => !permanentMarked.has(node.name));
             if (unmarkedNode) {
                 this.getTopologicallySortedVisit(graph, unmarkedNode, tmpMarked, permanentMarked, alreadySorted);
             } else {
                 throw new Error('Cannot establish topological ordering; is your graph indeed a DAG?');
             }
         }
-        return alreadySorted.filter(n => nodeNames.includes(n));
+        return alreadySorted.filter((n) => nodeNames.includes(n));
     }
 
     public static getTopologicallySortedReverse(graph: IDirectedGraph, nodeNames: string[]): string[] {
@@ -151,7 +147,7 @@ export class DirectedGraphUtil {
             throw new Error('Cannot establish topological ordering; does your graph contain a cycle?');
         }
         tmpMarked.add(currentNode.name);
-        currentNode.getChildren().forEach(n => this.getTopologicallySortedVisit(graph, n, tmpMarked, permanentMarked, alreadySorted));
+        currentNode.getChildren().forEach((n) => this.getTopologicallySortedVisit(graph, n, tmpMarked, permanentMarked, alreadySorted));
         tmpMarked.delete(currentNode.name);
         permanentMarked.add(currentNode.name);
         alreadySorted.unshift(currentNode.name);
@@ -163,7 +159,7 @@ export class DirectedGraphUtil {
         }
         return node
             .getParents()
-            .map(n => this.getAncestorsAndSelfOfSingleNodeRecursively(n))
+            .map((n) => this.getAncestorsAndSelfOfSingleNodeRecursively(n))
             .reduce<DirectedGraphNode[]>((prev, curr) => prev.concat(curr), [node])
             .reduce<DirectedGraphNode[]>(this.noDuplicatesAccumulate, []);
     }
@@ -174,7 +170,7 @@ export class DirectedGraphUtil {
         }
         return node
             .getChildren()
-            .map(n => this.getDescendantsAndSelfOfSingleNodeRecursively(n))
+            .map((n) => this.getDescendantsAndSelfOfSingleNodeRecursively(n))
             .reduce<DirectedGraphNode[]>((prev, curr) => prev.concat(curr), [node])
             .reduce<DirectedGraphNode[]>(this.noDuplicatesAccumulate, []);
     }
@@ -192,12 +188,12 @@ export class DirectedGraphUtil {
         }
         return node
             .getChildren()
-            .map(connectedNode => this.hasCycleRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
+            .map((connectedNode) => this.hasCycleRecursive(connectedNode, visitedAlready, nodesInDfsTraversal.concat(node)))
             .reduce((prev, curr) => prev || curr, false);
     }
 
     private static getNodeByName(graph: IDirectedGraph, name: string): DirectedGraphNode | null {
-        return graph.nodes.find(n => n.name === name) || null;
+        return graph.nodes.find((n) => n.name === name) || null;
     }
 
     private static noDuplicatesAccumulate<T>(prev: T[], curr: T): T[] {
@@ -211,7 +207,7 @@ class DirectedGraphBuilder {
     };
 
     public addNode(name: string): DirectedGraphBuilder {
-        if (this.graph.nodes.map(n => n.name).includes(name)) {
+        if (this.graph.nodes.map((n) => n.name).includes(name)) {
             throw Error(`Cannot add a node with name "${name}" to the graph, such a node already exists!`);
         }
         this.graph.nodes = this.graph.nodes.concat(new DirectedGraphNode(name));
@@ -219,8 +215,8 @@ class DirectedGraphBuilder {
     }
 
     public createDirectedEdge(parentName: string, childName: string): DirectedGraphBuilder {
-        const parentNode = this.graph.nodes.find(node => node.name === parentName);
-        const childNode = this.graph.nodes.find(node => node.name === childName);
+        const parentNode = this.graph.nodes.find((node) => node.name === parentName);
+        const childNode = this.graph.nodes.find((node) => node.name === childName);
         if (!parentNode || !childNode) {
             return this;
         }

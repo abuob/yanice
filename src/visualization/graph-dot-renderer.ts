@@ -8,16 +8,16 @@ export class GraphDotRenderer {
     }
 
     private static getAllNodeDeclarations(directedGraph: IDirectedGraph): string {
-        return directedGraph.nodes.map(node => `${GraphDotRenderer.getDotConformNodeName(node.name)} [label="${node.name}"];`).join('');
+        return directedGraph.nodes.map((node) => `${GraphDotRenderer.getDotConformNodeName(node.name)} [label="${node.name}"];`).join('');
     }
 
     private static getAllEdgeDeclarations(directedGraph: IDirectedGraph): string {
         return directedGraph.nodes
-            .map(ancestor =>
+            .map((ancestor) =>
                 ancestor
                     .getChildren()
                     .map(
-                        child =>
+                        (child) =>
                             `${GraphDotRenderer.getDotConformNodeName(ancestor.name)} -> ${GraphDotRenderer.getDotConformNodeName(
                                 child.name
                             )};`

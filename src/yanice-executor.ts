@@ -25,10 +25,7 @@ export class YaniceExecutor {
     public loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: IYaniceJson): YaniceExecutor {
         this.baseDirectory = baseDirectory;
         this.yaniceJson = yaniceJson;
-        return this.validateYaniceJson(yaniceJson)
-            .parseArgs(args)
-            .verifyArgs()
-            .parseYaniceJson();
+        return this.validateYaniceJson(yaniceJson).parseArgs(args).verifyArgs().parseYaniceJson();
     }
 
     public calculateChangedFiles(): YaniceExecutor {
@@ -81,14 +78,14 @@ export class YaniceExecutor {
                 const affected = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(this.depGraph, this.changedProjects);
                 this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySortedReverse(this.depGraph, affected);
             } else {
-                this.affectedProjectsUnfiltered = this.yaniceConfig.projects.map(project => project.projectName);
+                this.affectedProjectsUnfiltered = this.yaniceConfig.projects.map((project) => project.projectName);
             }
         }
         return this;
     }
 
     public filterOutUnsupportedProjectsIfNeeded(): YaniceExecutor {
-        this.affectedProjects = this.affectedProjectsUnfiltered.filter(projectName => {
+        this.affectedProjects = this.affectedProjectsUnfiltered.filter((projectName) => {
             if (!this.yaniceArgs || !this.yaniceConfig) {
                 return true;
             }
@@ -103,8 +100,8 @@ export class YaniceExecutor {
     public calculateResponsibles(): YaniceExecutor {
         if (this.yaniceConfig && this.affectedProjects) {
             this.responsibles = this.yaniceConfig.projects
-                .filter(project => this.affectedProjects.includes(project.projectName))
-                .map(project => project.responsibles)
+                .filter((project) => this.affectedProjects.includes(project.projectName))
+                .map((project) => project.responsibles)
                 .reduce((curr, prev) => curr.concat(prev), []);
         }
         return this;
@@ -112,7 +109,7 @@ export class YaniceExecutor {
 
     public outputResponsiblesAndExitIfShowResponsiblesMode(): YaniceExecutor {
         if (this.yaniceArgs && this.yaniceArgs.outputResponsibles) {
-            this.responsibles.forEach(responsible => log(responsible));
+            this.responsibles.forEach((responsible) => log(responsible));
             this.exitYanice(0, null);
         }
         return this;
@@ -120,7 +117,7 @@ export class YaniceExecutor {
 
     public outputAffectedAndExitIfOutputOnlyMode(): YaniceExecutor {
         if (this.yaniceArgs && this.yaniceArgs.outputOnly) {
-            this.affectedProjects.forEach(projectName => log(projectName));
+            this.affectedProjects.forEach((projectName) => log(projectName));
             this.exitYanice(0, null);
         }
         return this;
@@ -165,8 +162,8 @@ export class YaniceExecutor {
         ) {
             const scope = this.yaniceArgs.givenScope;
             const commands: IYaniceCommand[] = this.yaniceConfig.projects
-                .filter(project => this.affectedProjects.includes(project.projectName))
-                .map(project => project.commands[scope]);
+                .filter((project) => this.affectedProjects.includes(project.projectName))
+                .map((project) => project.commands[scope]);
 
             execucteInParallelLimited(
                 commands,
@@ -186,7 +183,7 @@ export class YaniceExecutor {
                     if (this.yaniceConfig) {
                         LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, commandsExecutionResults);
                     }
-                    if (commandsExecutionResults.some(result => result.exitCode !== 0)) {
+                    if (commandsExecutionResults.some((result) => result.exitCode !== 0)) {
                         this.exitYanice(1, null);
                     }
                 }

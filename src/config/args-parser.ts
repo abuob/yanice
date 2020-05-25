@@ -46,7 +46,7 @@ export class ArgsParser {
             commandOutputMode: null,
             concurrency: 1
         };
-        argv.slice(1).forEach(arg => {
+        argv.slice(1).forEach((arg) => {
             if (/^--branch=.+$/.test(arg)) {
                 resultArgs.diffTarget.branch = arg.replace(/--branch=/, '');
                 return;

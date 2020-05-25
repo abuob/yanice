@@ -5,10 +5,10 @@ const minimatch = require('minimatch');
 export class ChangedProjects {
     public static getChangedProjectsRaw(yaniceProjects: IYaniceProject[], changedFilePaths: string[]): string[] {
         return yaniceProjects
-            .filter(project =>
+            .filter((project) =>
                 changedFilePaths.some((changedFile: string): boolean => ChangedProjects.isFilePathPartOfProject(project, changedFile))
             )
-            .map(project => project.projectName);
+            .map((project) => project.projectName);
     }
 
     public static isFilePathPartOfProject(yaniceProject: IYaniceProject, filePath: string): boolean {

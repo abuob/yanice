@@ -27,13 +27,13 @@ export class LogUtil {
             case 'ignore':
                 return;
             case 'append-at-end':
-                commandExecutionResults.forEach(result => {
+                commandExecutionResults.forEach((result) => {
                     LogUtil.printOutputChunkFilteredUnlessIgnored(result.stdout, allSelectedFilters, ignoreStdout);
                     LogUtil.printOutputChunkFilteredUnlessIgnored(result.stderr, allSelectedFilters, ignoreStderr);
                 });
                 break;
             case 'append-at-end-on-error':
-                commandExecutionResults.forEach(result => {
+                commandExecutionResults.forEach((result) => {
                     if (result.exitCode !== 0) {
                         LogUtil.printOutputChunkFilteredUnlessIgnored(result.stdout, allSelectedFilters, ignoreStdout);
                         LogUtil.printOutputChunkFilteredUnlessIgnored(result.stderr, allSelectedFilters, ignoreStderr);
@@ -54,14 +54,14 @@ export class LogUtil {
         chunk
             .trim()
             .split('\n')
-            .filter(line => LogUtil.isOutputLineOkayToPrint(appliedFilters, line))
-            .forEach(line => {
+            .filter((line) => LogUtil.isOutputLineOkayToPrint(appliedFilters, line))
+            .forEach((line) => {
                 log(line);
             });
     }
 
     private static getAllSelectedOutputFilters(commandOutputFilter: commandOutputFilterType[]): OutputFilter[] {
         const filters: OutputFilter[] = [new NpmErrorFilter(), new KarmaProgressSuccessFilter()];
-        return filters.filter(filter => commandOutputFilter.includes(filter.filterName));
+        return filters.filter((filter) => commandOutputFilter.includes(filter.filterName));
     }
 }

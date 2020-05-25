@@ -33,7 +33,7 @@ export class ConfigParser {
     }
 
     public static supportsScopeCommand(yaniceConfig: IYaniceConfig, projectName: string, scope: string): boolean {
-        const yaniceProject = yaniceConfig.projects.find(project => project.projectName === projectName);
+        const yaniceProject = yaniceConfig.projects.find((project) => project.projectName === projectName);
         return !!yaniceProject && Object.keys(yaniceProject.commands).includes(scope);
     }
 
@@ -41,12 +41,12 @@ export class ConfigParser {
         const dependencies = yaniceConfig.dependencies;
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
-            .map(p => p.projectName)
-            .forEach(projectName => {
+            .map((p) => p.projectName)
+            .forEach((projectName) => {
                 graphBuilder.addNode(projectName);
             });
-        Object.keys(dependencies).forEach(projectName => {
-            dependencies[projectName].forEach(dependencyName => {
+        Object.keys(dependencies).forEach((projectName) => {
+            dependencies[projectName].forEach((dependencyName) => {
                 graphBuilder.createDirectedEdge(projectName, dependencyName);
             });
         });
@@ -58,7 +58,7 @@ export class ConfigParser {
             (project): IYaniceProject => {
                 const commandsRaw = project.commands || {};
                 const commands: ICommandPerScope = {};
-                Object.keys(commandsRaw).forEach(scope => {
+                Object.keys(commandsRaw).forEach((scope) => {
                     commands[scope] = {
                         command: commandsRaw[scope].command,
                         cwd: commandsRaw[scope].cwd || './'
@@ -95,8 +95,8 @@ export class ConfigParser {
     private static getEmptyDependencies(yaniceJson: IYaniceJson): IProjectDependencies {
         const emptyDependencies: IProjectDependencies = {};
         yaniceJson.projects
-            .map(p => p.projectName)
-            .forEach(projectName => {
+            .map((p) => p.projectName)
+            .forEach((projectName) => {
                 emptyDependencies[projectName] = [];
             });
         return emptyDependencies;

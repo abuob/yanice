@@ -26,15 +26,15 @@ export class GraphDagreRenderer {
     ): IYaniceGraphNodeInfo[] {
         const graphData = depGraph.nodes.map(
             (node): IYaniceGraphNodeInfo => {
-                const projectOrUndefined = yaniceConfig.projects.find(project => project.projectName === node.name);
+                const projectOrUndefined = yaniceConfig.projects.find((project) => project.projectName === node.name);
                 return {
                     projectName: node.name,
                     scope: yaniceArgs.givenScope,
-                    parents: node.getParents().map(e => e.name),
-                    children: node.getChildren().map(e => e.name),
+                    parents: node.getParents().map((e) => e.name),
+                    children: node.getChildren().map((e) => e.name),
                     responsibles: projectOrUndefined ? projectOrUndefined.responsibles : [],
                     changedFiles: projectOrUndefined
-                        ? changedFiles.filter(filePath => ChangedProjects.isFilePathPartOfProject(projectOrUndefined, filePath))
+                        ? changedFiles.filter((filePath) => ChangedProjects.isFilePathPartOfProject(projectOrUndefined, filePath))
                         : [],
                     isAffected: affectedProjects.includes(node.name),
                     command: projectOrUndefined ? projectOrUndefined.commands[yaniceArgs.givenScope] || null : null,
