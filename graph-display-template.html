@@ -126,8 +126,8 @@
                 <td><label for="graphEdgeDirectionSelect">A<span class="legend-arrow">&#10230;</span>B</label></td>
                 <td class="legend-table-padding">
                     <select onchange="graphEdgeDirectionSelectCallback(this)" id="graphEdgeDirectionSelect">
-                        <option value="A_IS_DEPENDENCY_OF_B">A is a dependency of B (B imports A)</option>
                         <option value="A_IMPORTS_B">A depends on B (A imports B)</option>
+                        <option value="A_IS_DEPENDENCY_OF_B">A is a dependency of B (B imports A)</option>
                     </select>
                 </td>
             </tr>
@@ -172,10 +172,17 @@
             </div>
         </div>
         <div class="options-row">
-            <div class="options-label"><label for="graphFocusSelect">Focus project</label></div>
+            <div class="options-label"><label for="graphFocusSelect">Focus Project</label></div>
             <div>
                 <select id="graphFocusSelect" onchange="graphFocusSelectCallback(this)">
                     <option value="-----">-----</option>
+                </select>
+            </div>
+        </div>
+        <div class="options-row">
+            <div class="options-label"><label for="graphFocusOptionsSelect">Focus Options</label></div>
+            <div>
+                <select id="graphFocusOptionsSelect" onchange="graphFocusOptionsSelectCallback(this)">
                 </select>
             </div>
         </div>
@@ -195,6 +202,8 @@
      *   scope: string;
      *   parents: string[];
      *   children: string[];
+     *   ancestors: string[];
+     *   descendants: string[];
      *   responsibles: string[];
      *   changedFiles: string[];
      *   isAffected: boolean;
@@ -208,17 +217,24 @@
     const GRAPH_FOCUS_DEFAULT = '-----';
 
     const DEFAULT_DISPLAY_OPTIONS = {
-        graphRenderDirection: 'TB', // TB | BT | LR | RL
-        graphEdgeDirection: 'A_IS_DEPENDENCY_OF_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B,
-        graphFocus: GRAPH_FOCUS_DEFAULT // ----- is nothing focused, otherwise name of the project
+        graphRenderDirection: 'BT', // TB | BT | LR | RL
+        graphEdgeDirection: 'A_IMPORTS_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B,
+        graphFocus: GRAPH_FOCUS_DEFAULT, // ----- is nothing focused, otherwise name of the project,
+        graphFocusOptions: 'DESCENDANTS_ONLY' // See GRAPH_FOCUS_OPTIONS
     };
 
     const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
-    const RENDERED_PROJECTS = getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus);
-    console.log('RENDER_OPTIONS', RENDER_OPTIONS);
+    const RENDERED_PROJECTS = getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus, RENDER_OPTIONS.graphFocusOptions);
+
+    const GRAPH_FOCUS_OPTIONS = [
+        { value: 'DESCENDANTS_ONLY', label: 'All transitive dependencies' },
+        { value: 'ANCESTORS_ONLY', label: 'All transitive dependants' },
+        { value: 'ANCESTORS_AND_DESCENDANTS', label: 'All transitive dependencies and dependants' },
+        { value: 'IMMEDIATE_CONNECTIONS', label: 'Only direct dependencies and dependants' }
+    ];
 
     // Set selects
-    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 0 : 1].selected = true;
+    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 1 : 0].selected = true;
     document.querySelector('#graphRenderOrientationSelect').options[
         RENDER_OPTIONS.graphRenderDirection === 'TB' ? 0 :
             RENDER_OPTIONS.graphRenderDirection === 'BT' ? 1 :
@@ -234,6 +250,7 @@
             RENDER_OPTIONS.graphFocus === data.projectName
         );
     });
+    initFocusOptionsSelect(GRAPH_FOCUS_OPTIONS, RENDER_OPTIONS, GRAPH_FOCUS_DEFAULT);
 
     // Initialize an empty graph
     const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
@@ -359,6 +376,32 @@
         writeOptionsToSessionStorageAndReload(newOptions);
     }
 
+    function graphFocusOptionsSelectCallback(selectElement) {
+        const options = getOptionsFromSessionStorageOrDefault();
+        const newOptions = {
+            ...options,
+            graphFocusOptions: selectElement.value
+        };
+        writeOptionsToSessionStorageAndReload(newOptions);
+    }
+
+    // =========== SELECT-SETUP ==============
+
+    function initFocusOptionsSelect(graphFocusOptions, renderOptions, graphFocusDefault) {
+        const selectElement = document.querySelector('#graphFocusOptionsSelect');
+        graphFocusOptions.forEach(option => {
+            selectElement.options[selectElement.options.length] = new Option(
+                option.label,
+                option.value,
+                renderOptions.graphFocusOptions === option.value,
+                renderOptions.graphFocusOptions === option.value
+            );
+        });
+        if (renderOptions.graphFocus === graphFocusDefault) {
+            selectElement.disabled = true;
+        }
+    }
+
     // =========== UTILITIES ==============
 
     function getOptionsFromSessionStorageOrDefault() {
@@ -371,13 +414,24 @@
         window.location.reload();
     }
 
-    function getProjectsThatNeedRendering(pGraphData, graphFocusSelection) {
+    function getProjectsThatNeedRendering(pGraphData, graphFocusSelection, graphFocusOption) {
         const allProjects = pGraphData.map(d => d.projectName);
-        if(graphFocusSelection === GRAPH_FOCUS_DEFAULT) {
+        if (graphFocusSelection === GRAPH_FOCUS_DEFAULT) {
             return allProjects;
         }
-        const projectData = pGraphData.find(d => d.projectName === graphFocusSelection);
-        return Array.from(new Set([projectData.projectName, ...projectData.parents, ...projectData.children]));
+
+        const focusProjectGraphData = pGraphData.find(d => d.projectName === graphFocusSelection);
+        console.log('focusProjectGraphData', focusProjectGraphData);
+        switch(graphFocusOption) {
+            case 'ANCESTORS_ONLY':
+                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.ancestors]));
+            case 'DESCENDANTS_ONLY':
+                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants]));
+            case 'ANCESTORS_AND_DESCENDANTS':
+                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants, ...focusProjectGraphData.ancestors]));
+            case 'IMMEDIATE_CONNECTIONS':
+                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.parents, ...focusProjectGraphData.children]));
+        }
     }
 
     function getNodeStyle(data) {
