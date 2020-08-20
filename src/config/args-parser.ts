@@ -71,6 +71,10 @@ export class ArgsParser {
                 resultArgs.includeUncommitted = true;
                 return;
             }
+            if (/^--exclude-uncommitted$/.test(arg)) {
+                resultArgs.includeUncommitted = false;
+                return;
+            }
             if (/^--includeCommandSupportedOnly=false$/.test(arg)) {
                 resultArgs.includeCommandSupportedOnly = false;
                 return;
@@ -134,5 +138,20 @@ export class ArgsParser {
             log(`Detected unknown parameter: "${arg}", ignore and continue...`);
         });
         return resultArgs;
+    }
+
+    public static verifyDiffTargetPresence(yaniceArgs: IYaniceArgs): void {
+        if (
+            yaniceArgs.diffTarget.commit === null &&
+            yaniceArgs.diffTarget.branch === null &&
+            yaniceArgs.diffTarget.rev === null &&
+            !yaniceArgs.includeAllProjects
+        ) {
+            yaniceArgs.includeAllProjects = true;
+            log('No diff target detected!');
+            log('Use e.g. --rev=HEAD or --branch=master to let yanice know what to compare with.');
+            log('See https://github.com/abuob/yanice#commands for details.');
+            log('Defaulting to "--all" as if all files have changed...');
+        }
     }
 }

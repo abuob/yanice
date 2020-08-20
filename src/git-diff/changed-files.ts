@@ -2,19 +2,21 @@ const execSync = require('child_process').execSync;
 
 export class ChangedFiles {
     public static filesChangedBetweenTwoCommitHashes(sha1: string, sha2: string): string[] {
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${sha1} ${sha2}`);
+        return ChangedFiles.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${sha1} ${sha2}`);
     }
 
     public static uncommittedFiles(): string[] {
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only HEAD`);
+        return ChangedFiles.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff-index --name-only HEAD`);
     }
 
     public static filesChangedBetweenHeadAndGivenCommit(commitSHA: string, includeUncommitted: boolean): string[] {
         if (includeUncommitted) {
-            const mergeBaseSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git merge-base --octopus ${commitSHA}`);
-            return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${mergeBaseSHA}`);
+            return [
+                ...ChangedFiles.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${commitSHA}...HEAD`),
+                ...ChangedFiles.uncommittedFiles()
+            ].reduce((prev: string[], curr): string[] => (prev.includes(curr) ? prev : prev.concat(curr)), []);
         }
-        return this.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${commitSHA}...HEAD`);
+        return ChangedFiles.getGitDiffNameOnlyOutputAsArrayOfFiles(`git diff --name-only ${commitSHA}...HEAD`);
     }
 
     public static gitCommandWithRevisionShaAsOutput(gitCommand: string): string {

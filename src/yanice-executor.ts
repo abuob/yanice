@@ -200,6 +200,7 @@ export class YaniceExecutor {
 
     private parseArgs(args: string[]): YaniceExecutor {
         this.yaniceArgs = ArgsParser.parseArgs(args);
+        ArgsParser.verifyDiffTargetPresence(this.yaniceArgs);
         return this;
     }
 
