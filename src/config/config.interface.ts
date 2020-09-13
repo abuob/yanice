@@ -29,6 +29,7 @@ export interface IYaniceJson {
     }>;
     dependencyScopes: {
         [scope: string]: {
+            defaultDependencies?: string[];
             extends?: string;
             options?: IOptionalOptions;
             dependencies: IProjectDependencies;

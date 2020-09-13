@@ -25,7 +25,7 @@ export class ConfigParser {
             options: this.getConfigOptions(yaniceJson, yaniceArgs),
             projects: this.getProjects(yaniceJson),
             dependencies: {
-                ...this.getEmptyDependencies(yaniceJson),
+                ...this.getDefaultDependencies(yaniceJson, yaniceArgs.givenScope),
                 ...this.getExtendedDependencies(yaniceJson, yaniceArgs.givenScope),
                 ...this.getDirectDependencies(yaniceJson, yaniceArgs.givenScope)
             }
@@ -90,16 +90,25 @@ export class ConfigParser {
         return yaniceConfigOptions;
     }
 
-    // Creates an object with all projects depending on nothing. Use this to treat unlisted projects equal as listed projects with no dependencies;
-    // i.e.: "dependencies: {}" is equal to "dependencies: { "A": []}"
-    private static getEmptyDependencies(yaniceJson: IYaniceJson): IProjectDependencies {
-        const emptyDependencies: IProjectDependencies = {};
+    /**
+     * Creates an object with all projects depending on nothing (or just the default-dependencies).
+     * We use this to initialize the final dependencies in the yaniceConfig-object, and to treat unlisted dependencies
+     * equal to listed dependencies (so that we don't have to take care of this further down the road).
+     * Examples:
+     *    1) "dependencies: {}" is equal to "dependencies: { "A": []}" if there is only a project A
+     *    2) "defaultDependencies: ["A"], "dependencies: { "B": ["C"] } with three projects A,B,C is equal to
+     *       "dependencies: { "A": [], "B": ["C"], "C": ["A"]}"
+     *
+     */
+    private static getDefaultDependencies(yaniceJson: IYaniceJson, givenScope: string): IProjectDependencies {
+        const initialDependencies: IProjectDependencies = {};
+        const defaultDependencies: string[] = yaniceJson.dependencyScopes[givenScope].defaultDependencies || [];
         yaniceJson.projects
             .map((p) => p.projectName)
             .forEach((projectName) => {
-                emptyDependencies[projectName] = [];
+                initialDependencies[projectName] = defaultDependencies.filter((e) => e !== projectName);
             });
-        return emptyDependencies;
+        return initialDependencies;
     }
 
     private static getExtendedDependencies(yaniceJson: IYaniceJson, givenScope: string): IProjectDependencies {

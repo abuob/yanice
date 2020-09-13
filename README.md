@@ -73,6 +73,10 @@ are modeled as such:
 A scope can extend another scope, but currently, only one level of extension is allowed. 
 If a scope is extended, all dependencies are the same as of the extended scope - except for those that are overridden (in the given example, `project-A` and `lib-1` have overridden dependencies inherited from `build`).
 
+A scope can have `defaultDependencies`; projects which are not listed will have these as dependencies. This is intended for scopes that
+have an inherently 'flat' dependency tree; e.g. linting: Each project might depend on some global linting configuration but nothing else.
+Not intended to be used in combination with `extends`.
+
 ### Commands
 In general, commands have the following base structure: `yanice <scope> --(rev|branch|commit)=<git-rev>`
 

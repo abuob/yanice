@@ -44,6 +44,12 @@
         "^[a-zA-Z][0-9a-zA-Z-]*$": {
           "type": "object",
           "properties": {
+            "defaultDependencies": {
+              "type": "array",
+              "items": {
+                "$ref": "#projectNamePatternString"
+              }
+            },
             "extends": {
               "$ref": "#projectNamePatternString"
             },

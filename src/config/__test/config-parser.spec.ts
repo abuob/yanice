@@ -53,13 +53,24 @@ describe('ConfigParser', () => {
             expect(actualConfigForTest.options.commandOutput).to.equal('ignore');
         });
 
-        it('should have empty dependencies if there are none listed (treat empty array same as undefined)', () => {
+        it('should have empty dependencies if there are none listed (treat empty array same as undefined; except defaultDependencies)', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'empty-deps'});
             expect(actualConfigForTest.dependencies).to.deep.equal({
                 "project-A": [],
                 "project-B": [],
                 "lib-1": [],
                 "lib-2": []
+            })
+        });
+
+        it('should add the defaultDependencies where no dependencies are defined', () => {
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-3'});
+            expect(actualConfigForTest.dependencies).to.deep.equal({
+                "A": [],
+                "B": ["C"],
+                "C": ["A", "D"],
+                "D": ["A"],
+                "E": ["A"]
             })
         });
 
