@@ -106,7 +106,7 @@ export class ConfigParser {
         yaniceJson.projects
             .map((p) => p.projectName)
             .forEach((projectName) => {
-                initialDependencies[projectName] = defaultDependencies.filter((e) => e !== projectName);
+                initialDependencies[projectName] = defaultDependencies.includes(projectName) ? [] : defaultDependencies;
             });
         return initialDependencies;
     }

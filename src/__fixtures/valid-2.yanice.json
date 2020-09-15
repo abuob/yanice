@@ -81,6 +81,18 @@
         "B": ["C"],
         "C": ["A", "D"]
       }
+    },
+    "scope-4": {
+      "defaultDependencies": ["A", "B"],
+      "dependencies": {
+      }
+    },
+    "scope-5": {
+      "defaultDependencies": ["A", "B"],
+      "dependencies": {
+        "B": ["C"],
+        "C": ["A", "D"]
+      }
     }
   }
 }

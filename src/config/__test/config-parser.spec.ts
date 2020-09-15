@@ -74,6 +74,28 @@ describe('ConfigParser', () => {
             })
         });
 
+        it('should add the defaultDependencies where no dependencies are defined, and not introduce cycles', () => {
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-4'});
+            expect(actualConfigForTest.dependencies).to.deep.equal({
+                "A": [],
+                "B": [],
+                "C": ["A", "B"],
+                "D": ["A", "B"],
+                "E": ["A", "B"]
+            })
+        });
+
+        it('should add the defaultDependencies and not introduce cycles', () => {
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-5'});
+            expect(actualConfigForTest.dependencies).to.deep.equal({
+                "A": [],
+                "B": ["C"],
+                "C": ["A", "D"],
+                "D": ["A", "B"],
+                "E": ["A", "B"]
+            })
+        });
+
         it('should load the dependencies of the scope which is extended', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'extended-scope'});
             expect(actualConfigForTest.dependencies).to.deep.equal({
