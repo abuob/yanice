@@ -37,7 +37,7 @@ export class ConfigVerifier {
 
     public static verifySchemaVersion(yaniceJson: IYaniceJson): boolean {
         const versionNumberOrUndefined: number = yaniceJson.schemaVersion;
-        return this.SUPPORTED_VERSIONS.includes(versionNumberOrUndefined);
+        return ConfigVerifier.SUPPORTED_VERSIONS.includes(versionNumberOrUndefined);
     }
 
     public static printErrorOnVerifySchemaVersionFailure(yaniceJson: IYaniceJson): void {
@@ -45,7 +45,7 @@ export class ConfigVerifier {
         log(
             `schemaVersion ${
                 yaniceJson.schemaVersion
-            } is not or no longer supported! This version of yanice currently supports the following versions: ${this.SUPPORTED_VERSIONS.join(
+            } is not or no longer supported! This version of yanice currently supports the following versions: ${ConfigVerifier.SUPPORTED_VERSIONS.join(
                 ', '
             )}`
         );

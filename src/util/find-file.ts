@@ -3,11 +3,11 @@ import * as path from 'path';
 
 export class FindFileUtil {
     public static findFileInParentDirsFromInitialDir(fileName: string, initialDir: string): string | null {
-        return this.findFileInParentDirsRecursively(initialDir, fileName);
+        return FindFileUtil.findFileInParentDirsRecursively(initialDir, fileName);
     }
 
     private static findFileInParentDirsRecursively(currentDir: string, fileName: string): string | null {
-        if (this.isFilePathValid(`${currentDir}/${fileName}`)) {
+        if (FindFileUtil.isFilePathValid(`${currentDir}/${fileName}`)) {
             // We found the file!
             return `${currentDir}/${fileName}`;
         }
@@ -16,7 +16,7 @@ export class FindFileUtil {
             return null;
         }
         // Go up recursively
-        return this.findFileInParentDirsRecursively(path.dirname(currentDir), fileName);
+        return FindFileUtil.findFileInParentDirsRecursively(path.dirname(currentDir), fileName);
     }
 
     private static isFilePathValid(filePath: string): boolean {

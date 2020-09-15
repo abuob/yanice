@@ -22,12 +22,12 @@ export class ConfigParser {
      */
     public static getYaniceConfig(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfig {
         return {
-            options: this.getConfigOptions(yaniceJson, yaniceArgs),
-            projects: this.getProjects(yaniceJson),
+            options: ConfigParser.getConfigOptions(yaniceJson, yaniceArgs),
+            projects: ConfigParser.getProjects(yaniceJson),
             dependencies: {
-                ...this.getDefaultDependencies(yaniceJson, yaniceArgs.givenScope),
-                ...this.getExtendedDependencies(yaniceJson, yaniceArgs.givenScope),
-                ...this.getDirectDependencies(yaniceJson, yaniceArgs.givenScope)
+                ...ConfigParser.getDefaultDependencies(yaniceJson, yaniceArgs.givenScope),
+                ...ConfigParser.getExtendedDependencies(yaniceJson, yaniceArgs.givenScope),
+                ...ConfigParser.getDirectDependencies(yaniceJson, yaniceArgs.givenScope)
             }
         };
     }
@@ -78,14 +78,16 @@ export class ConfigParser {
     private static getConfigOptions(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfigOptions {
         const scopeOptions = yaniceJson.dependencyScopes[yaniceArgs.givenScope].options;
         const yaniceConfigOptions: IYaniceConfigOptions = {
-            port: scopeOptions?.port || yaniceJson.options?.port || this.DEFAULT_CONFIG_OPTIONS.port,
+            port: scopeOptions?.port || yaniceJson.options?.port || ConfigParser.DEFAULT_CONFIG_OPTIONS.port,
             commandOutput:
                 yaniceArgs.commandOutputMode ||
                 scopeOptions?.commandOutput ||
                 yaniceJson.options?.commandOutput ||
-                this.DEFAULT_CONFIG_OPTIONS.commandOutput,
-            outputFolder: scopeOptions?.outputFolder || yaniceJson.options?.outputFolder || this.DEFAULT_CONFIG_OPTIONS.outputFolder,
-            outputFilters: scopeOptions?.outputFilters || yaniceJson.options?.outputFilters || this.DEFAULT_CONFIG_OPTIONS.outputFilters
+                ConfigParser.DEFAULT_CONFIG_OPTIONS.commandOutput,
+            outputFolder:
+                scopeOptions?.outputFolder || yaniceJson.options?.outputFolder || ConfigParser.DEFAULT_CONFIG_OPTIONS.outputFolder,
+            outputFilters:
+                scopeOptions?.outputFilters || yaniceJson.options?.outputFilters || ConfigParser.DEFAULT_CONFIG_OPTIONS.outputFilters
         };
         return yaniceConfigOptions;
     }
