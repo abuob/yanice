@@ -145,7 +145,9 @@ export class ArgsParser {
             yaniceArgs.diffTarget.commit === null &&
             yaniceArgs.diffTarget.branch === null &&
             yaniceArgs.diffTarget.rev === null &&
-            !yaniceArgs.includeAllProjects
+            !yaniceArgs.includeAllProjects &&
+            !yaniceArgs.visualizeDepGraph &&
+            !yaniceArgs.saveDepGraphVisualization
         ) {
             yaniceArgs.includeAllProjects = true;
             log('No diff target detected!');
