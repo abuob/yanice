@@ -106,6 +106,7 @@ on which lint-commands would be executed are printed to the console.
 * `yanice test --branch=master --responsibles`: Print all responsibles. Note that we have to provide a scope (here: test)
 in order to create the dependency graph. 
 Yanice will collect all responsibles of the projects that are either directly changed or affected by changes, and log them to the console.
+Note that the project does not need to have a command for the used scope; its responsibles are still included.
 
 ### Options
 Options are defined in the yanice.json and can be defined as global defaults and on a per-scope-basis.

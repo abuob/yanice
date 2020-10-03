@@ -126,11 +126,12 @@ describe('YaniceExecutor', () => {
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
                 .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded()
-                .calculateResponsibles();
+                .calculateResponsibles()
+                .filterOutUnsupportedProjectsIfNeeded();
             expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
+            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'E']);
             expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B']);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'Bob']);
+            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'Bob', 'Edith']);
         });
     });
 
@@ -155,7 +156,7 @@ describe('YaniceExecutor', () => {
             expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'D']);
             expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'D']);
             expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A']);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice']);
+            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'David']);
         });
     });
 
@@ -179,7 +180,7 @@ describe('YaniceExecutor', () => {
             expect((yaniceExecutor as any).changedProjects).to.have.same.members(['D']);
             expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['D']);
             expect((yaniceExecutor as any).affectedProjects).to.have.same.members([]);
-            expect((yaniceExecutor as any).responsibles).to.have.same.ordered.members([]);
+            expect((yaniceExecutor as any).responsibles).to.have.same.ordered.members(['David']);
         });
 
         it('should calculate affected projects for a scope with some dependencies properly when just one project changed', () => {
@@ -194,7 +195,7 @@ describe('YaniceExecutor', () => {
             expect((yaniceExecutor as any).changedProjects).to.have.same.members(['D']);
             expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D']);
             expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['B', 'C', 'D']);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Bob', 'Clara', 'David']);
+            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'Bob', 'Clara', 'David']);
         });
     });
 

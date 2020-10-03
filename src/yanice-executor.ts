@@ -100,9 +100,10 @@ export class YaniceExecutor {
     public calculateResponsibles(): YaniceExecutor {
         if (this.yaniceConfig && this.affectedProjects) {
             this.responsibles = this.yaniceConfig.projects
-                .filter((project) => this.affectedProjects.includes(project.projectName))
+                .filter((project) => this.affectedProjectsUnfiltered.includes(project.projectName))
                 .map((project) => project.responsibles)
-                .reduce((curr, prev) => curr.concat(prev), []);
+                .reduce((prev, curr) => prev.concat(curr), [])
+                .reduce((prev: string[], curr: string): string[] => (prev.includes(curr) ? prev : prev.concat(curr)), []);
         }
         return this;
     }
