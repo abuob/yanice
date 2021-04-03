@@ -15,7 +15,7 @@ interface IOptionalOptions {
 export interface IYaniceJson {
     options?: IOptionalOptions;
     schemaVersion: number;
-    projects: Array<{
+    projects: {
         projectName: string;
         pathRegExp?: string;
         pathGlob?: string;
@@ -26,7 +26,7 @@ export interface IYaniceJson {
             };
         };
         responsibles?: string[];
-    }>;
+    }[];
     dependencyScopes: {
         [scope: string]: {
             defaultDependencies?: string[];
