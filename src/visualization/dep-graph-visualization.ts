@@ -10,7 +10,6 @@ import { GraphDotRenderer } from './graph-dot-renderer';
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
-const open = require('open');
 
 export class DepGraphVisualization {
     public static createVisualizationHtml(
@@ -29,10 +28,8 @@ export class DepGraphVisualization {
                     affectedProjects,
                     changedFiles
                 );
-                break;
             case 'VIZJS':
                 return DepGraphVisualization.createVizJsVisualizationHtml(depGraph);
-                break;
         }
     }
 
@@ -45,7 +42,6 @@ export class DepGraphVisualization {
         server.listen(port, '127.0.0.1');
 
         log(`Visualized graph can be seen at: http://localhost:${port}`);
-        open(`http://localhost:${port}`);
     }
 
     public static saveTemplateFile(baseDirectory: string, relativeFilePath: string, fileName: string, templateHtml: string): void {
