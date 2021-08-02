@@ -9,6 +9,7 @@ export interface ICommandExecutionResult {
     stdout: string;
     stderr: string;
     exitCode: number;
+    executionDurationInMs: number;
 }
 
 export function execucteInParallelLimited(
@@ -27,14 +28,17 @@ export function execucteInParallelLimited(
         (command: IYaniceCommand, singleCommandDone: () => void) => {
             const workingDir = path.resolve(baseDirectory, command.cwd);
             initTaskCallback(command, workingDir);
+            const startTime: number = Date.now();
             exec(
                 command.command,
                 { cwd: workingDir, encoding: 'utf-8' },
                 (err: ExecException | null, stdout: string, stderr: string): void => {
+                    const endTime: number = Date.now();
                     const commandExecutionResult: ICommandExecutionResult = {
                         stdout,
                         stderr,
-                        exitCode: err ? (err.code ? err.code : 1) : 0
+                        exitCode: err ? (err.code ? err.code : 1) : 0,
+                        executionDurationInMs: endTime - startTime
                     };
                     executionResults.push(commandExecutionResult);
                     afterTaskCallback(command, commandExecutionResult);

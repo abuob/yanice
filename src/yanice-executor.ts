@@ -175,9 +175,9 @@ export class YaniceExecutor {
                 },
                 (command, commandExecutionResult: ICommandExecutionResult) => {
                     if (commandExecutionResult.exitCode === 0) {
-                        LogUtil.printCommandSuccess(command);
+                        LogUtil.printCommandSuccess(command, commandExecutionResult);
                     } else {
-                        LogUtil.printCommandFailure(command);
+                        LogUtil.printCommandFailure(command, commandExecutionResult);
                     }
                 },
                 (commandsExecutionResults: ICommandExecutionResult[]) => {

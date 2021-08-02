@@ -6,11 +6,13 @@ import { KarmaProgressSuccessFilter } from './output-filters/karma-progress-succ
 import { NpmErrorFilter } from './output-filters/npm-error-filter';
 
 export class LogUtil {
-    public static printCommandSuccess(command: IYaniceCommand): void {
-        log('  \x1B[1;32m ✔ ' + command.command + '\x1B[0m');
+    public static printCommandSuccess(command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult): void {
+        const durationInSeconds: number = Math.floor(commandExecutionResult.executionDurationInMs / 1000);
+        const durationMessage: string = `(${durationInSeconds}s)`;
+        log('  \x1B[1;32m ✔ ' + command.command + '\x1B[0m ' + durationMessage);
     }
 
-    public static printCommandFailure(command: IYaniceCommand): void {
+    public static printCommandFailure(command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult): void {
         const cwdInfoIfNotRoot: string = command.cwd !== './' ? ` (cwd: ${command.cwd})` : '';
         log('  \x1B[1;31m ✘ ' + command.command + '\x1B[0m' + cwdInfoIfNotRoot);
     }
