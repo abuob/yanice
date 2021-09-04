@@ -7,14 +7,19 @@ import { NpmErrorFilter } from './output-filters/npm-error-filter';
 
 export class LogUtil {
     public static printCommandSuccess(command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult): void {
-        const durationInSeconds: number = Math.floor(commandExecutionResult.executionDurationInMs / 1000);
-        const durationMessage: string = `(${durationInSeconds}s)`;
+        const durationMessage: string = LogUtil.createDurationInfoInBrackets(commandExecutionResult);
         log('  \x1B[1;32m ✔ ' + command.command + '\x1B[0m ' + durationMessage);
     }
 
     public static printCommandFailure(command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult): void {
+        const durationMessage: string = ` ${LogUtil.createDurationInfoInBrackets(commandExecutionResult)}`;
         const cwdInfoIfNotRoot: string = command.cwd !== './' ? ` (cwd: ${command.cwd})` : '';
-        log('  \x1B[1;31m ✘ ' + command.command + '\x1B[0m' + cwdInfoIfNotRoot);
+        log('  \x1B[1;31m ✘ ' + command.command + '\x1B[0m' + cwdInfoIfNotRoot + durationMessage);
+    }
+
+    private static createDurationInfoInBrackets(commandExecutionResult: ICommandExecutionResult): string {
+        const durationInSeconds: number = Math.floor(commandExecutionResult.executionDurationInMs / 1000);
+        return `(${durationInSeconds}s)`;
     }
 
     public static printOutputFormattedAfterAllCommandsCompleted(
