@@ -12,6 +12,6 @@ export class ChangedProjects {
     }
 
     public static isFilePathPartOfProject(yaniceProject: IYaniceProject, filePath: string): boolean {
-        return yaniceProject.pathRegExp.test(filePath) && minimatch(filePath, yaniceProject.pathGlob);
+        return yaniceProject.pathRegExp.test(filePath) && minimatch(filePath, yaniceProject.pathGlob, { dot: true });
     }
 }

@@ -29,7 +29,7 @@ describe('ChangedProjects', () => {
             {
                 projectName: "C",
                 pathRegExp: /.*/,
-                pathGlob: 'path/lib/C',
+                pathGlob: 'path/lib/C/**',
                 commands: {},
                 responsibles: []
             },
@@ -72,10 +72,18 @@ describe('ChangedProjects', () => {
             'path/to/dir/A/someFile.js',
             'path/to/dir/AAA/someOtherFile.js'
         ]);
+        const actual5 = ChangedProjects.getChangedProjectsRaw(exampleProjects, [
+            'path/to/dir/A/.someDotFile',
+        ]);
+        const actual6 = ChangedProjects.getChangedProjectsRaw(exampleProjects, [
+            'path/lib/C/.someDotDir/someFile.js',
+        ]);
         expect(actual0).to.have.same.members([]);
         expect(actual1).to.have.same.members(['A', 'all-javascript-files']);
         expect(actual2).to.have.same.members([]);
         expect(actual3).to.have.same.members(['A', 'E', 'all-javascript-files']);
         expect(actual4).to.have.same.members(['A', 'AAA', 'all-javascript-files']);
+        expect(actual5).to.have.same.members(['A']);
+        expect(actual6).to.have.same.members(['C', 'all-javascript-files']);
     });
 });
