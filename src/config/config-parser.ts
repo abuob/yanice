@@ -54,25 +54,23 @@ export class ConfigParser {
     }
 
     private static getProjects(yaniceJson: IYaniceJson): IYaniceProject[] {
-        return yaniceJson.projects.map(
-            (project): IYaniceProject => {
-                const commandsRaw = project.commands || {};
-                const commands: ICommandPerScope = {};
-                Object.keys(commandsRaw).forEach((scope) => {
-                    commands[scope] = {
-                        command: commandsRaw[scope].command,
-                        cwd: commandsRaw[scope].cwd || './'
-                    };
-                });
-                return {
-                    projectName: project.projectName,
-                    pathGlob: project.pathGlob ? project.pathGlob : '**',
-                    pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/,
-                    responsibles: project.responsibles ? project.responsibles : [],
-                    commands
+        return yaniceJson.projects.map((project): IYaniceProject => {
+            const commandsRaw = project.commands || {};
+            const commands: ICommandPerScope = {};
+            Object.keys(commandsRaw).forEach((scope) => {
+                commands[scope] = {
+                    command: commandsRaw[scope].command,
+                    cwd: commandsRaw[scope].cwd || './'
                 };
-            }
-        );
+            });
+            return {
+                projectName: project.projectName,
+                pathGlob: project.pathGlob ? project.pathGlob : '**',
+                pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/,
+                responsibles: project.responsibles ? project.responsibles : [],
+                commands
+            };
+        });
     }
 
     private static getConfigOptions(yaniceJson: IYaniceJson, yaniceArgs: IYaniceArgs): IYaniceConfigOptions {
