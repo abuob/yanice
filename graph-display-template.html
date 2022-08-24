@@ -485,12 +485,15 @@
             );
         }
 
-        // Add command if defined, add command-cwd if it's not the root directory
+        // Add commands if defined, add commands-cwd if it's not the root directory
         if (nodeData.command) {
+            const commands = nodeData.command.commands;
+            const commandDisplayString = commands.length === 1 ? commands[0] : `${commands.join(', ')}`;
+            const singularOrPluralCommand = commands.length === 1 ? 'command' : 'commands';
             table = table.concat(
                 '<tr>' +
-                '  <td><span style="font-family: courier; font-size: small;white-space: nowrap">' + nodeData.scope + '</span> command:</td>' +
-                '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' + nodeData.command.command + '</td>' +
+                '  <td><span style="font-family: courier; font-size: small;white-space: nowrap">' + nodeData.scope + '</span> ' + singularOrPluralCommand + ':</td>' +
+                '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' + commandDisplayString + '</td>' +
                 '</tr>'
             );
             if (nodeData.command.cwd && nodeData.command.cwd !== './') {

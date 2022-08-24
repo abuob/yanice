@@ -1,5 +1,4 @@
 import { ExecException } from 'child_process';
-import { IYaniceCommand } from '../config/config.interface';
 
 const async = require('async');
 const exec = require('child_process').exec;
@@ -12,20 +11,25 @@ export interface ICommandExecutionResult {
     executionDurationInMs: number;
 }
 
+export interface IParallelExecutionCommand {
+    command: string;
+    cwd: string;
+}
+
 export function execucteInParallelLimited(
-    commands: IYaniceCommand[],
+    commandQueue: IParallelExecutionCommand[],
     MAX_CONCURRENCY: number,
     baseDirectory: string,
-    initTaskCallback: (command: IYaniceCommand, workingDir: string) => void,
-    afterTaskCallback: (command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult) => void,
+    initTaskCallback: (command: IParallelExecutionCommand, workingDir: string) => void,
+    afterTaskCallback: (command: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult) => void,
     finalCallback: (commandExecutionResults: ICommandExecutionResult[]) => void
 ) {
     const executionResults: ICommandExecutionResult[] = [];
 
     async.eachLimit(
-        commands,
+        commandQueue,
         MAX_CONCURRENCY,
-        (command: IYaniceCommand, singleCommandDone: () => void) => {
+        (command: IParallelExecutionCommand, singleCommandDone: () => void) => {
             const workingDir = path.resolve(baseDirectory, command.cwd);
             initTaskCallback(command, workingDir);
             const startTime: number = Date.now();

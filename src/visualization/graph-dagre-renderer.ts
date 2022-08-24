@@ -1,6 +1,6 @@
 import { IYaniceArgs } from '../config/args-parser';
-import { IYaniceCommand, IYaniceConfig } from '../config/config.interface';
-import { DirectedGraphUtil, IDirectedGraph } from '../directed-graph/directed-graph';
+import { IYaniceCommand, IYaniceConfig, IYaniceProject } from '../config/config.interface';
+import { DirectedGraphNode, DirectedGraphUtil, IDirectedGraph } from '../directed-graph/directed-graph';
 import { ChangedProjects } from '../git-diff/changed-projects';
 
 interface IYaniceGraphNodeInfo {
@@ -26,8 +26,8 @@ export class GraphDagreRenderer {
         affectedProjects: string[],
         changedFiles: string[]
     ): IYaniceGraphNodeInfo[] {
-        const graphData = depGraph.nodes.map((node): IYaniceGraphNodeInfo => {
-            const projectOrUndefined = yaniceConfig.projects.find((project) => project.projectName === node.name);
+        return depGraph.nodes.map((node: DirectedGraphNode): IYaniceGraphNodeInfo => {
+            const projectOrUndefined = yaniceConfig.projects.find((project: IYaniceProject) => project.projectName === node.name);
             return {
                 projectName: node.name,
                 scope: yaniceArgs.givenScope,
@@ -45,6 +45,5 @@ export class GraphDagreRenderer {
                 pathRegExp: projectOrUndefined ? projectOrUndefined.pathRegExp.toString() : '.*'
             };
         });
-        return graphData;
     }
 }

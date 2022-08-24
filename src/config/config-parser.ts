@@ -57,9 +57,12 @@ export class ConfigParser {
         return yaniceJson.projects.map((project): IYaniceProject => {
             const commandsRaw = project.commands || {};
             const commands: ICommandPerScope = {};
-            Object.keys(commandsRaw).forEach((scope) => {
+            Object.keys(commandsRaw).forEach((scope: string) => {
+                const singleCommand: string | null = commandsRaw[scope].command ?? null;
+                const multiCommand: string[] = commandsRaw[scope].commands ?? [];
+                const allCommands: string[] = singleCommand ? [singleCommand, ...multiCommand] : multiCommand;
                 commands[scope] = {
-                    command: commandsRaw[scope].command,
+                    commands: allCommands,
                     cwd: commandsRaw[scope].cwd || './'
                 };
             });

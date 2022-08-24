@@ -1,11 +1,11 @@
 import { ArgsParser, IYaniceArgs } from './config/args-parser';
 import { ConfigParser } from './config/config-parser';
 import { ConfigVerifier } from './config/config-verifier';
-import { IYaniceCommand, IYaniceConfig, IYaniceJson } from './config/config.interface';
+import { IYaniceCommand, IYaniceConfig, IYaniceJson, IYaniceProject } from './config/config.interface';
 import { DirectedGraphUtil, IDirectedGraph } from './directed-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
-import { execucteInParallelLimited, ICommandExecutionResult } from './util/execute-in-parallel-limited';
+import { execucteInParallelLimited, ICommandExecutionResult, IParallelExecutionCommand } from './util/execute-in-parallel-limited';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
 import { DepGraphVisualization } from './visualization/dep-graph-visualization';
@@ -161,19 +161,25 @@ export class YaniceExecutor {
             this.baseDirectory &&
             !(this.yaniceArgs.visualizeDepGraph || this.yaniceArgs.saveDepGraphVisualization)
         ) {
-            const scope = this.yaniceArgs.givenScope;
-            const commands: IYaniceCommand[] = this.yaniceConfig.projects
-                .filter((project) => this.affectedProjects.includes(project.projectName))
-                .map((project) => project.commands[scope]);
+            const scope: string = this.yaniceArgs.givenScope;
+            const parallelExecutionCommands: IParallelExecutionCommand[] = this.yaniceConfig.projects
+                .filter((project: IYaniceProject) => this.affectedProjects.includes(project.projectName))
+                .map((project: IYaniceProject) => project.commands[scope])
+                .reduce((prev: IParallelExecutionCommand[], curr: IYaniceCommand): IParallelExecutionCommand[] => {
+                    const commands: IParallelExecutionCommand[] = curr.commands.map(
+                        (command: string): IParallelExecutionCommand => ({ command, cwd: curr.cwd })
+                    );
+                    return prev.concat(commands);
+                }, []);
 
             execucteInParallelLimited(
-                commands,
+                parallelExecutionCommands,
                 this.yaniceArgs.concurrency,
                 this.baseDirectory,
-                (command, dir) => {
+                (command: IParallelExecutionCommand, dir: string) => {
                     return;
                 },
-                (command, commandExecutionResult: ICommandExecutionResult) => {
+                (command: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult) => {
                     if (commandExecutionResult.exitCode === 0) {
                         LogUtil.printCommandSuccess(command, commandExecutionResult);
                     } else {
@@ -184,7 +190,7 @@ export class YaniceExecutor {
                     if (this.yaniceConfig) {
                         LogUtil.printOutputFormattedAfterAllCommandsCompleted(this.yaniceConfig, commandsExecutionResults);
                     }
-                    if (commandsExecutionResults.some((result) => result.exitCode !== 0)) {
+                    if (commandsExecutionResults.some((result: ICommandExecutionResult) => result.exitCode !== 0)) {
                         this.exitYanice(1, null);
                     }
                 }

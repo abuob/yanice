@@ -106,18 +106,18 @@ describe('ConfigParser', () => {
             });
         });
 
-        it('should properly map command-cwd', () => {
+        it('should properly map commands-cwd', () => {
             const yaniceConfig = ConfigParser.getYaniceConfig(yaniceJson2, args);
             const yaniceProject1 = yaniceConfig.projects.find(project => project.projectName === 'A');
             const yaniceProject2 = yaniceConfig.projects.find(project => project.projectName === 'B');
-            expect(yaniceProject1!.commands.lint).to.deep.equal({
-                command: 'lint A',
+            expect(yaniceProject1?.commands.lint).to.deep.equal({
+                commands: ['lint A1', 'lint A2'],
                 cwd: 'path/to/dir/A'
             });
-            expect(yaniceProject1!.commands.test).to.equal(undefined);
-            expect(yaniceProject1!.commands).to.have.same.keys('lint');
-            expect(yaniceProject2!.commands.lint).to.deep.equal({
-                command: 'lint B',
+            expect(yaniceProject1?.commands.test).to.equal(undefined);
+            expect(yaniceProject1?.commands).to.have.same.keys('lint');
+            expect(yaniceProject2?.commands.lint).to.deep.equal({
+                commands: ['lint B'],
                 cwd: './'
             });
         });
@@ -126,7 +126,7 @@ describe('ConfigParser', () => {
     describe('getDepGraphFromConfig', () => {
         it('should properly create a directed graph when there are no dependencies', () => {
             const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, {...args, givenScope: 'lint'}));
-            expect(actualGraph!.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+            expect(actualGraph?.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
         });
 
         it('should properly create a directed graph with some dependencies', () => {

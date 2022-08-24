@@ -7,7 +7,7 @@
       "pathRegExp": "path/to/dir/A",
       "commands": {
         "lint": {
-          "command": "lint A",
+          "commands": ["lint A1", "lint A2"],
           "cwd": "path/to/dir/A"
         }
       }

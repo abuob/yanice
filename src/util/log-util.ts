@@ -1,20 +1,20 @@
-import { IYaniceCommand, IYaniceConfig } from '../config/config.interface';
-import { ICommandExecutionResult } from './execute-in-parallel-limited';
+import { IYaniceConfig } from '../config/config.interface';
+import { ICommandExecutionResult, IParallelExecutionCommand } from './execute-in-parallel-limited';
 import { log } from './log';
 import { commandOutputFilterType, OutputFilter } from './output-filter';
 import { KarmaProgressSuccessFilter } from './output-filters/karma-progress-success-filter';
 import { NpmErrorFilter } from './output-filters/npm-error-filter';
 
 export class LogUtil {
-    public static printCommandSuccess(command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult): void {
+    public static printCommandSuccess(executionCommand: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
         const durationMessage: string = LogUtil.createDurationInfoInBrackets(commandExecutionResult);
-        log('  \x1B[1;32m ✔ ' + command.command + '\x1B[0m ' + durationMessage);
+        log('  \x1B[1;32m ✔ ' + executionCommand.command + '\x1B[0m ' + durationMessage);
     }
 
-    public static printCommandFailure(command: IYaniceCommand, commandExecutionResult: ICommandExecutionResult): void {
+    public static printCommandFailure(executionCommand: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
         const durationMessage: string = ` ${LogUtil.createDurationInfoInBrackets(commandExecutionResult)}`;
-        const cwdInfoIfNotRoot: string = command.cwd !== './' ? ` (cwd: ${command.cwd})` : '';
-        log('  \x1B[1;31m ✘ ' + command.command + '\x1B[0m' + cwdInfoIfNotRoot + durationMessage);
+        const cwdInfoIfNotRoot: string = executionCommand.cwd !== './' ? ` (cwd: ${executionCommand.cwd})` : '';
+        log('  \x1B[1;31m ✘ ' + executionCommand.command + '\x1B[0m' + cwdInfoIfNotRoot + durationMessage);
     }
 
     private static createDurationInfoInBrackets(commandExecutionResult: ICommandExecutionResult): string {

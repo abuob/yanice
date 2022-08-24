@@ -92,10 +92,17 @@
             },
             "cwd": {
               "type": "string"
+            },
+            "commands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
-          "required": [
-            "command"
+          "oneOf": [
+            { "required": ["command"] },
+            { "required": ["commands"] }
           ],
           "additionalProperties": false
         }

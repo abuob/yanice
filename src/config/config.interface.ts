@@ -21,7 +21,8 @@ export interface IYaniceJson {
         pathGlob?: string;
         commands?: {
             [scope: string]: {
-                command: string;
+                command?: string;
+                commands?: string[];
                 cwd?: string;
             };
         };
@@ -50,7 +51,7 @@ export interface IProjectDependencies {
 }
 
 export interface IYaniceCommand {
-    command: string;
+    commands: string[];
     cwd: string;
 }
 
