@@ -3,14 +3,14 @@ import { YaniceExecutor } from '../yanice-executor';
 import validYaniceJson1 from '../__fixtures/valid-1.yanice.json';
 import validYaniceJson4 from '../__fixtures/valid-4.yanice.json';
 import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
-import { IYaniceJson } from '../config/config.interface'
+import { YaniceJsonType } from '../config/config.interface'
 
 describe('YaniceExecutor', () => {
     let yaniceExecutor: YaniceExecutor;
     const baseDirectory = process.cwd();
-    const yaniceJson1: IYaniceJson = validYaniceJson1 as any;
-    const yaniceJson4: IYaniceJson = validYaniceJson4 as any;
-    const readmeYaniceJson: IYaniceJson = validReadmeYaniceJson as any;
+    const yaniceJson1: YaniceJsonType = validYaniceJson1 as any;
+    const yaniceJson4: YaniceJsonType = validYaniceJson4 as any;
+    const readmeYaniceJson: YaniceJsonType = validReadmeYaniceJson as any;
 
     describe('some changed projects', () => {
         beforeEach(() => {

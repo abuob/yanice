@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { IYaniceArgs } from '../config/args-parser';
-import { IYaniceConfig } from '../config/config.interface';
+import { YaniceArgs } from '../config/args-parser';
+import { YaniceConfig } from '../config/config.interface';
 import { IDirectedGraph } from '../directed-graph/directed-graph';
 import { FindFileUtil } from '../util/find-file';
 import { log } from '../util/log';
@@ -14,8 +14,8 @@ const http = require('http');
 export class DepGraphVisualization {
     public static createVisualizationHtml(
         depGraph: IDirectedGraph,
-        yaniceConfig: IYaniceConfig,
-        yaniceArgs: IYaniceArgs,
+        yaniceConfig: YaniceConfig,
+        yaniceArgs: YaniceArgs,
         affectedProjects: string[],
         changedFiles: string[]
     ): string {
@@ -53,8 +53,8 @@ export class DepGraphVisualization {
 
     private static createDagreVisualizationHtml(
         depGraph: IDirectedGraph,
-        yaniceConfig: IYaniceConfig,
-        yaniceArgs: IYaniceArgs,
+        yaniceConfig: YaniceConfig,
+        yaniceArgs: YaniceArgs,
         affectedProjects: string[],
         changedFiles: string[]
     ): string {

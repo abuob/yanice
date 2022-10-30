@@ -1,4 +1,4 @@
-import { ArgsParser, IYaniceArgs } from '../args-parser'
+import { ArgsParser, YaniceArgs } from '../args-parser'
 import { expect } from 'chai';
 
 describe('ArgsParser', () => {
@@ -17,7 +17,7 @@ describe('ArgsParser', () => {
             const actualArgs11 = ArgsParser.parseArgs(["lint", "--branch=master", "--output-mode=append-at-end-on-error"]);
             const actualArgs12 = ArgsParser.parseArgs(["lint", "--branch=master", "--output-mode=ignore"]);
 
-            const args: IYaniceArgs = {
+            const args: YaniceArgs = {
                 givenScope: 'lint',
                 diffTarget: {
                     branch: 'master',

@@ -2,7 +2,7 @@ import { commandOutputFilterType } from '../util/output-filter';
 
 export type commandOutputOptionsType = 'ignore' | 'append-at-end' | 'append-at-end-on-error';
 
-interface IOptionalOptions {
+interface YaniceOptionalOptions {
     commandOutput?: commandOutputOptionsType;
     outputFilters?: commandOutputFilterType[];
     outputFolder?: string;
@@ -11,9 +11,9 @@ interface IOptionalOptions {
 
 // This is the interface describing the content of the 'yanice.json'-file. It should adhere and is validated against
 // jsonschema (schema.json). This interface is only used for when we initially read the config-file; later, we only want to work
-// with the IYaniceConfig, where all options etc. are set to default if undefined.
-export interface IYaniceJson {
-    options?: IOptionalOptions;
+// with the YaniceConfig, where all options etc. are set to default if undefined.
+export interface YaniceJsonType {
+    options?: YaniceOptionalOptions;
     schemaVersion: number;
     projects: {
         projectName: string;
@@ -32,42 +32,42 @@ export interface IYaniceJson {
         [scope: string]: {
             defaultDependencies?: string[];
             extends?: string;
-            options?: IOptionalOptions;
-            dependencies: IProjectDependencies;
+            options?: YaniceOptionalOptions;
+            dependencies: YaniceProjectDependencies;
         };
     };
 }
 
-export interface IYaniceProject {
+export interface YaniceProject {
     projectName: string;
     pathRegExp: RegExp;
     pathGlob: string;
-    commands: ICommandPerScope;
+    commands: YaniceCommandPerScope;
     responsibles: string[];
 }
 
-export interface IProjectDependencies {
+export interface YaniceProjectDependencies {
     [projectName: string]: string[];
 }
 
-export interface IYaniceCommand {
+export interface YaniceCommand {
     commands: string[];
     cwd: string;
 }
 
-export interface ICommandPerScope {
-    [scope: string]: IYaniceCommand;
+export interface YaniceCommandPerScope {
+    [scope: string]: YaniceCommand;
 }
 
-export interface IYaniceConfigOptions {
+export interface YaniceConfigOptions {
     commandOutput: commandOutputOptionsType;
     outputFilters: commandOutputFilterType[];
     outputFolder: string;
     port: number;
 }
 
-export interface IYaniceConfig {
-    options: IYaniceConfigOptions;
-    projects: IYaniceProject[];
-    dependencies: IProjectDependencies;
+export interface YaniceConfig {
+    options: YaniceConfigOptions;
+    projects: YaniceProject[];
+    dependencies: YaniceProjectDependencies;
 }

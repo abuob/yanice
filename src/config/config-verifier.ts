@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import schemaJson from '../../schema.json';
 import { log } from '../util/log';
-import { IYaniceJson } from './config.interface';
+import { YaniceJsonType } from './config.interface';
 
 /**
  * Concept: Each verification-method has a corresponding "printErrorOn<verification>Failure"-method, which will be called
@@ -35,12 +35,12 @@ export class ConfigVerifier {
 
     // ========= verifySchemaVersion
 
-    public static verifySchemaVersion(yaniceJson: IYaniceJson): boolean {
+    public static verifySchemaVersion(yaniceJson: YaniceJsonType): boolean {
         const versionNumberOrUndefined: number = yaniceJson.schemaVersion;
         return ConfigVerifier.SUPPORTED_VERSIONS.includes(versionNumberOrUndefined);
     }
 
-    public static printErrorOnVerifySchemaVersionFailure(yaniceJson: IYaniceJson): void {
+    public static printErrorOnVerifySchemaVersionFailure(yaniceJson: YaniceJsonType): void {
         const versionNumber: number = yaniceJson.schemaVersion;
         log(
             `schemaVersion ${versionNumber} is not or no longer supported! This version of yanice currently supports the following versions: ${ConfigVerifier.SUPPORTED_VERSIONS.join(
@@ -51,7 +51,7 @@ export class ConfigVerifier {
 
     // ========= verifyDependencyScopeProjectNames
 
-    public static verifyDependencyScopeProjectNames(yaniceJson: IYaniceJson): boolean {
+    public static verifyDependencyScopeProjectNames(yaniceJson: YaniceJsonType): boolean {
         const allProjectNames = yaniceJson.projects.map((project) => project.projectName);
         return Object.keys(yaniceJson.dependencyScopes).every((scope) =>
             Object.keys(yaniceJson.dependencyScopes[scope].dependencies).every(
@@ -62,7 +62,7 @@ export class ConfigVerifier {
         );
     }
 
-    public static printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfig: IYaniceJson): void {
+    public static printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfig: YaniceJsonType): void {
         const allProjectNames = yaniceConfig.projects.map((project) => project.projectName);
         Object.keys(yaniceConfig.dependencyScopes).forEach((scope) => {
             Object.keys(yaniceConfig.dependencyScopes[scope].dependencies).forEach((project) => {
@@ -85,7 +85,7 @@ export class ConfigVerifier {
     // ========= verifyMaxOneLevelGraphExtension
 
     // A graph can only extend a graph that does not extend another graph (maximum one level of extension)
-    public static verifyMaxOneLevelGraphExtension(yaniceJson: IYaniceJson): boolean {
+    public static verifyMaxOneLevelGraphExtension(yaniceJson: YaniceJsonType): boolean {
         return Object.keys(yaniceJson.dependencyScopes).every((scope) => {
             const extendsOrUndefined = yaniceJson.dependencyScopes[scope].extends;
             if (!extendsOrUndefined) {
@@ -102,7 +102,7 @@ export class ConfigVerifier {
         });
     }
 
-    public static printErrorOnVerifyMaxOneLevelGraphExtension(yaniceJson: IYaniceJson): void {
+    public static printErrorOnVerifyMaxOneLevelGraphExtension(yaniceJson: YaniceJsonType): void {
         Object.keys(yaniceJson.dependencyScopes).forEach((scope) => {
             const extendsOrUndefined = yaniceJson.dependencyScopes[scope].extends;
             if (!extendsOrUndefined) {

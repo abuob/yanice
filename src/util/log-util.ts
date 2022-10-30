@@ -1,4 +1,4 @@
-import { IYaniceConfig } from '../config/config.interface';
+import { YaniceConfig } from '../config/config.interface';
 import { ICommandExecutionResult, IParallelExecutionCommand } from './execute-in-parallel-limited';
 import { log } from './log';
 import { commandOutputFilterType, OutputFilter } from './output-filter';
@@ -23,7 +23,7 @@ export class LogUtil {
     }
 
     public static printOutputFormattedAfterAllCommandsCompleted(
-        yaniceConfig: IYaniceConfig,
+        yaniceConfig: YaniceConfig,
         commandExecutionResults: ICommandExecutionResult[]
     ): void {
         const allSelectedFilters = LogUtil.getAllSelectedOutputFilters(yaniceConfig.options.outputFilters);

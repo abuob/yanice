@@ -2,11 +2,11 @@ import yaniceJson2 from '../../__fixtures/valid-2.yanice.json';
 import yaniceJson3 from '../../__fixtures/valid-3.yanice.json';
 import { ConfigParser } from '../config-parser'
 import { expect } from 'chai';
-import { IYaniceArgs } from '../args-parser'
+import { YaniceArgs } from '../args-parser'
 import { DirectedGraphUtil, IDirectedGraph } from '../../directed-graph/directed-graph'
 
 describe('ConfigParser', () => {
-    const args: IYaniceArgs = {
+    const args: YaniceArgs = {
         givenScope: 'lint',
         diffTarget: {
             branch: null,

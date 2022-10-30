@@ -3,7 +3,7 @@ import { commandOutputOptionsType } from './config.interface';
 
 export type graphRendererType = 'DAGREJS' | 'VIZJS';
 
-export interface IYaniceArgs {
+export interface YaniceArgs {
     givenScope: string;
     diffTarget: {
         branch: string | null;
@@ -27,8 +27,8 @@ export class ArgsParser {
      *
      * @param argv: process.argv.slice(2)
      */
-    public static parseArgs(argv: string[]): IYaniceArgs {
-        const resultArgs: IYaniceArgs = {
+    public static parseArgs(argv: string[]): YaniceArgs {
+        const resultArgs: YaniceArgs = {
             givenScope: argv[0],
             diffTarget: {
                 branch: null,
@@ -140,7 +140,7 @@ export class ArgsParser {
         return resultArgs;
     }
 
-    public static verifyDiffTargetPresence(yaniceArgs: IYaniceArgs): void {
+    public static verifyDiffTargetPresence(yaniceArgs: YaniceArgs): void {
         if (
             yaniceArgs.diffTarget.commit === null &&
             yaniceArgs.diffTarget.branch === null &&

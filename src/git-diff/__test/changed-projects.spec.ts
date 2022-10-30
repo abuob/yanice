@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { ChangedProjects } from '../changed-projects'
-import { IYaniceProject } from '../../config/config.interface'
+import { YaniceProject } from '../../config/config.interface'
 
 describe('ChangedProjects', () => {
     describe('getChangedProjectsRaw', () => {
-        const exampleProjects: IYaniceProject[] = [
+        const exampleProjects: YaniceProject[] = [
             {
                 projectName: "A",
                 pathRegExp: new RegExp("path/to/dir/A"),

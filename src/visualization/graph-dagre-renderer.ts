@@ -1,9 +1,9 @@
-import { IYaniceArgs } from '../config/args-parser';
-import { IYaniceCommand, IYaniceConfig, IYaniceProject } from '../config/config.interface';
+import { YaniceArgs } from '../config/args-parser';
+import { YaniceCommand, YaniceConfig, YaniceProject } from '../config/config.interface';
 import { DirectedGraphNode, DirectedGraphUtil, IDirectedGraph } from '../directed-graph/directed-graph';
 import { ChangedProjects } from '../git-diff/changed-projects';
 
-interface IYaniceGraphNodeInfo {
+interface YaniceGraphNodeInfo {
     projectName: string;
     scope: string;
     parents: string[];
@@ -13,7 +13,7 @@ interface IYaniceGraphNodeInfo {
     responsibles: string[];
     changedFiles: string[];
     isAffected: boolean;
-    command: IYaniceCommand | null;
+    command: YaniceCommand | null;
     pathGlob: string;
     pathRegExp: string;
 }
@@ -21,13 +21,13 @@ interface IYaniceGraphNodeInfo {
 export class GraphDagreRenderer {
     public static getGraphData(
         depGraph: IDirectedGraph,
-        yaniceConfig: IYaniceConfig,
-        yaniceArgs: IYaniceArgs,
+        yaniceConfig: YaniceConfig,
+        yaniceArgs: YaniceArgs,
         affectedProjects: string[],
         changedFiles: string[]
-    ): IYaniceGraphNodeInfo[] {
-        return depGraph.nodes.map((node: DirectedGraphNode): IYaniceGraphNodeInfo => {
-            const projectOrUndefined = yaniceConfig.projects.find((project: IYaniceProject) => project.projectName === node.name);
+    ): YaniceGraphNodeInfo[] {
+        return depGraph.nodes.map((node: DirectedGraphNode): YaniceGraphNodeInfo => {
+            const projectOrUndefined = yaniceConfig.projects.find((project: YaniceProject) => project.projectName === node.name);
             return {
                 projectName: node.name,
                 scope: yaniceArgs.givenScope,

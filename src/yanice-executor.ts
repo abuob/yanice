@@ -1,7 +1,7 @@
-import { ArgsParser, IYaniceArgs } from './config/args-parser';
+import { ArgsParser, YaniceArgs } from './config/args-parser';
 import { ConfigParser } from './config/config-parser';
 import { ConfigVerifier } from './config/config-verifier';
-import { IYaniceCommand, IYaniceConfig, IYaniceJson, IYaniceProject } from './config/config.interface';
+import { YaniceCommand, YaniceConfig, YaniceJsonType, YaniceProject } from './config/config.interface';
 import { DirectedGraphUtil, IDirectedGraph } from './directed-graph/directed-graph';
 import { ChangedFiles } from './git-diff/changed-files';
 import { ChangedProjects } from './git-diff/changed-projects';
@@ -12,9 +12,9 @@ import { DepGraphVisualization } from './visualization/dep-graph-visualization';
 
 export class YaniceExecutor {
     private baseDirectory: string | null = null;
-    private yaniceJson: IYaniceJson | null = null;
-    private yaniceConfig: IYaniceConfig | null = null;
-    private yaniceArgs: IYaniceArgs | null = null;
+    private yaniceJson: YaniceJsonType | null = null;
+    private yaniceConfig: YaniceConfig | null = null;
+    private yaniceArgs: YaniceArgs | null = null;
     private changedFiles: string[] = [];
     private changedProjects: string[] = [];
     private depGraph: IDirectedGraph | null = null;
@@ -22,7 +22,7 @@ export class YaniceExecutor {
     private affectedProjectsUnfiltered: string[] = [];
     private responsibles: string[] = [];
 
-    public loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: IYaniceJson): YaniceExecutor {
+    public loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): YaniceExecutor {
         this.baseDirectory = baseDirectory;
         this.yaniceJson = yaniceJson;
         return this.validateYaniceJson(yaniceJson).parseArgs(args).verifyArgs().parseYaniceJson();
@@ -163,9 +163,9 @@ export class YaniceExecutor {
         ) {
             const scope: string = this.yaniceArgs.givenScope;
             const parallelExecutionCommands: IParallelExecutionCommand[] = this.yaniceConfig.projects
-                .filter((project: IYaniceProject) => this.affectedProjects.includes(project.projectName))
-                .map((project: IYaniceProject) => project.commands[scope])
-                .reduce((prev: IParallelExecutionCommand[], curr: IYaniceCommand): IParallelExecutionCommand[] => {
+                .filter((project: YaniceProject) => this.affectedProjects.includes(project.projectName))
+                .map((project: YaniceProject) => project.commands[scope])
+                .reduce((prev: IParallelExecutionCommand[], curr: YaniceCommand): IParallelExecutionCommand[] => {
                     const commands: IParallelExecutionCommand[] = curr.commands.map(
                         (command: string): IParallelExecutionCommand => ({ command, cwd: curr.cwd })
                     );
@@ -199,7 +199,7 @@ export class YaniceExecutor {
         return this;
     }
 
-    private loadYaniceJson(yaniceJson: IYaniceJson): YaniceExecutor {
+    private loadYaniceJson(yaniceJson: YaniceJsonType): YaniceExecutor {
         this.yaniceJson = yaniceJson;
         this.validateYaniceJson(this.yaniceJson);
         return this;
@@ -225,7 +225,7 @@ export class YaniceExecutor {
         return this;
     }
 
-    private verifyScopeParam(scopeParam: string, yaniceJson: IYaniceJson): void {
+    private verifyScopeParam(scopeParam: string, yaniceJson: YaniceJsonType): void {
         const scopes = Object.keys(yaniceJson.dependencyScopes);
         if (!scopeParam) {
             this.exitYanice(

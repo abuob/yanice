@@ -2,14 +2,14 @@
   "name": "yanice",
   "version": "2.5.0",
   "description": "Yet another incremental command executor",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "engines": {
     "node": ">=12"
   },
+  "main": "dist/index.js",
   "bin": {
-    "yanice": "dist/index.js"
+    "yanice": "dist/bin.js"
   },
+  "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
     "schema.json",
