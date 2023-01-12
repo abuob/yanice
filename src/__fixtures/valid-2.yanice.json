@@ -1,98 +1,97 @@
 {
-  "$schema": "../../schema.json",
-  "schemaVersion": 2,
-  "projects": [
-    {
-      "projectName": "A",
-      "pathRegExp": "path/to/dir/A",
-      "commands": {
-        "lint": {
-          "commands": ["lint A1", "lint A2"],
-          "cwd": "path/to/dir/A"
+    "$schema": "../../schema.json",
+    "schemaVersion": 2,
+    "projects": [
+        {
+            "projectName": "A",
+            "pathRegExp": "path/to/dir/A",
+            "commands": {
+                "lint": {
+                    "commands": ["lint A1", "lint A2"],
+                    "cwd": "path/to/dir/A"
+                }
+            }
+        },
+        {
+            "projectName": "B",
+            "pathRegExp": "path/to/dir/B",
+            "commands": {
+                "lint": {
+                    "command": "lint B"
+                }
+            }
+        },
+        {
+            "projectName": "C",
+            "pathRegExp": "path/to/dir/C"
+        },
+        {
+            "projectName": "D",
+            "pathRegExp": "path/to/dir/D"
+        },
+        {
+            "projectName": "E",
+            "pathRegExp": "path/to/dir/E"
         }
-      }
-    },
-    {
-      "projectName": "B",
-      "pathRegExp": "path/to/dir/B",
-      "commands": {
+    ],
+    "dependencyScopes": {
         "lint": {
-          "command": "lint B"
+            "dependencies": {
+                "A": [],
+                "B": [],
+                "C": [],
+                "D": [],
+                "E": []
+            }
+        },
+        "test": {
+            "dependencies": {
+                "A": ["B", "C"],
+                "B": ["D"],
+                "C": ["D"],
+                "D": ["E"],
+                "E": []
+            }
+        },
+        "illegalCycle": {
+            "dependencies": {
+                "A": ["B"],
+                "B": ["C"],
+                "C": ["D"],
+                "D": ["E"],
+                "E": ["A"]
+            }
+        },
+        "scope-1": {
+            "dependencies": {
+                "A": ["B", "C"],
+                "B": ["D"]
+            }
+        },
+        "scope-2": {
+            "extends": "scope-1",
+            "dependencies": {
+                "B": ["C"],
+                "C": ["D"]
+            }
+        },
+        "scope-3": {
+            "defaultDependencies": ["A"],
+            "dependencies": {
+                "B": ["C"],
+                "C": ["A", "D"]
+            }
+        },
+        "scope-4": {
+            "defaultDependencies": ["A", "B"],
+            "dependencies": {}
+        },
+        "scope-5": {
+            "defaultDependencies": ["A", "B"],
+            "dependencies": {
+                "B": ["C"],
+                "C": ["A", "D"]
+            }
         }
-      }
-    },
-    {
-      "projectName": "C",
-      "pathRegExp": "path/to/dir/C"
-    },
-    {
-      "projectName": "D",
-      "pathRegExp": "path/to/dir/D"
-    },
-    {
-      "projectName": "E",
-      "pathRegExp": "path/to/dir/E"
     }
-  ],
-  "dependencyScopes": {
-    "lint": {
-      "dependencies": {
-        "A": [],
-        "B": [],
-        "C": [],
-        "D": [],
-        "E": []
-      }
-    },
-    "test": {
-      "dependencies": {
-        "A": ["B", "C"],
-        "B": ["D"],
-        "C": ["D"],
-        "D": ["E"],
-        "E": []
-      }
-    },
-    "illegalCycle": {
-      "dependencies": {
-        "A": ["B"],
-        "B": ["C"],
-        "C": ["D"],
-        "D": ["E"],
-        "E": ["A"]
-      }
-    },
-    "scope-1": {
-      "dependencies": {
-        "A": ["B", "C"],
-        "B": ["D"]
-      }
-    },
-    "scope-2": {
-      "extends": "scope-1",
-      "dependencies": {
-        "B": ["C"],
-        "C": ["D"]
-      }
-    },
-    "scope-3": {
-      "defaultDependencies": ["A"],
-      "dependencies": {
-        "B": ["C"],
-        "C": ["A", "D"]
-      }
-    },
-    "scope-4": {
-      "defaultDependencies": ["A", "B"],
-      "dependencies": {
-      }
-    },
-    "scope-5": {
-      "defaultDependencies": ["A", "B"],
-      "dependencies": {
-        "B": ["C"],
-        "C": ["A", "D"]
-      }
-    }
-  }
 }

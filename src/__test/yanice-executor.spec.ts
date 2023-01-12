@@ -3,7 +3,7 @@ import { YaniceExecutor } from '../yanice-executor';
 import validYaniceJson1 from '../__fixtures/valid-1.yanice.json';
 import validYaniceJson4 from '../__fixtures/valid-4.yanice.json';
 import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
-import { YaniceJsonType } from '../config/config.interface'
+import { YaniceJsonType } from '../config/config.interface';
 
 describe('YaniceExecutor', () => {
     let yaniceExecutor: YaniceExecutor;
@@ -15,11 +15,7 @@ describe('YaniceExecutor', () => {
     describe('some changed projects', () => {
         beforeEach(() => {
             yaniceExecutor = new YaniceExecutor();
-            (yaniceExecutor as any).changedFiles = [
-                "path/to/dir/A/some-A-file",
-                "path/to/dir/B/some-B-file",
-                "path/to/dir/E/some-E-file",
-            ];
+            (yaniceExecutor as any).changedFiles = ['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'];
         });
 
         it('should calculate all changed projects correctly', () => {
@@ -31,7 +27,11 @@ describe('YaniceExecutor', () => {
 
         it('should calculate all affected projects correctly when including unsupported commands', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=false'], baseDirectory, yaniceJson1)
+                .loadConfigAndParseArgs(
+                    ['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=false'],
+                    baseDirectory,
+                    yaniceJson1
+                )
                 .calculateChangedProjects()
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
@@ -44,7 +44,11 @@ describe('YaniceExecutor', () => {
 
         it('should calculate all affected projects correctly when not including unsupported commands', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=true'], baseDirectory, yaniceJson1)
+                .loadConfigAndParseArgs(
+                    ['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=true'],
+                    baseDirectory,
+                    yaniceJson1
+                )
                 .calculateChangedProjects()
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
@@ -83,7 +87,11 @@ describe('YaniceExecutor', () => {
 
         it('should filter unsupported commands when --all and outputOnly=false even when includeCommandSupportedOnly=true', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--all', '--outputOnly=false', '--includeCommandSupportedOnly=false'], baseDirectory, yaniceJson1)
+                .loadConfigAndParseArgs(
+                    ['lint', '--all', '--outputOnly=false', '--includeCommandSupportedOnly=false'],
+                    baseDirectory,
+                    yaniceJson1
+                )
                 .calculateChangedProjects()
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
@@ -95,7 +103,11 @@ describe('YaniceExecutor', () => {
 
         it('should set affectedProjects to all projects that support the given scope when --all parameter is given', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--all', '--outputOnly=true', '--includeCommandSupportedOnly=true'], baseDirectory, yaniceJson1)
+                .loadConfigAndParseArgs(
+                    ['lint', '--all', '--outputOnly=true', '--includeCommandSupportedOnly=true'],
+                    baseDirectory,
+                    yaniceJson1
+                )
                 .calculateChangedProjects()
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
@@ -107,7 +119,11 @@ describe('YaniceExecutor', () => {
 
         it('should filter out projects according to parameters', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=true'], baseDirectory, yaniceJson1)
+                .loadConfigAndParseArgs(
+                    ['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=true'],
+                    baseDirectory,
+                    yaniceJson1
+                )
                 .calculateChangedProjects()
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
@@ -121,7 +137,11 @@ describe('YaniceExecutor', () => {
 
         it('should calculate responsibles correctly', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--rev=HEAD', '--responsibles', '--includeCommandSupportedOnly=true'], baseDirectory, yaniceJson1)
+                .loadConfigAndParseArgs(
+                    ['lint', '--rev=HEAD', '--responsibles', '--includeCommandSupportedOnly=true'],
+                    baseDirectory,
+                    yaniceJson1
+                )
                 .calculateChangedProjects()
                 .calculateDepGraphForGivenScope()
                 .verifyDepGraphValidity()
@@ -138,10 +158,7 @@ describe('YaniceExecutor', () => {
     describe('some changed projects', () => {
         beforeEach(() => {
             yaniceExecutor = new YaniceExecutor();
-            (yaniceExecutor as any).changedFiles = [
-                "path/to/dir/A/some-A-file",
-                "path/to/dir/D/some-D-file",
-            ];
+            (yaniceExecutor as any).changedFiles = ['path/to/dir/A/some-A-file', 'path/to/dir/D/some-D-file'];
         });
 
         it('should detect directly changed projects correctly', () => {
@@ -163,9 +180,7 @@ describe('YaniceExecutor', () => {
     describe('one single project changed', () => {
         beforeEach(() => {
             yaniceExecutor = new YaniceExecutor();
-            (yaniceExecutor as any).changedFiles = [
-                "path/to/dir/D/some-D-file"
-            ];
+            (yaniceExecutor as any).changedFiles = ['path/to/dir/D/some-D-file'];
         });
 
         it('should calculate affected projects for a simple scope properly when just one project changed', () => {
@@ -325,7 +340,13 @@ describe('YaniceExecutor', () => {
                     .filterOutUnsupportedProjectsIfNeeded()
                     .calculateResponsibles();
                 expect((yaniceExecutorReadme as any).changedProjects).to.have.same.members(['important-repo-files']);
-                expect((yaniceExecutorReadme as any).affectedProjectsUnfiltered).to.have.same.members(['project-A', 'project-B', 'lib-1', 'lib-2', 'important-repo-files']);
+                expect((yaniceExecutorReadme as any).affectedProjectsUnfiltered).to.have.same.members([
+                    'project-A',
+                    'project-B',
+                    'lib-1',
+                    'lib-2',
+                    'important-repo-files'
+                ]);
                 expect((yaniceExecutorReadme as any).affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
             });
             it('should test project-A and lib-1 if lib-1 has changed', () => {

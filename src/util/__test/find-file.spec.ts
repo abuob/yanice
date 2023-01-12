@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import { FindFileUtil } from '../find-file'
+import { expect } from 'chai';
+import { FindFileUtil } from '../find-file';
 
 describe('FindFileUtil', () => {
     describe('findFileInParentDirsFromInitialDir', () => {

@@ -1,67 +1,67 @@
 {
-  "$schema": "../../schema.json",
-  "schemaVersion": 2,
-  "projects": [
-    {
-      "projectName": "A",
-      "pathGlob": "A/**",
-      "commands": {
+    "$schema": "../../schema.json",
+    "schemaVersion": 2,
+    "projects": [
+        {
+            "projectName": "A",
+            "pathGlob": "A/**",
+            "commands": {
+                "scope-1": {
+                    "command": ""
+                },
+                "scope-2": {
+                    "command": ""
+                }
+            }
+        },
+        {
+            "projectName": "B",
+            "pathGlob": "B/**",
+            "commands": {
+                "scope-1": {
+                    "command": ""
+                },
+                "scope-2": {
+                    "command": ""
+                }
+            }
+        },
+        {
+            "projectName": "C",
+            "pathGlob": "C/**",
+            "commands": {
+                "scope-1": {
+                    "command": ""
+                }
+            }
+        },
+        {
+            "projectName": "D",
+            "pathGlob": "D/**",
+            "commands": {
+                "scope-1": {
+                    "command": ""
+                },
+                "scope-2": {
+                    "command": ""
+                }
+            }
+        }
+    ],
+    "dependencyScopes": {
         "scope-1": {
-          "command": ""
+            "dependencies": {
+                "A": ["B"],
+                "B": ["C"],
+                "C": ["D"]
+            }
         },
         "scope-2": {
-          "command": ""
+            "extends": "scope-1",
+            "dependencies": {
+                "A": ["B", "C"],
+                "B": ["D"]
+            }
         }
-      }
-    },
-    {
-      "projectName": "B",
-      "pathGlob": "B/**",
-      "commands": {
-        "scope-1": {
-          "command": ""
-        },
-        "scope-2": {
-          "command": ""
-        }
-      }
-    },
-    {
-      "projectName": "C",
-      "pathGlob": "C/**",
-      "commands": {
-        "scope-1": {
-          "command": ""
-        }
-      }
-    },
-    {
-      "projectName": "D",
-      "pathGlob": "D/**",
-      "commands": {
-        "scope-1": {
-          "command": ""
-        },
-        "scope-2": {
-          "command": ""
-        }
-      }
     }
-  ],
-  "dependencyScopes": {
-    "scope-1": {
-      "dependencies": {
-        "A": ["B"],
-        "B": ["C"],
-        "C": ["D"]
-      }
-    },
-    "scope-2": {
-      "extends": "scope-1",
-      "dependencies": {
-        "A": ["B", "C"],
-        "B": ["D"]
-      }
-    }
-  }
 }

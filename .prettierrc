@@ -1,7 +1,15 @@
 {
-  "trailingComma": "none",
-  "tabWidth": 4,
-  "singleQuote": true,
-  "printWidth": 140,
-  "endOfLine": "lf"
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "singleQuote": true,
+    "printWidth": 140,
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": "*.md",
+            "options": {
+                "printWidth": 200
+            }
+        }
+    ]
 }

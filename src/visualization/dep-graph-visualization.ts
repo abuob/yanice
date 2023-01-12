@@ -65,9 +65,9 @@ export class DepGraphVisualization {
             .replace(
                 'INSERT_GIT_REVISION',
                 yaniceArgs.diffTarget.branch ||
-                yaniceArgs.diffTarget.commit ||
-                yaniceArgs.diffTarget.rev ||
-                'None provided (use e.g. --rev=HEAD)'
+                    yaniceArgs.diffTarget.commit ||
+                    yaniceArgs.diffTarget.rev ||
+                    'None provided (use e.g. --rev=HEAD)'
             )
             .replace('INSERT_SCOPE', yaniceArgs.givenScope);
         return actualHtml;

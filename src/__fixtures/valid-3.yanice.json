@@ -1,58 +1,58 @@
 {
-  "$schema": "../../schema.json",
-  "schemaVersion": 2,
-  "options": {
-    "commandOutput": "append-at-end",
-    "outputFilters": ["npmError"],
-    "outputFolder": "./.yanice-graph-output",
-    "port": 7777
-  },
-  "projects": [
-    {
-      "projectName": "project-A",
-      "pathRegExp": "project-A",
-      "pathGlob": "project-A/**"
+    "$schema": "../../schema.json",
+    "schemaVersion": 2,
+    "options": {
+        "commandOutput": "append-at-end",
+        "outputFilters": ["npmError"],
+        "outputFolder": "./.yanice-graph-output",
+        "port": 7777
     },
-    {
-      "projectName": "project-B",
-      "pathRegExp": "project-B"
-    },
-    {
-      "projectName": "lib-1",
-      "pathRegExp": "libs/lib-1"
-    },
-    {
-      "projectName": "lib-2",
-      "pathRegExp": "libs/lib-2"
+    "projects": [
+        {
+            "projectName": "project-A",
+            "pathRegExp": "project-A",
+            "pathGlob": "project-A/**"
+        },
+        {
+            "projectName": "project-B",
+            "pathRegExp": "project-B"
+        },
+        {
+            "projectName": "lib-1",
+            "pathRegExp": "libs/lib-1"
+        },
+        {
+            "projectName": "lib-2",
+            "pathRegExp": "libs/lib-2"
+        }
+    ],
+    "dependencyScopes": {
+        "test": {
+            "options": {
+                "port": 8888,
+                "commandOutput": "append-at-end-on-error"
+            },
+            "dependencies": {
+                "project-A": ["lib-1"],
+                "project-B": ["lib-2"],
+                "lib-1": [],
+                "lib-2": []
+            }
+        },
+        "build-some": {
+            "dependencies": {
+                "project-A": ["lib-1"],
+                "project-B": ["lib-2"]
+            }
+        },
+        "extended-scope": {
+            "extends": "build-some",
+            "dependencies": {
+                "lib-1": ["lib-2"]
+            }
+        },
+        "empty-deps": {
+            "dependencies": {}
+        }
     }
-  ],
-  "dependencyScopes": {
-    "test": {
-      "options": {
-        "port": 8888,
-        "commandOutput": "append-at-end-on-error"
-      },
-      "dependencies": {
-        "project-A": ["lib-1"],
-        "project-B": ["lib-2"],
-        "lib-1": [],
-        "lib-2": []
-      }
-    },
-    "build-some": {
-      "dependencies": {
-        "project-A": ["lib-1"],
-        "project-B": ["lib-2"]
-      }
-    },
-    "extended-scope": {
-      "extends": "build-some",
-      "dependencies": {
-        "lib-1": ["lib-2"]
-      }
-    },
-    "empty-deps": {
-      "dependencies": {}
-    }
-  }
 }

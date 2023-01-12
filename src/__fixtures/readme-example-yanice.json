@@ -1,108 +1,108 @@
 {
-  "$schema": "./node_modules/yanice/schema.json",
-  "schemaVersion": 2,
-  "options": {
-    "outputFilters": [],
-    "commandOutput": "ignore"
-  },
-  "projects": [
-    {
-      "projectName": "project-A",
-      "pathGlob": "project-A/**",
-      "commands": {
-        "build": {
-          "command": "npm run build",
-          "cwd": "./project-A"
+    "$schema": "./node_modules/yanice/schema.json",
+    "schemaVersion": 2,
+    "options": {
+        "outputFilters": [],
+        "commandOutput": "ignore"
+    },
+    "projects": [
+        {
+            "projectName": "project-A",
+            "pathGlob": "project-A/**",
+            "commands": {
+                "build": {
+                    "command": "npm run build",
+                    "cwd": "./project-A"
+                },
+                "lint": {
+                    "command": "npm run lint-project-A",
+                    "cwd": "./"
+                },
+                "test": {
+                    "command": "npm run test-project-A"
+                }
+            },
+            "responsibles": ["Bob", "Bill"]
         },
+        {
+            "projectName": "project-B",
+            "pathGlob": "project-B/**",
+            "commands": {
+                "build": {
+                    "command": "npm run build",
+                    "cwd": "./project-B"
+                },
+                "lint": {
+                    "command": "npm run lint-project-B",
+                    "cwd": "./project-B"
+                }
+            },
+            "responsibles": ["Bob"]
+        },
+        {
+            "projectName": "lib-1",
+            "pathGlob": "libs/lib-1/**",
+            "commands": {
+                "build": {
+                    "command": "npm run build",
+                    "cwd": "./libs/lib-1"
+                },
+                "test": {
+                    "command": "npm run test-lib-1"
+                }
+            },
+            "responsibles": ["Frank", "Harry"]
+        },
+        {
+            "projectName": "lib-2",
+            "pathGlob": "libs/lib-2/**",
+            "commands": {
+                "build": {
+                    "command": "npm run build",
+                    "cwd": "./libs/lib-2"
+                }
+            }
+        },
+        {
+            "projectName": "test-utils",
+            "pathGlob": "libs/test-utils"
+        },
+        {
+            "projectName": "important-repo-files",
+            "pathGlob": "+(package.json|yanice.json|some-ci-config.file)"
+        }
+    ],
+    "dependencyScopes": {
         "lint": {
-          "command": "npm run lint-project-A",
-          "cwd": "./"
+            "options": {
+                "commandOutput": "append-at-end-on-error",
+                "outputFilters": ["npmError"]
+            },
+            "dependencies": {
+                "project-A": ["important-repo-files"],
+                "project-B": ["important-repo-files"],
+                "lib-1": ["important-repo-files"],
+                "lib-2": ["important-repo-files"]
+            }
+        },
+        "build": {
+            "dependencies": {
+                "project-A": ["lib-1", "lib-2", "important-repo-files"],
+                "project-B": ["lib-2", "important-repo-files"],
+                "lib-1": ["important-repo-files"],
+                "lib-2": ["important-repo-files"]
+            }
         },
         "test": {
-          "command": "npm run test-project-A"
+            "extends": "build",
+            "options": {
+                "commandOutput": "append-at-end-on-error",
+                "outputFilters": ["npmError"]
+            },
+            "dependencies": {
+                "project-A": ["lib-1", "lib-2", "important-repo-files", "test-utils"],
+                "lib-1": ["important-repo-files", "test-utils"]
+            }
         }
-      },
-      "responsibles": ["Bob", "Bill"]
-    },
-    {
-      "projectName": "project-B",
-      "pathGlob": "project-B/**",
-      "commands": {
-        "build": {
-          "command": "npm run build",
-          "cwd": "./project-B"
-        },
-        "lint": {
-          "command": "npm run lint-project-B",
-          "cwd": "./project-B"
-        }
-      },
-      "responsibles": ["Bob"]
-    },
-    {
-      "projectName": "lib-1",
-      "pathGlob": "libs/lib-1/**",
-      "commands": {
-        "build": {
-          "command": "npm run build",
-          "cwd": "./libs/lib-1"
-        },
-        "test": {
-          "command": "npm run test-lib-1"
-        }
-      },
-      "responsibles": ["Frank", "Harry"]
-    },
-    {
-      "projectName": "lib-2",
-      "pathGlob": "libs/lib-2/**",
-      "commands": {
-        "build": {
-          "command": "npm run build",
-          "cwd": "./libs/lib-2"
-        }
-      }
-    },
-    {
-      "projectName": "test-utils",
-      "pathGlob": "libs/test-utils"
-    },
-    {
-      "projectName": "important-repo-files",
-      "pathGlob": "+(package.json|yanice.json|some-ci-config.file)"
     }
-  ],
-  "dependencyScopes": {
-    "lint": {
-      "options": {
-        "commandOutput": "append-at-end-on-error",
-        "outputFilters": ["npmError"]
-      },
-      "dependencies": {
-        "project-A": ["important-repo-files"],
-        "project-B": ["important-repo-files"],
-        "lib-1": ["important-repo-files"],
-        "lib-2": ["important-repo-files"]
-      }
-    },
-    "build": {
-      "dependencies": {
-        "project-A": ["lib-1", "lib-2", "important-repo-files"],
-        "project-B": ["lib-2", "important-repo-files"],
-        "lib-1": ["important-repo-files"],
-        "lib-2": ["important-repo-files"]
-      }
-    },
-    "test": {
-      "extends": "build",
-      "options": {
-        "commandOutput": "append-at-end-on-error",
-        "outputFilters": ["npmError"]
-      },
-      "dependencies": {
-        "project-A": ["lib-1", "lib-2", "important-repo-files", "test-utils"],
-        "lib-1": ["important-repo-files", "test-utils"]
-      }
-    }
-  }
 }

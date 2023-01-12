@@ -1,14 +1,13 @@
-import { expect } from "chai";
-import { NpmErrorFilter } from '../output-filters/npm-error-filter'
-import { KarmaProgressSuccessFilter } from '../output-filters/karma-progress-success-filter'
-import { LogUtil } from '../log-util'
+import { expect } from 'chai';
+import { NpmErrorFilter } from '../output-filters/npm-error-filter';
+import { KarmaProgressSuccessFilter } from '../output-filters/karma-progress-success-filter';
+import { LogUtil } from '../log-util';
 
 describe('LogUtil', () => {
     describe('isOutputLineOkayToPrint', () => {
         it('should return true if at least one of the filters returns true for a given string', () => {
             const npmErrorFilter = new NpmErrorFilter();
             const karmaProgressSuccessFilter = new KarmaProgressSuccessFilter();
-
 
             const sampleLine0 = 'this one should be ok';
             const sampleLine1 = 'Executed 1 of 2 SUCCESS';

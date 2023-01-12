@@ -1,18 +1,18 @@
 {
-  "$schema": "../../../schema.json",
-  "schemaVersion": 2,
-  "projects": [],
-  "dependencyScopes": {
-    "scope-1": {
-      "dependencies": {}
-    },
-    "scope-2": {
-      "extends": "scope-1",
-      "dependencies": {}
-    },
-    "scope-3": {
-      "extends": "scope-2",
-      "dependencies": {}
+    "$schema": "../../../schema.json",
+    "schemaVersion": 2,
+    "projects": [],
+    "dependencyScopes": {
+        "scope-1": {
+            "dependencies": {}
+        },
+        "scope-2": {
+            "extends": "scope-1",
+            "dependencies": {}
+        },
+        "scope-3": {
+            "extends": "scope-2",
+            "dependencies": {}
+        }
     }
-  }
 }

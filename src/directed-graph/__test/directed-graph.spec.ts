@@ -1,12 +1,8 @@
-import { expect } from "chai";
-import { DirectedGraphUtil } from '../directed-graph'
+import { expect } from 'chai';
+import { DirectedGraphUtil } from '../directed-graph';
 
 const graph0 = DirectedGraphUtil.directedGraphBuilder.build();
-const graph1 = DirectedGraphUtil.directedGraphBuilder
-    .addNode('A')
-    .addNode('B')
-    .createDirectedEdge('A', 'B')
-    .build();
+const graph1 = DirectedGraphUtil.directedGraphBuilder.addNode('A').addNode('B').createDirectedEdge('A', 'B').build();
 const graph2 = DirectedGraphUtil.directedGraphBuilder
     .addNode('A')
     .addNode('B')
@@ -30,10 +26,7 @@ const graph3 = DirectedGraphUtil.directedGraphBuilder
 describe('DirectedGraphUtil', () => {
     describe('hasCycle', () => {
         it('should return true if there is a cycle in a given graph', () => {
-            const cyclicGraph0 = DirectedGraphUtil.directedGraphBuilder
-                .addNode('A')
-                .createDirectedEdge('A', 'A')
-                .build();
+            const cyclicGraph0 = DirectedGraphUtil.directedGraphBuilder.addNode('A').createDirectedEdge('A', 'A').build();
             const cyclicGraph1 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
                 .addNode('B')
@@ -178,11 +171,7 @@ describe('DirectedGraphUtil', () => {
 
     describe('directedGraphBuilder', () => {
         it('should create the graphs correctly', () => {
-            const createdGraph0 = DirectedGraphUtil.directedGraphBuilder
-                .addNode('A')
-                .addNode('B')
-                .addNode('C')
-                .build();
+            const createdGraph0 = DirectedGraphUtil.directedGraphBuilder.addNode('A').addNode('B').addNode('C').build();
             const createdGraph1 = DirectedGraphUtil.directedGraphBuilder
                 .addNode('A')
                 .addNode('B')
@@ -191,16 +180,27 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('A', 'C')
                 .createDirectedEdge('B', 'C')
                 .build();
-            expect(createdGraph0.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C']);
-            expect(createdGraph1.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C']);
-            expect(createdGraph1.nodes.find(n => n.name === 'A')!.getChildren().map(n => n.name)).to.have.same.members(['B', 'C']);
-            expect(createdGraph1.nodes.find(n => n.name === 'B')!.getChildren().map(n => n.name)).to.have.same.members(['C']);
+            expect(createdGraph0.nodes.map((n) => n.name)).to.have.same.members(['A', 'B', 'C']);
+            expect(createdGraph1.nodes.map((n) => n.name)).to.have.same.members(['A', 'B', 'C']);
+            expect(
+                createdGraph1.nodes
+                    .find((n) => n.name === 'A')!
+                    .getChildren()
+                    .map((n) => n.name)
+            ).to.have.same.members(['B', 'C']);
+            expect(
+                createdGraph1.nodes
+                    .find((n) => n.name === 'B')!
+                    .getChildren()
+                    .map((n) => n.name)
+            ).to.have.same.members(['C']);
         });
 
         it('should throw an error when trying to add another node with the same name', () => {
-            const builderWithOneNode = DirectedGraphUtil.directedGraphBuilder
-                .addNode('A');
-            expect(builderWithOneNode.addNode.bind(builderWithOneNode, 'A')).to.throw('Cannot add a node with name "A" to the graph, such a node already exists!');
+            const builderWithOneNode = DirectedGraphUtil.directedGraphBuilder.addNode('A');
+            expect(builderWithOneNode.addNode.bind(builderWithOneNode, 'A')).to.throw(
+                'Cannot add a node with name "A" to the graph, such a node already exists!'
+            );
         });
     });
 });

@@ -1,21 +1,21 @@
-import { ArgsParser, YaniceArgs } from '../args-parser'
+import { ArgsParser, YaniceArgs } from '../args-parser';
 import { expect } from 'chai';
 
 describe('ArgsParser', () => {
     describe('parseArgs', () => {
         it('should parse valid arguments correctly', () => {
-            const actualArgs01 = ArgsParser.parseArgs(["lint", "--branch=master", "--includeUncommitted=true"]);
-            const actualArgs02 = ArgsParser.parseArgs(["test", "--branch=master", "--includeUncommitted=false", "--concurrency=123"]);
-            const actualArgs03 = ArgsParser.parseArgs(["build", "--commit=1234567", "--concurrency=3"]);
-            const actualArgs04 = ArgsParser.parseArgs(["build", "--all", "--responsibles"]);
-            const actualArgs05 = ArgsParser.parseArgs(["lint", "--branch=master", "--include-uncommitted", "--output-only"]);
-            const actualArgs06 = ArgsParser.parseArgs(["lint", "--branch=master", "--outputOnly=false"]);
-            const actualArgs07 = ArgsParser.parseArgs(["lint", "--rev=HEAD~1"]);
-            const actualArgs08 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=dagre", "--branch=master"]);
-            const actualArgs09 = ArgsParser.parseArgs(["lint", "--visualize", "--renderer=vizjs"]);
-            const actualArgs10 = ArgsParser.parseArgs(["lint", "--save-visualization", "--renderer=vizjs", "--branch=master"]);
-            const actualArgs11 = ArgsParser.parseArgs(["lint", "--branch=master", "--output-mode=append-at-end-on-error"]);
-            const actualArgs12 = ArgsParser.parseArgs(["lint", "--branch=master", "--output-mode=ignore"]);
+            const actualArgs01 = ArgsParser.parseArgs(['lint', '--branch=master', '--includeUncommitted=true']);
+            const actualArgs02 = ArgsParser.parseArgs(['test', '--branch=master', '--includeUncommitted=false', '--concurrency=123']);
+            const actualArgs03 = ArgsParser.parseArgs(['build', '--commit=1234567', '--concurrency=3']);
+            const actualArgs04 = ArgsParser.parseArgs(['build', '--all', '--responsibles']);
+            const actualArgs05 = ArgsParser.parseArgs(['lint', '--branch=master', '--include-uncommitted', '--output-only']);
+            const actualArgs06 = ArgsParser.parseArgs(['lint', '--branch=master', '--outputOnly=false']);
+            const actualArgs07 = ArgsParser.parseArgs(['lint', '--rev=HEAD~1']);
+            const actualArgs08 = ArgsParser.parseArgs(['lint', '--visualize', '--renderer=dagre', '--branch=master']);
+            const actualArgs09 = ArgsParser.parseArgs(['lint', '--visualize', '--renderer=vizjs']);
+            const actualArgs10 = ArgsParser.parseArgs(['lint', '--save-visualization', '--renderer=vizjs', '--branch=master']);
+            const actualArgs11 = ArgsParser.parseArgs(['lint', '--branch=master', '--output-mode=append-at-end-on-error']);
+            const actualArgs12 = ArgsParser.parseArgs(['lint', '--branch=master', '--output-mode=ignore']);
 
             const args: YaniceArgs = {
                 givenScope: 'lint',

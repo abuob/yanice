@@ -1,530 +1,551 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <body>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="https://dagrejs.github.io/project/dagre/v0.7.5/dagre.min.js"></script>
-<script src="https://dagrejs.github.io/project/graphlib-dot/v0.6.3/graphlib-dot.min.js"></script>
-<script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://dagrejs.github.io/project/dagre/v0.7.5/dagre.min.js"></script>
+    <script src="https://dagrejs.github.io/project/graphlib-dot/v0.6.3/graphlib-dot.min.js"></script>
+    <script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js"></script>
 
-<style>
-    .node {
-        white-space: nowrap;
-    }
+    <style>
+        .node {
+            white-space: nowrap;
+        }
 
-    .node rect,
-    .node circle,
-    .node ellipse {
-        stroke: #333;
-        fill: #fff;
-        stroke-width: 2px;
-    }
+        .node rect,
+        .node circle,
+        .node ellipse {
+            stroke: #333;
+            fill: #fff;
+            stroke-width: 2px;
+        }
 
-    .cluster rect {
-        stroke: #333;
-        fill: #000;
-        fill-opacity: 0.1;
-        stroke-width: 2px;
-    }
+        .cluster rect {
+            stroke: #333;
+            fill: #000;
+            fill-opacity: 0.1;
+            stroke-width: 2px;
+        }
 
-    .edgePath path.path {
-        stroke: #333;
-        stroke-width: 1.5px;
-        fill: none;
-    }
+        .edgePath path.path {
+            stroke: #333;
+            stroke-width: 1.5px;
+            fill: none;
+        }
 
-    .tooltip-content {
-        position: absolute;
-        z-index: 10;
-        display: block;
-    }
+        .tooltip-content {
+            position: absolute;
+            z-index: 10;
+            display: block;
+        }
 
-    .container {
-        display: flex;
-        flex-direction: row;
-    }
+        .container {
+            display: flex;
+            flex-direction: row;
+        }
 
-    .legend {
-        background: lightgrey;
-        width: fit-content;
-        display: flex;
-        flex-direction: column;
-    }
+        .legend {
+            background: lightgrey;
+            width: fit-content;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .legend .legend-item {
-        align-items: center;
-        display: flex;
-        flex-direction: row;
-        padding: 5px;
-    }
+        .legend .legend-item {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            padding: 5px;
+        }
 
-    .legend .legend-arrow {
-        font-size: medium;
-        margin-left: 7px;
-        margin-right: 7px;
-    }
+        .legend .legend-arrow {
+            font-size: medium;
+            margin-left: 7px;
+            margin-right: 7px;
+        }
 
-    .legend .legend-rectangle {
-        width: 60px;
-        height: 20px;
-        border: 2px solid;
-    }
+        .legend .legend-rectangle {
+            width: 60px;
+            height: 20px;
+            border: 2px solid;
+        }
 
-    .legend .dashed-border {
-        border: 2px dashed;
-    }
+        .legend .dashed-border {
+            border: 2px dashed;
+        }
 
-    .legend .red-border {
-        border: 2px solid #ff0000;
-    }
+        .legend .red-border {
+            border: 2px solid #ff0000;
+        }
 
-    .legend .red-fill {
-        background: #ff0000;
-    }
+        .legend .red-fill {
+            background: #ff0000;
+        }
 
-    .legend-table-padding {
-        padding-left: 8px;
-    }
+        .legend-table-padding {
+            padding-left: 8px;
+        }
 
-    .options {
-        background: lightgrey;
-        width: fit-content;
-        display: flex;
-        flex-direction: column;
-        margin: 0 20px;
-    }
+        .options {
+            background: lightgrey;
+            width: fit-content;
+            display: flex;
+            flex-direction: column;
+            margin: 0 20px;
+        }
 
-    .options .options-title {
-        padding: 5px
-    }
+        .options .options-title {
+            padding: 5px;
+        }
 
-    .options .options-row {
-        margin: 3px 5px;
-        display: flex;
-        flex-direction: row;
-    }
+        .options .options-row {
+            margin: 3px 5px;
+            display: flex;
+            flex-direction: row;
+        }
 
-    .options .options-label {
-        width: 200px;
-    }
+        .options .options-label {
+            width: 200px;
+        }
 
-    .svg-container {
-        margin: 30px;
-    }
-
-
-</style>
-<div class="container">
-    <div class="legend">
-        <div class="legend-item">
-            <span><strong>Scope: </strong>INSERT_SCOPE</span>
+        .svg-container {
+            margin: 30px;
+        }
+    </style>
+    <div class="container">
+        <div class="legend">
+            <div class="legend-item">
+                <span><strong>Scope: </strong>INSERT_SCOPE</span>
+            </div>
+            <div class="legend-item">
+                <span><strong>git-revision to compare to: </strong>INSERT_GIT_REVISION</span>
+            </div>
+            <table style="margin-left: 5px">
+                <tr>
+                    <td>
+                        <label for="graphEdgeDirectionSelect">A<span class="legend-arrow">&#10230;</span>B</label>
+                    </td>
+                    <td class="legend-table-padding">
+                        <select onchange="graphEdgeDirectionSelectCallback(this)" id="graphEdgeDirectionSelect">
+                            <option value="A_IMPORTS_B">A depends on B (A imports B)</option>
+                            <option value="A_IS_DEPENDENCY_OF_B">A is a dependency of B (B imports A)</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="legend-rectangle dashed-border"></div>
+                    </td>
+                    <td class="legend-table-padding">Dashed border: Has no command to execute corresponding to the scope of the graph</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="legend-rectangle red-border"></div>
+                    </td>
+                    <td class="legend-table-padding">Red border: A dependency has changed compared to the given git-revision</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="legend-rectangle red-border red-fill"></div>
+                    </td>
+                    <td class="legend-table-padding">
+                        Red background: File(s) of this project have changed compared to the given git-revision
+                    </td>
+                </tr>
+            </table>
         </div>
-        <div class="legend-item">
-            <span><strong>git-revision to compare to: </strong>INSERT_GIT_REVISION</span>
-        </div>
-        <table style="margin-left: 5px">
-            <tr>
-                <td><label for="graphEdgeDirectionSelect">A<span class="legend-arrow">&#10230;</span>B</label></td>
-                <td class="legend-table-padding">
-                    <select onchange="graphEdgeDirectionSelectCallback(this)" id="graphEdgeDirectionSelect">
-                        <option value="A_IMPORTS_B">A depends on B (A imports B)</option>
-                        <option value="A_IS_DEPENDENCY_OF_B">A is a dependency of B (B imports A)</option>
+        <div class="options">
+            <div class="options-title"><strong>Options:</strong></div>
+            <div class="options-row">
+                <div class="options-label"><label for="graphRenderOrientationSelect">Graph Render Orientation</label></div>
+                <div>
+                    <select id="graphRenderOrientationSelect" onchange="graphRenderOrientationSelectCallback(this)">
+                        <option value="TB">Top to Bottom</option>
+                        <option value="BT">Bottom to Top</option>
+                        <option value="LR">Left to Right</option>
+                        <option value="RL">Right to Left</option>
                     </select>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="legend-rectangle dashed-border"></div>
-                </td>
-                <td class="legend-table-padding">Dashed border: Has no command to execute corresponding to the scope of
-                    the
-                    graph
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="legend-rectangle red-border"></div>
-                </td>
-                <td class="legend-table-padding">Red border: A dependency has changed compared to the given git-revision
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="legend-rectangle red-border red-fill"></div>
-                </td>
-                <td class="legend-table-padding">Red background: File(s) of this project have changed compared to the
-                    given
-                    git-revision
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div class="options">
-        <div class="options-title"><strong>Options:</strong></div>
-        <div class="options-row">
-            <div class="options-label"><label for="graphRenderOrientationSelect">Graph Render Orientation</label></div>
-            <div>
-                <select id="graphRenderOrientationSelect" onchange="graphRenderOrientationSelectCallback(this)">
-                    <option value="TB">Top to Bottom</option>
-                    <option value="BT">Bottom to Top</option>
-                    <option value="LR">Left to Right</option>
-                    <option value="RL">Right to Left</option>
-                </select>
+                </div>
             </div>
-        </div>
-        <div class="options-row">
-            <div class="options-label"><label for="graphFocusSelect">Focus Project</label></div>
-            <div>
-                <select id="graphFocusSelect" onchange="graphFocusSelectCallback(this)">
-                    <option value="-----">-----</option>
-                </select>
+            <div class="options-row">
+                <div class="options-label"><label for="graphFocusSelect">Focus Project</label></div>
+                <div>
+                    <select id="graphFocusSelect" onchange="graphFocusSelectCallback(this)">
+                        <option value="-----">-----</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="options-row">
-            <div class="options-label"><label for="graphFocusOptionsSelect">Focus Options</label></div>
-            <div>
-                <select id="graphFocusOptionsSelect" onchange="graphFocusOptionsSelectCallback(this)">
-                </select>
+            <div class="options-row">
+                <div class="options-label"><label for="graphFocusOptionsSelect">Focus Options</label></div>
+                <div>
+                    <select id="graphFocusOptionsSelect" onchange="graphFocusOptionsSelectCallback(this)"></select>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="svg-container">
-    <svg id="svg-id" height="450" width="800" style="display: block">
-        <g/>
-    </svg>
-</div>
-<script>
+    <div class="svg-container">
+        <svg id="svg-id" height="450" width="800" style="display: block">
+            <g />
+        </svg>
+    </div>
+    <script>
+        /**
+         * graphData corresponds to YaniceGraphNodeInfo[] (see graph-dagre-renderer.ts), an array of:
+         * {
+         *   projectName: string;
+         *   scope: string;
+         *   parents: string[];
+         *   children: string[];
+         *   ancestors: string[];
+         *   descendants: string[];
+         *   responsibles: string[];
+         *   changedFiles: string[];
+         *   isAffected: boolean;
+         *   command: YaniceCommand | null;
+         *   pathGlob: string;
+         *   pathRegExp: string;
+         * }
+         */
+        const graphData = INSERT_GRAPH_DATA_OBJECT_HERE;
 
-    /**
-     * graphData corresponds to YaniceGraphNodeInfo[] (see graph-dagre-renderer.ts), an array of:
-     * {
-     *   projectName: string;
-     *   scope: string;
-     *   parents: string[];
-     *   children: string[];
-     *   ancestors: string[];
-     *   descendants: string[];
-     *   responsibles: string[];
-     *   changedFiles: string[];
-     *   isAffected: boolean;
-     *   command: YaniceCommand | null;
-     *   pathGlob: string;
-     *   pathRegExp: string;
-     * }
-     */
-    const graphData = INSERT_GRAPH_DATA_OBJECT_HERE;
+        const GRAPH_FOCUS_DEFAULT = '-----';
 
-    const GRAPH_FOCUS_DEFAULT = '-----';
+        const DEFAULT_DISPLAY_OPTIONS = {
+            graphRenderDirection: 'BT', // TB | BT | LR | RL
+            graphEdgeDirection: 'A_IMPORTS_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B,
+            graphFocus: GRAPH_FOCUS_DEFAULT, // ----- is nothing focused, otherwise name of the project,
+            graphFocusOptions: 'DESCENDANTS_ONLY' // See GRAPH_FOCUS_OPTIONS
+        };
 
-    const DEFAULT_DISPLAY_OPTIONS = {
-        graphRenderDirection: 'BT', // TB | BT | LR | RL
-        graphEdgeDirection: 'A_IMPORTS_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B,
-        graphFocus: GRAPH_FOCUS_DEFAULT, // ----- is nothing focused, otherwise name of the project,
-        graphFocusOptions: 'DESCENDANTS_ONLY' // See GRAPH_FOCUS_OPTIONS
-    };
+        const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
+        const RENDERED_PROJECTS = getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus, RENDER_OPTIONS.graphFocusOptions);
 
-    const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
-    const RENDERED_PROJECTS = getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus, RENDER_OPTIONS.graphFocusOptions);
+        const GRAPH_FOCUS_OPTIONS = [
+            { value: 'DESCENDANTS_ONLY', label: 'All transitive dependencies' },
+            { value: 'ANCESTORS_ONLY', label: 'All transitive dependants' },
+            { value: 'ANCESTORS_AND_DESCENDANTS', label: 'All transitive dependencies and dependants' },
+            { value: 'IMMEDIATE_CONNECTIONS', label: 'Only direct dependencies and dependants' }
+        ];
 
-    const GRAPH_FOCUS_OPTIONS = [
-        { value: 'DESCENDANTS_ONLY', label: 'All transitive dependencies' },
-        { value: 'ANCESTORS_ONLY', label: 'All transitive dependants' },
-        { value: 'ANCESTORS_AND_DESCENDANTS', label: 'All transitive dependencies and dependants' },
-        { value: 'IMMEDIATE_CONNECTIONS', label: 'Only direct dependencies and dependants' }
-    ];
-
-    // Set selects
-    document.querySelector('#graphEdgeDirectionSelect').options[RENDER_OPTIONS.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 1 : 0].selected = true;
-    document.querySelector('#graphRenderOrientationSelect').options[
-        RENDER_OPTIONS.graphRenderDirection === 'TB' ? 0 :
-            RENDER_OPTIONS.graphRenderDirection === 'BT' ? 1 :
-                RENDER_OPTIONS.graphRenderDirection === 'LR' ? 2 :
-                    RENDER_OPTIONS.graphRenderDirection === 'RL' ? 3 : 0
+        // Set selects
+        document.querySelector('#graphEdgeDirectionSelect').options[
+            RENDER_OPTIONS.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 1 : 0
         ].selected = true;
-    graphData.forEach(data => {
-        const select = document.querySelector('#graphFocusSelect');
-        select.options[select.options.length] = new Option(
-            data.projectName,
-            data.projectName,
-            RENDER_OPTIONS.graphFocus === data.projectName,
-            RENDER_OPTIONS.graphFocus === data.projectName
-        );
-    });
-    initFocusOptionsSelect(GRAPH_FOCUS_OPTIONS, RENDER_OPTIONS, GRAPH_FOCUS_DEFAULT);
-
-    // Initialize an empty graph
-    const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
-
-    // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
-    // is available: See e.g. "dagreGraph.node(d)"-usages below
-    graphData
-        .filter(data => RENDERED_PROJECTS.includes(data.projectName))
-        .forEach(data => {
-        data.label = data.projectName;
-        data.style = getNodeStyle(data);
-
-        dagreGraph.setNode(data.projectName, data);
-        switch (RENDER_OPTIONS.graphEdgeDirection) {
-            case 'A_IS_DEPENDENCY_OF_B':
-                data.parents
-                    .filter(e => RENDERED_PROJECTS.includes(e))
-                    .forEach(e => dagreGraph.setEdge(data.projectName, e, {
-                        curve: d3.curveBasis,
-                        style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
-                    }));
-                break;
-            case 'A_IMPORTS_B':
-                data.parents
-                    .filter(e => RENDERED_PROJECTS.includes(e))
-                    .forEach(e => dagreGraph.setEdge(e, data.projectName, {
-                        curve: d3.curveBasis,
-                        style: getEdgeStyle(data, graphData.find(n => n.projectName === e))
-                    }));
-                break;
-        }
-    });
-
-
-    // Enable zoom
-    const svg = d3.select("svg"),
-        inner = d3.select("svg g"),
-        zoom = d3.zoom().on("zoom", function () {
-            inner.attr("transform", d3.event.transform);
-        });
-    svg.call(zoom);
-
-    // Add some margins (otherwise the graph looks a bit cut-off at the borders)
-    if (!dagreGraph.graph().hasOwnProperty("marginx") &&
-        !dagreGraph.graph().hasOwnProperty("marginy")) {
-        dagreGraph.graph().marginx = 20;
-        dagreGraph.graph().marginy = 20;
-    }
-    // Graph direction
-    dagreGraph.graph().rankdir = RENDER_OPTIONS.graphRenderDirection;
-
-    dagreGraph.graph().transition = function (selection) {
-        return selection.transition().duration(500);
-    };
-
-    dagre.layout(dagreGraph);
-
-    const render = dagreD3.render();
-    render(d3.select("svg g"), dagreGraph);
-
-    const svgHeight = dagreGraph.graph().height * 1.2;
-    const svgWidth = dagreGraph.graph().width * 1.2;
-    document.getElementById('svg-id').setAttribute("height", svgHeight + "px");
-    document.getElementById('svg-id').setAttribute("width", svgWidth + "px");
-
-    // Attach tooltip-div. Note that there is only one such div, which will be rendered depending on which
-    // graph-node (project) is currently being hovered. If none is hovered, the tooltip-div is hidden
-    const tooltip = d3.select(".svg-container")
-        .append("div")
-        .attr("class", "tooltip-content")
-        .style("visibility", "hidden")
-        .style("border", "solid")
-        .style("min-width", "600px")
-        .style("border-width", "2px")
-        .style("border-radius", "5px")
-        .style("padding", "5px")
-        .style("background-color", "white");
-
-    const mouseover = function (d) {
-        const nodeData = dagreGraph.node(d);
-        tooltip
-            .style("visibility", "visible")
-            .html(getProjectInfoTable(nodeData))
-            .style("left", nodeData.x + "px")
-            .style("top", (nodeData.y + 50) + "px"); // the +50 takes makes the tooltip appear below the node
-        // TODO: Take zoom into account - zooming currently breaks tooltip-positioning
-    };
-    const mouseout = function (d) {
-        tooltip
-            .style("visibility", "hidden");
-    };
-
-    d3.selectAll('g.node')
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout);
-
-    // =========== SELECT-CALLBACKS ===========
-
-    function graphEdgeDirectionSelectCallback(selectElement) {
-        const options = getOptionsFromSessionStorageOrDefault();
-        const newOptions = {
-            ...options,
-            graphEdgeDirection: selectElement.value
-        };
-        writeOptionsToSessionStorageAndReload(newOptions);
-    }
-
-    function graphRenderOrientationSelectCallback(selectElement) {
-        const options = getOptionsFromSessionStorageOrDefault();
-        const newOptions = {
-            ...options,
-            graphRenderDirection: selectElement.value
-        };
-        writeOptionsToSessionStorageAndReload(newOptions);
-    }
-
-    function graphFocusSelectCallback(selectElement) {
-        const options = getOptionsFromSessionStorageOrDefault();
-        const newOptions = {
-            ...options,
-            graphFocus: selectElement.value
-        };
-        writeOptionsToSessionStorageAndReload(newOptions);
-    }
-
-    function graphFocusOptionsSelectCallback(selectElement) {
-        const options = getOptionsFromSessionStorageOrDefault();
-        const newOptions = {
-            ...options,
-            graphFocusOptions: selectElement.value
-        };
-        writeOptionsToSessionStorageAndReload(newOptions);
-    }
-
-    // =========== SELECT-SETUP ==============
-
-    function initFocusOptionsSelect(graphFocusOptions, renderOptions, graphFocusDefault) {
-        const selectElement = document.querySelector('#graphFocusOptionsSelect');
-        graphFocusOptions.forEach(option => {
-            selectElement.options[selectElement.options.length] = new Option(
-                option.label,
-                option.value,
-                renderOptions.graphFocusOptions === option.value,
-                renderOptions.graphFocusOptions === option.value
+        document.querySelector('#graphRenderOrientationSelect').options[
+            RENDER_OPTIONS.graphRenderDirection === 'TB'
+                ? 0
+                : RENDER_OPTIONS.graphRenderDirection === 'BT'
+                ? 1
+                : RENDER_OPTIONS.graphRenderDirection === 'LR'
+                ? 2
+                : RENDER_OPTIONS.graphRenderDirection === 'RL'
+                ? 3
+                : 0
+        ].selected = true;
+        graphData.forEach((data) => {
+            const select = document.querySelector('#graphFocusSelect');
+            select.options[select.options.length] = new Option(
+                data.projectName,
+                data.projectName,
+                RENDER_OPTIONS.graphFocus === data.projectName,
+                RENDER_OPTIONS.graphFocus === data.projectName
             );
         });
-        if (renderOptions.graphFocus === graphFocusDefault) {
-            selectElement.disabled = true;
+        initFocusOptionsSelect(GRAPH_FOCUS_OPTIONS, RENDER_OPTIONS, GRAPH_FOCUS_DEFAULT);
+
+        // Initialize an empty graph
+        const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
+
+        // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
+        // is available: See e.g. "dagreGraph.node(d)"-usages below
+        graphData
+            .filter((data) => RENDERED_PROJECTS.includes(data.projectName))
+            .forEach((data) => {
+                data.label = data.projectName;
+                data.style = getNodeStyle(data);
+
+                dagreGraph.setNode(data.projectName, data);
+                switch (RENDER_OPTIONS.graphEdgeDirection) {
+                    case 'A_IS_DEPENDENCY_OF_B':
+                        data.parents
+                            .filter((e) => RENDERED_PROJECTS.includes(e))
+                            .forEach((e) =>
+                                dagreGraph.setEdge(data.projectName, e, {
+                                    curve: d3.curveBasis,
+                                    style: getEdgeStyle(
+                                        data,
+                                        graphData.find((n) => n.projectName === e)
+                                    )
+                                })
+                            );
+                        break;
+                    case 'A_IMPORTS_B':
+                        data.parents
+                            .filter((e) => RENDERED_PROJECTS.includes(e))
+                            .forEach((e) =>
+                                dagreGraph.setEdge(e, data.projectName, {
+                                    curve: d3.curveBasis,
+                                    style: getEdgeStyle(
+                                        data,
+                                        graphData.find((n) => n.projectName === e)
+                                    )
+                                })
+                            );
+                        break;
+                }
+            });
+
+        // Enable zoom
+        const svg = d3.select('svg'),
+            inner = d3.select('svg g'),
+            zoom = d3.zoom().on('zoom', function () {
+                inner.attr('transform', d3.event.transform);
+            });
+        svg.call(zoom);
+
+        // Add some margins (otherwise the graph looks a bit cut-off at the borders)
+        if (!dagreGraph.graph().hasOwnProperty('marginx') && !dagreGraph.graph().hasOwnProperty('marginy')) {
+            dagreGraph.graph().marginx = 20;
+            dagreGraph.graph().marginy = 20;
         }
-    }
+        // Graph direction
+        dagreGraph.graph().rankdir = RENDER_OPTIONS.graphRenderDirection;
 
-    // =========== UTILITIES ==============
+        dagreGraph.graph().transition = function (selection) {
+            return selection.transition().duration(500);
+        };
 
-    function getOptionsFromSessionStorageOrDefault() {
-        const optionsFromSessionStorage = sessionStorage.getItem('graphDisplayOptions');
-        return optionsFromSessionStorage ? JSON.parse(optionsFromSessionStorage) : DEFAULT_DISPLAY_OPTIONS;
-    }
+        dagre.layout(dagreGraph);
 
-    function writeOptionsToSessionStorageAndReload(graphDisplayOptions) {
-        sessionStorage.setItem('graphDisplayOptions', JSON.stringify(graphDisplayOptions));
-        window.location.reload();
-    }
+        const render = dagreD3.render();
+        render(d3.select('svg g'), dagreGraph);
 
-    function getProjectsThatNeedRendering(pGraphData, graphFocusSelection, graphFocusOption) {
-        const allProjects = pGraphData.map(d => d.projectName);
-        if (graphFocusSelection === GRAPH_FOCUS_DEFAULT) {
-            return allProjects;
+        const svgHeight = dagreGraph.graph().height * 1.2;
+        const svgWidth = dagreGraph.graph().width * 1.2;
+        document.getElementById('svg-id').setAttribute('height', svgHeight + 'px');
+        document.getElementById('svg-id').setAttribute('width', svgWidth + 'px');
+
+        // Attach tooltip-div. Note that there is only one such div, which will be rendered depending on which
+        // graph-node (project) is currently being hovered. If none is hovered, the tooltip-div is hidden
+        const tooltip = d3
+            .select('.svg-container')
+            .append('div')
+            .attr('class', 'tooltip-content')
+            .style('visibility', 'hidden')
+            .style('border', 'solid')
+            .style('min-width', '600px')
+            .style('border-width', '2px')
+            .style('border-radius', '5px')
+            .style('padding', '5px')
+            .style('background-color', 'white');
+
+        const mouseover = function (d) {
+            const nodeData = dagreGraph.node(d);
+            tooltip
+                .style('visibility', 'visible')
+                .html(getProjectInfoTable(nodeData))
+                .style('left', nodeData.x + 'px')
+                .style('top', nodeData.y + 50 + 'px'); // the +50 takes makes the tooltip appear below the node
+            // TODO: Take zoom into account - zooming currently breaks tooltip-positioning
+        };
+        const mouseout = function (d) {
+            tooltip.style('visibility', 'hidden');
+        };
+
+        d3.selectAll('g.node').on('mouseover', mouseover).on('mouseout', mouseout);
+
+        // =========== SELECT-CALLBACKS ===========
+
+        function graphEdgeDirectionSelectCallback(selectElement) {
+            const options = getOptionsFromSessionStorageOrDefault();
+            const newOptions = {
+                ...options,
+                graphEdgeDirection: selectElement.value
+            };
+            writeOptionsToSessionStorageAndReload(newOptions);
         }
 
-        const focusProjectGraphData = pGraphData.find(d => d.projectName === graphFocusSelection);
-        console.log('focusProjectGraphData', focusProjectGraphData);
-        switch(graphFocusOption) {
-            case 'ANCESTORS_ONLY':
-                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.ancestors]));
-            case 'DESCENDANTS_ONLY':
-                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants]));
-            case 'ANCESTORS_AND_DESCENDANTS':
-                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants, ...focusProjectGraphData.ancestors]));
-            case 'IMMEDIATE_CONNECTIONS':
-                return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.parents, ...focusProjectGraphData.children]));
-        }
-    }
-
-    function getNodeStyle(data) {
-        let styleStr = "stroke-width: 2px;";
-        // If there is no command, the graph-node has dashed borders
-        if (!data.command) {
-            styleStr = styleStr.concat("stroke-dasharray: 5, 5;");
-        }
-        // If a project itself or one of its dependencies changed, outline is red
-        if (data.isAffected) {
-            styleStr = styleStr.concat("stroke: #ff0000;")
-        }
-        // If the project changed directly (changed files), color entire node red
-        if (data.changedFiles.length > 0) {
-            styleStr = styleStr.concat("fill: #ff0000;")
-        }
-        return styleStr;
-    }
-
-    function getEdgeStyle(importerNode, dependencyNode) {
-        let styleStr = "";
-        if (importerNode.changedFiles.length > 0 && dependencyNode.isAffected) {
-            styleStr = styleStr.concat("stroke: #ff0000;");
-        }
-        return styleStr;
-    }
-
-    function getProjectInfoTable(nodeData) {
-        let table = ' <table style="width:100%">';
-
-        // Add basic info: Caption (project-name), pathGlob, pathRegExp
-        table = table.concat(
-            '<caption><strong>' + nodeData.projectName + '<strong></strong></caption>' +
-            '<tr>' +
-            '  <td>pathGlob:</td>' +
-            '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' + nodeData.pathGlob + '</td>' +
-            '</tr>' +
-            '<tr>' +
-            '  <td>pathRegExp:</td>' +
-            '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' + nodeData.pathRegExp + '</td>' +
-            '</tr>'
-        );
-
-        // Add responsibles, if there are any
-        if (nodeData.responsibles.length > 0) {
-            table = table.concat(
-                '<tr>' +
-                '  <td>responsibles:</td>' +
-                '  <td>' + nodeData.responsibles.join(', ') + '</td>' +
-                '</tr>'
-            );
+        function graphRenderOrientationSelectCallback(selectElement) {
+            const options = getOptionsFromSessionStorageOrDefault();
+            const newOptions = {
+                ...options,
+                graphRenderDirection: selectElement.value
+            };
+            writeOptionsToSessionStorageAndReload(newOptions);
         }
 
-        // Add commands if defined, add commands-cwd if it's not the root directory
-        if (nodeData.command) {
-            const commands = nodeData.command.commands;
-            const commandDisplayString = commands.length === 1 ? commands[0] : `${commands.join(', ')}`;
-            const singularOrPluralCommand = commands.length === 1 ? 'command' : 'commands';
-            table = table.concat(
-                '<tr>' +
-                '  <td><span style="font-family: courier; font-size: small;white-space: nowrap">' + nodeData.scope + '</span> ' + singularOrPluralCommand + ':</td>' +
-                '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' + commandDisplayString + '</td>' +
-                '</tr>'
-            );
-            if (nodeData.command.cwd && nodeData.command.cwd !== './') {
-                table = table.concat(
-                    '<tr>' +
-                    '  <td style="white-space:nowrap">command directory:</td>' +
-                    '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' + nodeData.command.cwd + '</td>' +
-                    '</tr>'
+        function graphFocusSelectCallback(selectElement) {
+            const options = getOptionsFromSessionStorageOrDefault();
+            const newOptions = {
+                ...options,
+                graphFocus: selectElement.value
+            };
+            writeOptionsToSessionStorageAndReload(newOptions);
+        }
+
+        function graphFocusOptionsSelectCallback(selectElement) {
+            const options = getOptionsFromSessionStorageOrDefault();
+            const newOptions = {
+                ...options,
+                graphFocusOptions: selectElement.value
+            };
+            writeOptionsToSessionStorageAndReload(newOptions);
+        }
+
+        // =========== SELECT-SETUP ==============
+
+        function initFocusOptionsSelect(graphFocusOptions, renderOptions, graphFocusDefault) {
+            const selectElement = document.querySelector('#graphFocusOptionsSelect');
+            graphFocusOptions.forEach((option) => {
+                selectElement.options[selectElement.options.length] = new Option(
+                    option.label,
+                    option.value,
+                    renderOptions.graphFocusOptions === option.value,
+                    renderOptions.graphFocusOptions === option.value
                 );
+            });
+            if (renderOptions.graphFocus === graphFocusDefault) {
+                selectElement.disabled = true;
             }
         }
 
-        // Add dependents if there are any
-        if (nodeData.parents.length > 0) {
-            table = table.concat(
-                '<tr>' +
-                '  <td>Dependents:</td>' +
-                '  <td>' + nodeData.parents.join(', ') + '</td>' +
-                '</tr>'
-            )
+        // =========== UTILITIES ==============
+
+        function getOptionsFromSessionStorageOrDefault() {
+            const optionsFromSessionStorage = sessionStorage.getItem('graphDisplayOptions');
+            return optionsFromSessionStorage ? JSON.parse(optionsFromSessionStorage) : DEFAULT_DISPLAY_OPTIONS;
         }
 
-        // If there are changed files, list them
-        if (nodeData.changedFiles.length > 0) {
-            table = table.concat(
-                '  <tr>' +
-                '    <td style="white-space:nowrap">Changed files:</td>' +
-                '    <td><ul style="font-family: courier; font-size: x-small;white-space:nowrap;list-style:none;padding:0;margin:0";>' + nodeData.changedFiles.map(f => '<li>' + f + '</li>').join('') + '</ul></td>' +
-                '  </tr>'
-            )
+        function writeOptionsToSessionStorageAndReload(graphDisplayOptions) {
+            sessionStorage.setItem('graphDisplayOptions', JSON.stringify(graphDisplayOptions));
+            window.location.reload();
         }
-        return table + '</table>';
-    }
-</script>
+
+        function getProjectsThatNeedRendering(pGraphData, graphFocusSelection, graphFocusOption) {
+            const allProjects = pGraphData.map((d) => d.projectName);
+            if (graphFocusSelection === GRAPH_FOCUS_DEFAULT) {
+                return allProjects;
+            }
+
+            const focusProjectGraphData = pGraphData.find((d) => d.projectName === graphFocusSelection);
+            console.log('focusProjectGraphData', focusProjectGraphData);
+            switch (graphFocusOption) {
+                case 'ANCESTORS_ONLY':
+                    return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.ancestors]));
+                case 'DESCENDANTS_ONLY':
+                    return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants]));
+                case 'ANCESTORS_AND_DESCENDANTS':
+                    return Array.from(
+                        new Set([
+                            focusProjectGraphData.projectName,
+                            ...focusProjectGraphData.descendants,
+                            ...focusProjectGraphData.ancestors
+                        ])
+                    );
+                case 'IMMEDIATE_CONNECTIONS':
+                    return Array.from(
+                        new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.parents, ...focusProjectGraphData.children])
+                    );
+            }
+        }
+
+        function getNodeStyle(data) {
+            let styleStr = 'stroke-width: 2px;';
+            // If there is no command, the graph-node has dashed borders
+            if (!data.command) {
+                styleStr = styleStr.concat('stroke-dasharray: 5, 5;');
+            }
+            // If a project itself or one of its dependencies changed, outline is red
+            if (data.isAffected) {
+                styleStr = styleStr.concat('stroke: #ff0000;');
+            }
+            // If the project changed directly (changed files), color entire node red
+            if (data.changedFiles.length > 0) {
+                styleStr = styleStr.concat('fill: #ff0000;');
+            }
+            return styleStr;
+        }
+
+        function getEdgeStyle(importerNode, dependencyNode) {
+            let styleStr = '';
+            if (importerNode.changedFiles.length > 0 && dependencyNode.isAffected) {
+                styleStr = styleStr.concat('stroke: #ff0000;');
+            }
+            return styleStr;
+        }
+
+        function getProjectInfoTable(nodeData) {
+            let table = ' <table style="width:100%">';
+
+            // Add basic info: Caption (project-name), pathGlob, pathRegExp
+            table = table.concat(
+                '<caption><strong>' +
+                    nodeData.projectName +
+                    '<strong></strong></caption>' +
+                    '<tr>' +
+                    '  <td>pathGlob:</td>' +
+                    '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' +
+                    nodeData.pathGlob +
+                    '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                    '  <td>pathRegExp:</td>' +
+                    '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' +
+                    nodeData.pathRegExp +
+                    '</td>' +
+                    '</tr>'
+            );
+
+            // Add responsibles, if there are any
+            if (nodeData.responsibles.length > 0) {
+                table = table.concat('<tr>' + '  <td>responsibles:</td>' + '  <td>' + nodeData.responsibles.join(', ') + '</td>' + '</tr>');
+            }
+
+            // Add commands if defined, add commands-cwd if it's not the root directory
+            if (nodeData.command) {
+                const commands = nodeData.command.commands;
+                const commandDisplayString = commands.length === 1 ? commands[0] : `${commands.join(', ')}`;
+                const singularOrPluralCommand = commands.length === 1 ? 'command' : 'commands';
+                table = table.concat(
+                    '<tr>' +
+                        '  <td><span style="font-family: courier; font-size: small;white-space: nowrap">' +
+                        nodeData.scope +
+                        '</span> ' +
+                        singularOrPluralCommand +
+                        ':</td>' +
+                        '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' +
+                        commandDisplayString +
+                        '</td>' +
+                        '</tr>'
+                );
+                if (nodeData.command.cwd && nodeData.command.cwd !== './') {
+                    table = table.concat(
+                        '<tr>' +
+                            '  <td style="white-space:nowrap">command directory:</td>' +
+                            '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' +
+                            nodeData.command.cwd +
+                            '</td>' +
+                            '</tr>'
+                    );
+                }
+            }
+
+            // Add dependents if there are any
+            if (nodeData.parents.length > 0) {
+                table = table.concat('<tr>' + '  <td>Dependents:</td>' + '  <td>' + nodeData.parents.join(', ') + '</td>' + '</tr>');
+            }
+
+            // If there are changed files, list them
+            if (nodeData.changedFiles.length > 0) {
+                table = table.concat(
+                    '  <tr>' +
+                        '    <td style="white-space:nowrap">Changed files:</td>' +
+                        '    <td><ul style="font-family: courier; font-size: x-small;white-space:nowrap;list-style:none;padding:0;margin:0";>' +
+                        nodeData.changedFiles.map((f) => '<li>' + f + '</li>').join('') +
+                        '</ul></td>' +
+                        '  </tr>'
+                );
+            }
+            return table + '</table>';
+        }
+    </script>
+</body>

@@ -1,9 +1,9 @@
 import yaniceJson2 from '../../__fixtures/valid-2.yanice.json';
 import yaniceJson3 from '../../__fixtures/valid-3.yanice.json';
-import { ConfigParser } from '../config-parser'
+import { ConfigParser } from '../config-parser';
 import { expect } from 'chai';
-import { YaniceArgs } from '../args-parser'
-import { DirectedGraphUtil, IDirectedGraph } from '../../directed-graph/directed-graph'
+import { YaniceArgs } from '../args-parser';
+import { DirectedGraphUtil, IDirectedGraph } from '../../directed-graph/directed-graph';
 
 describe('ConfigParser', () => {
     const args: YaniceArgs = {
@@ -23,7 +23,7 @@ describe('ConfigParser', () => {
         graphRenderer: 'DAGREJS',
         commandOutputMode: null,
         concurrency: 1
-    }
+    };
 
     describe('getYaniceConfig', () => {
         it('should set the options to default values if none are specified', () => {
@@ -49,67 +49,71 @@ describe('ConfigParser', () => {
         });
 
         it('should override scope options if they are overridden via cli-arguments', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'test', commandOutputMode: 'ignore' });
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {
+                ...args,
+                givenScope: 'test',
+                commandOutputMode: 'ignore'
+            });
             expect(actualConfigForTest.options.commandOutput).to.equal('ignore');
         });
 
         it('should have empty dependencies if there are none listed (treat empty array same as undefined; except defaultDependencies)', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'empty-deps' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
-                "project-A": [],
-                "project-B": [],
-                "lib-1": [],
-                "lib-2": []
-            })
+                'project-A': [],
+                'project-B': [],
+                'lib-1': [],
+                'lib-2': []
+            });
         });
 
         it('should add the defaultDependencies where no dependencies are defined', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-3' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
-                "A": [],
-                "B": ["C"],
-                "C": ["A", "D"],
-                "D": ["A"],
-                "E": ["A"]
-            })
+                A: [],
+                B: ['C'],
+                C: ['A', 'D'],
+                D: ['A'],
+                E: ['A']
+            });
         });
 
         it('should add the defaultDependencies where no dependencies are defined, and not introduce cycles', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-4' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
-                "A": [],
-                "B": [],
-                "C": ["A", "B"],
-                "D": ["A", "B"],
-                "E": ["A", "B"]
-            })
+                A: [],
+                B: [],
+                C: ['A', 'B'],
+                D: ['A', 'B'],
+                E: ['A', 'B']
+            });
         });
 
         it('should add the defaultDependencies and not introduce cycles', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-5' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
-                "A": [],
-                "B": ["C"],
-                "C": ["A", "D"],
-                "D": ["A", "B"],
-                "E": ["A", "B"]
-            })
+                A: [],
+                B: ['C'],
+                C: ['A', 'D'],
+                D: ['A', 'B'],
+                E: ['A', 'B']
+            });
         });
 
         it('should load the dependencies of the scope which is extended', () => {
             const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'extended-scope' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
-                "lib-1": ["lib-2"],
-                "lib-2": [],
-                "project-A": ["lib-1"],
-                "project-B": ["lib-2"]
+                'lib-1': ['lib-2'],
+                'lib-2': [],
+                'project-A': ['lib-1'],
+                'project-B': ['lib-2']
             });
         });
 
         it('should properly map commands-cwd', () => {
             const yaniceConfig = ConfigParser.getYaniceConfig(yaniceJson2, args);
-            const yaniceProject1 = yaniceConfig.projects.find(project => project.projectName === 'A');
-            const yaniceProject2 = yaniceConfig.projects.find(project => project.projectName === 'B');
+            const yaniceProject1 = yaniceConfig.projects.find((project) => project.projectName === 'A');
+            const yaniceProject2 = yaniceConfig.projects.find((project) => project.projectName === 'B');
             expect(yaniceProject1?.commands.lint).to.deep.equal({
                 commands: ['lint A1', 'lint A2'],
                 cwd: 'path/to/dir/A'
@@ -125,12 +129,16 @@ describe('ConfigParser', () => {
 
     describe('getDepGraphFromConfig', () => {
         it('should properly create a directed graph when there are no dependencies', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'lint' }));
-            expect(actualGraph?.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+            const actualGraph = ConfigParser.getDepGraphFromConfig(
+                ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'lint' })
+            );
+            expect(actualGraph?.nodes.map((n) => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
         });
 
         it('should properly create a directed graph with some dependencies', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'test' }));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(
+                ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'test' })
+            );
             expect(actualGraph).to.not.equal(null);
             expect(getChildrenOf(actualGraph, 'project-A')).to.have.same.members(['lib-1']);
             expect(getChildrenOf(actualGraph, 'lib-1')).to.have.same.members([]);
@@ -139,7 +147,9 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph when given a scope-definition', () => {
-            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'test' }));
+            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfig(
+                ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'test' })
+            );
             expect(actualGraphForTestScope).to.not.equal(null);
             expect(getChildrenOf(actualGraphForTestScope, 'A')).to.have.same.members(['B', 'C']);
             expect(getChildrenOf(actualGraphForTestScope, 'B')).to.have.same.members(['D']);
@@ -149,7 +159,9 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph even when given a scope-definition containing an illegal cycle', () => {
-            const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'illegalCycle' }));
+            const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfig(
+                ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'illegalCycle' })
+            );
             expect(actualGraphForIllegalCycleScope).to.not.equal(null);
             expect(getChildrenOf(actualGraphForIllegalCycleScope, 'A')).to.have.same.members(['B']);
             expect(getChildrenOf(actualGraphForIllegalCycleScope, 'B')).to.have.same.members(['C']);
@@ -160,7 +172,9 @@ describe('ConfigParser', () => {
         });
 
         it('should create nodes for projects even if they are not explicitly listed in the dependency scope', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'build-some' }));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(
+                ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'build-some' })
+            );
             expect(getAllNodeNames(actualGraph)).to.have.same.members(['project-A', 'project-B', 'lib-1', 'lib-2']);
             expect(getChildrenOf(actualGraph, 'project-A')).to.have.same.members(['lib-1']);
             expect(getChildrenOf(actualGraph, 'project-B')).to.have.same.members(['lib-2']);
@@ -169,7 +183,9 @@ describe('ConfigParser', () => {
         });
 
         it('should create the graph for a scope which extends another scope', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-2' }));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(
+                ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-2' })
+            );
             expect(getAllNodeNames(actualGraph)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
             expect(getChildrenOf(actualGraph, 'A')).to.have.same.members(['B', 'C']);
             expect(getChildrenOf(actualGraph, 'B')).to.have.same.members(['C']);
@@ -181,17 +197,21 @@ describe('ConfigParser', () => {
 });
 
 function getAllNodeNames(graph: IDirectedGraph | null): string[] {
-    return graph ? graph.nodes.map(n => n.name) : [];
+    return graph ? graph.nodes.map((n) => n.name) : [];
 }
 
 function getParentsOf(graph: IDirectedGraph | null, projectName: string): string[] {
-    if (!graph) {return [];}
-    const node = graph.nodes.find(n => n.name === projectName);
-    return node ? node.getParents().map(n => n.name) : [];
+    if (!graph) {
+        return [];
+    }
+    const node = graph.nodes.find((n) => n.name === projectName);
+    return node ? node.getParents().map((n) => n.name) : [];
 }
 
 function getChildrenOf(graph: IDirectedGraph | null, projectName: string): string[] {
-    if (!graph) {return [];}
-    const node = graph.nodes.find(n => n.name === projectName);
-    return node ? node.getChildren().map(n => n.name) : [];
+    if (!graph) {
+        return [];
+    }
+    const node = graph.nodes.find((n) => n.name === projectName);
+    return node ? node.getChildren().map((n) => n.name) : [];
 }

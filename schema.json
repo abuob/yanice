@@ -1,156 +1,136 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "schemaVersion": {
-      "type": "number"
-    },
-    "options": {
-      "$ref": "#options"
-    },
-    "projects": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "projectName": {
-            "$ref": "#projectNamePatternString"
-          },
-          "pathGlob": {
-            "type": "string"
-          },
-          "pathRegExp": {
-            "type": "string"
-          },
-          "commands": {
-            "$ref": "#commands"
-          },
-          "responsibles": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "schemaVersion": {
+            "type": "number"
+        },
+        "options": {
+            "$ref": "#options"
+        },
+        "projects": {
             "type": "array",
             "items": {
-              "type": "string"
+                "type": "object",
+                "properties": {
+                    "projectName": {
+                        "$ref": "#projectNamePatternString"
+                    },
+                    "pathGlob": {
+                        "type": "string"
+                    },
+                    "pathRegExp": {
+                        "type": "string"
+                    },
+                    "commands": {
+                        "$ref": "#commands"
+                    },
+                    "responsibles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": ["projectName"],
+                "additionalProperties": false
             }
-          }
         },
-        "required": [
-          "projectName"
-        ],
-        "additionalProperties": false
-      }
-    },
-    "dependencyScopes": {
-      "type": "object",
-      "patternProperties": {
-        "^[a-zA-Z][0-9a-zA-Z-]*$": {
-          "type": "object",
-          "properties": {
-            "defaultDependencies": {
-              "type": "array",
-              "items": {
-                "$ref": "#projectNamePatternString"
-              }
+        "dependencyScopes": {
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                    "type": "object",
+                    "properties": {
+                        "defaultDependencies": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#projectNamePatternString"
+                            }
+                        },
+                        "extends": {
+                            "$ref": "#projectNamePatternString"
+                        },
+                        "dependencies": {
+                            "$ref": "#dependencies"
+                        },
+                        "options": {
+                            "$ref": "#options"
+                        }
+                    },
+                    "required": ["dependencies"],
+                    "additionalProperties": false
+                }
             },
-            "extends": {
-              "$ref": "#projectNamePatternString"
-            },
-            "dependencies": {
-              "$ref": "#dependencies"
-            },
-            "options": {
-              "$ref": "#options"
-            }
-          },
-          "required": [
-            "dependencies"
-          ],
-          "additionalProperties": false
+            "additionalProperties": false
         }
-      },
-      "additionalProperties": false
+    },
+    "required": ["schemaVersion", "projects", "dependencyScopes"],
+    "definitions": {
+        "projectNamePatternString": {
+            "$id": "#projectNamePatternString",
+            "type": "string",
+            "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
+        },
+        "commands": {
+            "$id": "#commands",
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                    "type": "object",
+                    "properties": {
+                        "command": {
+                            "type": "string"
+                        },
+                        "cwd": {
+                            "type": "string"
+                        },
+                        "commands": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "oneOf": [{ "required": ["command"] }, { "required": ["commands"] }],
+                    "additionalProperties": false
+                }
+            }
+        },
+        "options": {
+            "$id": "#options",
+            "type": "object",
+            "properties": {
+                "commandOutput": {
+                    "enum": ["ignore", "append-at-end", "append-at-end-on-error"]
+                },
+                "outputFilters": {
+                    "type": "array",
+                    "items": {
+                        "enum": ["npmError", "karmaProgressSuccess", "ignoreStderr", "ignoreStdout"]
+                    }
+                },
+                "outputFolder": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                }
+            },
+            "additionalProperties": false
+        },
+        "dependencies": {
+            "$id": "#dependencies",
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#projectNamePatternString"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
     }
-  },
-  "required": [
-    "schemaVersion",
-    "projects",
-    "dependencyScopes"
-  ],
-  "definitions": {
-    "projectNamePatternString": {
-      "$id": "#projectNamePatternString",
-      "type": "string",
-      "pattern": "^[a-zA-Z][0-9a-zA-Z-]*$"
-    },
-    "commands": {
-      "$id": "#commands",
-      "type": "object",
-      "patternProperties": {
-        "^[a-zA-Z][0-9a-zA-Z-]*$": {
-          "type": "object",
-          "properties": {
-            "command": {
-              "type": "string"
-            },
-            "cwd": {
-              "type": "string"
-            },
-            "commands": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "oneOf": [
-            { "required": ["command"] },
-            { "required": ["commands"] }
-          ],
-          "additionalProperties": false
-        }
-      }
-    },
-    "options": {
-      "$id": "#options",
-      "type": "object",
-      "properties": {
-        "commandOutput": {
-          "enum": [
-            "ignore",
-            "append-at-end",
-            "append-at-end-on-error"
-          ]
-        },
-        "outputFilters": {
-          "type": "array",
-          "items": {
-            "enum": [
-              "npmError",
-              "karmaProgressSuccess",
-              "ignoreStderr",
-              "ignoreStdout"
-            ]
-          }
-        },
-        "outputFolder": {
-          "type": "string"
-        },
-        "port": {
-          "type": "number"
-        }
-      },
-      "additionalProperties": false
-    },
-    "dependencies": {
-      "$id": "#dependencies",
-      "type": "object",
-      "patternProperties": {
-        "^[a-zA-Z][0-9a-zA-Z-]*$": {
-          "type": "array",
-          "items": {
-            "$ref": "#projectNamePatternString"
-          }
-        }
-      },
-      "additionalProperties": false
-    }
-  }
 }

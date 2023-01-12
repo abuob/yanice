@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import { ConfigVerifier } from '../config-verifier'
+import { expect } from 'chai';
+import { ConfigVerifier } from '../config-verifier';
 import yaniceJson1 from '../../__fixtures/valid-2.yanice.json';
 import yaniceJson2 from '../../__fixtures/valid-3.yanice.json';
 import readmeYaniceJson from '../../__fixtures/readme-example-yanice.json';
