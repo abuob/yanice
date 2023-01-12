@@ -1,6 +1,6 @@
 import { commandOutputFilterType } from '../util/output-filter';
 
-export type commandOutputOptionsType = 'ignore' | 'append-at-end' | 'append-at-end-on-error';
+export type commandOutputOptionsType = 'append-at-end-on-error' | 'append-at-end' | 'ignore';
 
 interface YaniceOptionalOptions {
     commandOutput?: commandOutputOptionsType;

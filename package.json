@@ -1,59 +1,59 @@
 {
-  "name": "yanice",
-  "version": "2.6.0",
-  "description": "Yet another incremental command executor",
-  "engines": {
-    "node": ">=12"
-  },
-  "main": "dist/index.js",
-  "bin": {
-    "yanice": "dist/bin.js"
-  },
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist/**/*",
-    "schema.json",
-    "graph-display-template.html"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "lint": "tslint -p tsconfig.json -c tslint.json",
-    "lint:fix": "tslint -p tsconfig.json -c tslint.json --fix",
-    "test": "mocha -r ts-node/register \"**/*.spec.ts\"",
-    "prepublishOnly": "npm test && npm run lint && npm run build"
-  },
-  "keywords": [
-    "monorepo",
-    "change detection"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/abuob/yanice.git"
-  },
-  "author": "abuob",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/abuob/yanice/issues"
-  },
-  "homepage": "https://github.com/abuob/yanice#readme",
-  "dependencies": {
-    "ajv": "8.11.0",
-    "async": "3.2.4",
-    "minimatch": "5.1.0"
-  },
-  "devDependencies": {
-    "@types/async": "3.2.13",
-    "@types/chai": "4.3.1",
-    "@types/minimatch": "3.0.5",
-    "@types/mocha": "9.1.1",
-    "@types/node": "18.0.0",
-    "chai": "4.3.6",
-    "mocha": "10.0.0",
-    "prettier": "2.7.1",
-    "ts-node": "10.8.1",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "1.18.0",
-    "tslint-plugin-prettier": "2.3.0",
-    "typescript": "4.7.4"
-  }
+    "name": "yanice",
+    "version": "2.6.0",
+    "description": "Yet another incremental command executor",
+    "engines": {
+        "node": ">=12"
+    },
+    "main": "dist/index.js",
+    "bin": {
+        "yanice": "dist/bin.js"
+    },
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/**/*",
+        "schema.json",
+        "graph-display-template.html"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "test": "mocha -r ts-node/register \"**/*.spec.ts\"",
+        "prepublishOnly": "npm test && npm run lint && npm run build"
+    },
+    "keywords": [
+        "monorepo",
+        "change detection"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/abuob/yanice.git"
+    },
+    "author": "abuob",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/abuob/yanice/issues"
+    },
+    "homepage": "https://github.com/abuob/yanice#readme",
+    "dependencies": {
+        "ajv": "8.11.0",
+        "async": "3.2.4",
+        "minimatch": "5.1.0"
+    },
+    "devDependencies": {
+        "@types/async": "3.2.13",
+        "@types/chai": "4.3.1",
+        "@types/minimatch": "3.0.5",
+        "@types/mocha": "9.1.1",
+        "@types/node": "18.0.0",
+        "@typescript-eslint/eslint-plugin": "^5.48.1",
+        "@typescript-eslint/parser": "^5.48.1",
+        "chai": "4.3.6",
+        "eslint": "^8.31.0",
+        "mocha": "10.0.0",
+        "prettier": "2.7.1",
+        "ts-node": "10.8.1",
+        "typescript": "4.7.4"
+    }
 }

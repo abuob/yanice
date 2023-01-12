@@ -176,7 +176,7 @@ export class YaniceExecutor {
                 parallelExecutionCommands,
                 this.yaniceArgs.concurrency,
                 this.baseDirectory,
-                (command: IParallelExecutionCommand, dir: string) => {
+                (_command: IParallelExecutionCommand, _dir: string) => {
                     return;
                 },
                 (command: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult) => {

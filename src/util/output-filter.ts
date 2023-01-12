@@ -1,4 +1,4 @@
-export type commandOutputFilterType = 'npmError' | 'karmaProgressSuccess' | 'ignoreStdout' | 'ignoreStderr';
+export type commandOutputFilterType = 'ignoreStderr' | 'ignoreStdout' | 'karmaProgressSuccess' | 'npmError';
 
 export abstract class OutputFilter {
     protected constructor(public readonly filterName: commandOutputFilterType) {}

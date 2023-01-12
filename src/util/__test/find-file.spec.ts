@@ -5,7 +5,7 @@ describe('FindFileUtil', () => {
     describe('findFileInParentDirsFromInitialDir', () => {
         it('should be able to find some configuration files at the root of this repo', () => {
             expect(FindFileUtil.findFileInParentDirsFromInitialDir('tsconfig.json', __dirname)).to.not.equal(null);
-            expect(FindFileUtil.findFileInParentDirsFromInitialDir('tslint.json', __dirname)).to.not.equal(null);
+            expect(FindFileUtil.findFileInParentDirsFromInitialDir('.eslintrc.cjs', __dirname)).to.not.equal(null);
             expect(FindFileUtil.findFileInParentDirsFromInitialDir('package.json', __dirname)).to.not.equal(null);
         });
 

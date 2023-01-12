@@ -23,7 +23,7 @@ export function execucteInParallelLimited(
     initTaskCallback: (command: IParallelExecutionCommand, workingDir: string) => void,
     afterTaskCallback: (command: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult) => void,
     finalCallback: (commandExecutionResults: ICommandExecutionResult[]) => void
-) {
+): void {
     const executionResults: ICommandExecutionResult[] = [];
 
     async.eachLimit(

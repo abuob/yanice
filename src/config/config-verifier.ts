@@ -9,6 +9,8 @@ import { YaniceJsonType } from './config.interface';
  * They are kept separate to improve testability, and to make it easier to refactor.
  */
 export class ConfigVerifier {
+    private static readonly SUPPORTED_VERSIONS: number[] = [2];
+
     // ========= verifyYaniceJsonWithSchema
 
     public static verifyYaniceJsonWithSchema(yaniceJson: any): boolean {
@@ -121,6 +123,4 @@ export class ConfigVerifier {
             }
         });
     }
-
-    private static readonly SUPPORTED_VERSIONS = [2];
 }

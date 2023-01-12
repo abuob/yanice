@@ -8,18 +8,13 @@ import { NpmErrorFilter } from './output-filters/npm-error-filter';
 export class LogUtil {
     public static printCommandSuccess(executionCommand: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
         const durationMessage: string = LogUtil.createDurationInfoInBrackets(commandExecutionResult);
-        log('  \x1B[1;32m ✔ ' + executionCommand.command + '\x1B[0m ' + durationMessage);
+        log(`  \x1B[1;32m ✔ ${ executionCommand.command }\x1B[0m ${ durationMessage}`);
     }
 
     public static printCommandFailure(executionCommand: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
         const durationMessage: string = ` ${LogUtil.createDurationInfoInBrackets(commandExecutionResult)}`;
         const cwdInfoIfNotRoot: string = executionCommand.cwd !== './' ? ` (cwd: ${executionCommand.cwd})` : '';
-        log('  \x1B[1;31m ✘ ' + executionCommand.command + '\x1B[0m' + cwdInfoIfNotRoot + durationMessage);
-    }
-
-    private static createDurationInfoInBrackets(commandExecutionResult: ICommandExecutionResult): string {
-        const durationInSeconds: number = Math.floor(commandExecutionResult.executionDurationInMs / 1000);
-        return `(${durationInSeconds}s)`;
+        log(`  \x1B[1;31m ✘ ${ executionCommand.command }\x1B[0m${ cwdInfoIfNotRoot }${durationMessage}`);
     }
 
     public static printOutputFormattedAfterAllCommandsCompleted(
@@ -52,6 +47,11 @@ export class LogUtil {
 
     public static isOutputLineOkayToPrint(appliedFilters: OutputFilter[], outputLine: string): boolean {
         return appliedFilters.reduce((prev: boolean, curr): boolean => prev && curr.filterOutputLine(outputLine), true);
+    }
+
+    private static createDurationInfoInBrackets(commandExecutionResult: ICommandExecutionResult): string {
+        const durationInSeconds: number = Math.floor(commandExecutionResult.executionDurationInMs / 1000);
+        return `(${durationInSeconds}s)`;
     }
 
     private static printOutputChunkFilteredUnlessIgnored(chunk: string, appliedFilters: OutputFilter[], ignoreFlag: boolean): void {

@@ -34,7 +34,7 @@ export class DepGraphVisualization {
     }
 
     public static startServer(servedHtml: string, port: number): void {
-        const server = http.createServer((request: IncomingMessage, response: ServerResponse): void => {
+        const server = http.createServer((_request: IncomingMessage, response: ServerResponse): void => {
             response.writeHead(200, { 'Content-Type': 'text/html' });
             response.end(servedHtml);
         });
@@ -65,9 +65,9 @@ export class DepGraphVisualization {
             .replace(
                 'INSERT_GIT_REVISION',
                 yaniceArgs.diffTarget.branch ||
-                    yaniceArgs.diffTarget.commit ||
-                    yaniceArgs.diffTarget.rev ||
-                    'None provided (use e.g. --rev=HEAD)'
+                yaniceArgs.diffTarget.commit ||
+                yaniceArgs.diffTarget.rev ||
+                'None provided (use e.g. --rev=HEAD)'
             )
             .replace('INSERT_SCOPE', yaniceArgs.givenScope);
         return actualHtml;

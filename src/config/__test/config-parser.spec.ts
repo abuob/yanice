@@ -27,7 +27,7 @@ describe('ConfigParser', () => {
 
     describe('getYaniceConfig', () => {
         it('should set the options to default values if none are specified', () => {
-            const actualConfigForLint = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'lint'});
+            const actualConfigForLint = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'lint' });
             expect(actualConfigForLint.options.outputFilters).to.have.same.members([]);
             expect(actualConfigForLint.options.commandOutput).to.equal('ignore');
             expect(actualConfigForLint.options.outputFolder).to.equal('./.yanice-output');
@@ -35,7 +35,7 @@ describe('ConfigParser', () => {
         });
 
         it('should override default options with global options when defined in yanice.json', () => {
-            const actualConfigForBuild = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'build-some'});
+            const actualConfigForBuild = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'build-some' });
             expect(actualConfigForBuild.options.outputFilters).to.have.same.members(['npmError']);
             expect(actualConfigForBuild.options.commandOutput).to.equal('append-at-end');
             expect(actualConfigForBuild.options.outputFolder).to.equal('./.yanice-graph-output');
@@ -43,18 +43,18 @@ describe('ConfigParser', () => {
         });
 
         it('should override global options with options defined on scope-level', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'test'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'test' });
             expect(actualConfigForTest.options.commandOutput).to.equal('append-at-end-on-error');
             expect(actualConfigForTest.options.port).to.equal(8888);
         });
 
         it('should override scope options if they are overridden via cli-arguments', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'test', commandOutputMode: 'ignore'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'test', commandOutputMode: 'ignore' });
             expect(actualConfigForTest.options.commandOutput).to.equal('ignore');
         });
 
         it('should have empty dependencies if there are none listed (treat empty array same as undefined; except defaultDependencies)', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'empty-deps'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'empty-deps' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
                 "project-A": [],
                 "project-B": [],
@@ -64,7 +64,7 @@ describe('ConfigParser', () => {
         });
 
         it('should add the defaultDependencies where no dependencies are defined', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-3'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-3' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
                 "A": [],
                 "B": ["C"],
@@ -75,7 +75,7 @@ describe('ConfigParser', () => {
         });
 
         it('should add the defaultDependencies where no dependencies are defined, and not introduce cycles', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-4'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-4' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
                 "A": [],
                 "B": [],
@@ -86,7 +86,7 @@ describe('ConfigParser', () => {
         });
 
         it('should add the defaultDependencies and not introduce cycles', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-5'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-5' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
                 "A": [],
                 "B": ["C"],
@@ -97,7 +97,7 @@ describe('ConfigParser', () => {
         });
 
         it('should load the dependencies of the scope which is extended', () => {
-            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'extended-scope'});
+            const actualConfigForTest = ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'extended-scope' });
             expect(actualConfigForTest.dependencies).to.deep.equal({
                 "lib-1": ["lib-2"],
                 "lib-2": [],
@@ -125,12 +125,12 @@ describe('ConfigParser', () => {
 
     describe('getDepGraphFromConfig', () => {
         it('should properly create a directed graph when there are no dependencies', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, {...args, givenScope: 'lint'}));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'lint' }));
             expect(actualGraph?.nodes.map(n => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
         });
 
         it('should properly create a directed graph with some dependencies', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'test'}));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'test' }));
             expect(actualGraph).to.not.equal(null);
             expect(getChildrenOf(actualGraph, 'project-A')).to.have.same.members(['lib-1']);
             expect(getChildrenOf(actualGraph, 'lib-1')).to.have.same.members([]);
@@ -139,7 +139,7 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph when given a scope-definition', () => {
-            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, {...args, givenScope: 'test'}));
+            const actualGraphForTestScope = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'test' }));
             expect(actualGraphForTestScope).to.not.equal(null);
             expect(getChildrenOf(actualGraphForTestScope, 'A')).to.have.same.members(['B', 'C']);
             expect(getChildrenOf(actualGraphForTestScope, 'B')).to.have.same.members(['D']);
@@ -149,7 +149,7 @@ describe('ConfigParser', () => {
         });
 
         it('should properly create a directed graph even when given a scope-definition containing an illegal cycle', () => {
-            const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, {...args, givenScope: 'illegalCycle'}));
+            const actualGraphForIllegalCycleScope = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2, { ...args, givenScope: 'illegalCycle' }));
             expect(actualGraphForIllegalCycleScope).to.not.equal(null);
             expect(getChildrenOf(actualGraphForIllegalCycleScope, 'A')).to.have.same.members(['B']);
             expect(getChildrenOf(actualGraphForIllegalCycleScope, 'B')).to.have.same.members(['C']);
@@ -160,7 +160,7 @@ describe('ConfigParser', () => {
         });
 
         it('should create nodes for projects even if they are not explicitly listed in the dependency scope', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson3 as any, {...args, givenScope: 'build-some'}));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson3 as any, { ...args, givenScope: 'build-some' }));
             expect(getAllNodeNames(actualGraph)).to.have.same.members(['project-A', 'project-B', 'lib-1', 'lib-2']);
             expect(getChildrenOf(actualGraph, 'project-A')).to.have.same.members(['lib-1']);
             expect(getChildrenOf(actualGraph, 'project-B')).to.have.same.members(['lib-2']);
@@ -169,7 +169,7 @@ describe('ConfigParser', () => {
         });
 
         it('should create the graph for a scope which extends another scope', () => {
-            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2 as any, {...args, givenScope: 'scope-2'}));
+            const actualGraph = ConfigParser.getDepGraphFromConfig(ConfigParser.getYaniceConfig(yaniceJson2 as any, { ...args, givenScope: 'scope-2' }));
             expect(getAllNodeNames(actualGraph)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
             expect(getChildrenOf(actualGraph, 'A')).to.have.same.members(['B', 'C']);
             expect(getChildrenOf(actualGraph, 'B')).to.have.same.members(['C']);
@@ -185,13 +185,13 @@ function getAllNodeNames(graph: IDirectedGraph | null): string[] {
 }
 
 function getParentsOf(graph: IDirectedGraph | null, projectName: string): string[] {
-    if (!graph) return [];
+    if (!graph) {return [];}
     const node = graph.nodes.find(n => n.name === projectName);
     return node ? node.getParents().map(n => n.name) : [];
 }
 
 function getChildrenOf(graph: IDirectedGraph | null, projectName: string): string[] {
-    if (!graph) return [];
+    if (!graph) {return [];}
     const node = graph.nodes.find(n => n.name === projectName);
     return node ? node.getChildren().map(n => n.name) : [];
 }
