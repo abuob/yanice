@@ -3,7 +3,7 @@ import yaniceJson3 from '../../__fixtures/valid-3.yanice.json';
 import { ConfigParser } from '../config-parser';
 import { expect } from 'chai';
 import { YaniceArgs } from '../args-parser';
-import { DirectedGraphUtil, IDirectedGraph } from '../../directed-graph/directed-graph';
+import { DirectedGraphUtil, DirectedGraph } from '../../directed-graph/directed-graph';
 
 describe('ConfigParser', () => {
     const args: YaniceArgs = {
@@ -196,11 +196,11 @@ describe('ConfigParser', () => {
     });
 });
 
-function getAllNodeNames(graph: IDirectedGraph | null): string[] {
+function getAllNodeNames(graph: DirectedGraph | null): string[] {
     return graph ? graph.nodes.map((n) => n.name) : [];
 }
 
-function getParentsOf(graph: IDirectedGraph | null, projectName: string): string[] {
+function getParentsOf(graph: DirectedGraph | null, projectName: string): string[] {
     if (!graph) {
         return [];
     }
@@ -208,7 +208,7 @@ function getParentsOf(graph: IDirectedGraph | null, projectName: string): string
     return node ? node.getParents().map((n) => n.name) : [];
 }
 
-function getChildrenOf(graph: IDirectedGraph | null, projectName: string): string[] {
+function getChildrenOf(graph: DirectedGraph | null, projectName: string): string[] {
     if (!graph) {
         return [];
     }

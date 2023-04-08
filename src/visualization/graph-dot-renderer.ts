@@ -1,17 +1,17 @@
-import { IDirectedGraph } from '../directed-graph/directed-graph';
+import { DirectedGraph } from '../directed-graph/directed-graph';
 
 export class GraphDotRenderer {
-    public static getDotRepresentation(directedGraph: IDirectedGraph): string {
+    public static getDotRepresentation(directedGraph: DirectedGraph): string {
         return `digraph {${GraphDotRenderer.getAllNodeDeclarations(directedGraph)} ${GraphDotRenderer.getAllEdgeDeclarations(
             directedGraph
         )}}`;
     }
 
-    private static getAllNodeDeclarations(directedGraph: IDirectedGraph): string {
+    private static getAllNodeDeclarations(directedGraph: DirectedGraph): string {
         return directedGraph.nodes.map((node) => `${GraphDotRenderer.getDotConformNodeName(node.name)} [label="${node.name}"];`).join('');
     }
 
-    private static getAllEdgeDeclarations(directedGraph: IDirectedGraph): string {
+    private static getAllEdgeDeclarations(directedGraph: DirectedGraph): string {
         return directedGraph.nodes
             .map((ancestor) =>
                 ancestor

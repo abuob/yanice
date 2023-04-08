@@ -26,7 +26,7 @@ export class DirectedGraphNode {
     }
 }
 
-export interface IDirectedGraph {
+export interface DirectedGraph {
     nodes: DirectedGraphNode[];
 }
 
@@ -39,7 +39,7 @@ export class DirectedGraphUtil {
         return new DirectedGraphBuilder();
     }
 
-    public static hasCycle(graph: IDirectedGraph): boolean {
+    public static hasCycle(graph: DirectedGraph): boolean {
         let visitedAlready: DirectedGraphNode[] = [];
         let result = false;
         graph.nodes.forEach((node) => {
@@ -51,7 +51,7 @@ export class DirectedGraphUtil {
         return result;
     }
 
-    public static getAncestorsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+    public static getAncestorsOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
         return nodeNames
             .map<string[]>((nodeName) => {
                 const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
@@ -66,7 +66,7 @@ export class DirectedGraphUtil {
             .reduce<string[]>(DirectedGraphUtil.noDuplicatesAccumulate, []);
     }
 
-    public static getDescendantsOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+    public static getDescendantsOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
         return nodeNames
             .map<string[]>((nodeName) => {
                 const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
@@ -81,19 +81,19 @@ export class DirectedGraphUtil {
             .reduce<string[]>(DirectedGraphUtil.noDuplicatesAccumulate, []);
     }
 
-    public static getAncestorsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+    public static getAncestorsAndSelfOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
         return DirectedGraphUtil.getAncestorsOfMultipleNodes(graph, nodeNames)
             .concat(nodeNames)
             .reduce<string[]>(DirectedGraphUtil.noDuplicatesAccumulate, []);
     }
 
-    public static getDescendantsAndSelfOfMultipleNodes(graph: IDirectedGraph, nodeNames: string[]): string[] {
+    public static getDescendantsAndSelfOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
         return DirectedGraphUtil.getDescendantsOfMultipleNodes(graph, nodeNames)
             .concat(nodeNames)
             .reduce<string[]>(DirectedGraphUtil.noDuplicatesAccumulate, []);
     }
 
-    public static getAncestorsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
+    public static getAncestorsAndSelfForSingleNode(graph: DirectedGraph, nodeName: string): string[] {
         const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
         if (!givenNode) {
             return [];
@@ -101,7 +101,7 @@ export class DirectedGraphUtil {
         return DirectedGraphUtil.getAncestorsAndSelfOfSingleNodeRecursively(givenNode).map((n) => n.name);
     }
 
-    public static getDescendantsAndSelfForSingleNode(graph: IDirectedGraph, nodeName: string): string[] {
+    public static getDescendantsAndSelfForSingleNode(graph: DirectedGraph, nodeName: string): string[] {
         const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
         if (!givenNode) {
             return [];
@@ -112,7 +112,7 @@ export class DirectedGraphUtil {
     /**
      * Implementation as per https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
      */
-    public static getTopologicallySorted(graph: IDirectedGraph, nodeNames: string[]): string[] {
+    public static getTopologicallySorted(graph: DirectedGraph, nodeNames: string[]): string[] {
         const alreadySorted: string[] = [];
         const tmpMarked = new Set<string>();
         const permanentMarked = new Set<string>();
@@ -127,11 +127,11 @@ export class DirectedGraphUtil {
         return alreadySorted.filter((n) => nodeNames.includes(n));
     }
 
-    public static getTopologicallySortedReverse(graph: IDirectedGraph, nodeNames: string[]): string[] {
+    public static getTopologicallySortedReverse(graph: DirectedGraph, nodeNames: string[]): string[] {
         return DirectedGraphUtil.getTopologicallySorted(graph, nodeNames).reverse();
     }
 
-    public static isAncestorOf(graph: IDirectedGraph, ancestor: string, descendant: string, allowReflexive: boolean): boolean {
+    public static isAncestorOf(graph: DirectedGraph, ancestor: string, descendant: string, allowReflexive: boolean): boolean {
         if (ancestor === descendant) {
             return allowReflexive;
         }
@@ -142,7 +142,7 @@ export class DirectedGraphUtil {
      * visitor-function for getTopologicallySorted; as per https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search
      */
     private static getTopologicallySortedVisit(
-        graph: IDirectedGraph,
+        graph: DirectedGraph,
         currentNode: DirectedGraphNode,
         tmpMarked: Set<string>,
         permanentMarked: Set<string>,
@@ -202,7 +202,7 @@ export class DirectedGraphUtil {
             .reduce((prev, curr) => prev || curr, false);
     }
 
-    private static getNodeByName(graph: IDirectedGraph, name: string): DirectedGraphNode | null {
+    private static getNodeByName(graph: DirectedGraph, name: string): DirectedGraphNode | null {
         return graph.nodes.find((n) => n.name === name) || null;
     }
 
@@ -212,7 +212,7 @@ export class DirectedGraphUtil {
 }
 
 class DirectedGraphBuilder {
-    private graph: IDirectedGraph = {
+    private graph: DirectedGraph = {
         nodes: []
     };
 
@@ -235,7 +235,7 @@ class DirectedGraphBuilder {
         return this;
     }
 
-    public build(): IDirectedGraph {
+    public build(): DirectedGraph {
         return this.graph;
     }
 }

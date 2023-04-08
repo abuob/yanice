@@ -1,6 +1,6 @@
 import { YaniceArgs } from '../config/args-parser';
 import { YaniceCommand, YaniceConfig, YaniceProject } from '../config/config.interface';
-import { DirectedGraphNode, DirectedGraphUtil, IDirectedGraph } from '../directed-graph/directed-graph';
+import { DirectedGraphNode, DirectedGraphUtil, DirectedGraph } from '../directed-graph/directed-graph';
 import { ChangedProjects } from '../git-diff/changed-projects';
 
 interface YaniceGraphNodeInfo {
@@ -20,7 +20,7 @@ interface YaniceGraphNodeInfo {
 
 export class GraphDagreRenderer {
     public static getGraphData(
-        depGraph: IDirectedGraph,
+        depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
         yaniceArgs: YaniceArgs,
         affectedProjects: string[],

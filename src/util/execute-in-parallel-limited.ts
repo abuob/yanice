@@ -11,17 +11,17 @@ export interface ICommandExecutionResult {
     executionDurationInMs: number;
 }
 
-export interface IParallelExecutionCommand {
+export interface ParallelExecutionCommand {
     command: string;
     cwd: string;
 }
 
 export function execucteInParallelLimited(
-    commandQueue: IParallelExecutionCommand[],
+    commandQueue: ParallelExecutionCommand[],
     MAX_CONCURRENCY: number,
     baseDirectory: string,
-    initTaskCallback: (command: IParallelExecutionCommand, workingDir: string) => void,
-    afterTaskCallback: (command: IParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult) => void,
+    initTaskCallback: (command: ParallelExecutionCommand, workingDir: string) => void,
+    afterTaskCallback: (command: ParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult) => void,
     finalCallback: (commandExecutionResults: ICommandExecutionResult[]) => void
 ): void {
     const executionResults: ICommandExecutionResult[] = [];
@@ -29,7 +29,7 @@ export function execucteInParallelLimited(
     async.eachLimit(
         commandQueue,
         MAX_CONCURRENCY,
-        (command: IParallelExecutionCommand, singleCommandDone: () => void) => {
+        (command: ParallelExecutionCommand, singleCommandDone: () => void) => {
             const workingDir = path.resolve(baseDirectory, command.cwd);
             initTaskCallback(command, workingDir);
             const startTime: number = Date.now();

@@ -1,4 +1,4 @@
-import { DirectedGraphUtil, IDirectedGraph } from '../directed-graph/directed-graph';
+import { DirectedGraphUtil, DirectedGraph } from '../directed-graph/directed-graph';
 import { YaniceArgs } from './args-parser';
 import {
     YaniceCommandPerScope,
@@ -33,16 +33,18 @@ export class ConfigParser {
     }
 
     public static supportsScopeCommand(yaniceConfig: YaniceConfig, projectName: string, scope: string): boolean {
-        const yaniceProject = yaniceConfig.projects.find((project) => project.projectName === projectName);
+        const yaniceProject: YaniceProject | undefined = yaniceConfig.projects.find(
+            (project: YaniceProject): boolean => project.projectName === projectName
+        );
         return !!yaniceProject && Object.keys(yaniceProject.commands).includes(scope);
     }
 
-    public static getDepGraphFromConfig(yaniceConfig: YaniceConfig): IDirectedGraph | null {
-        const dependencies = yaniceConfig.dependencies;
+    public static getDepGraphFromConfig(yaniceConfig: YaniceConfig): DirectedGraph | null {
+        const dependencies: YaniceProjectDependencies = yaniceConfig.dependencies;
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
-            .map((p) => p.projectName)
-            .forEach((projectName) => {
+            .map((p: YaniceProject): string => p.projectName)
+            .forEach((projectName: string) => {
                 graphBuilder.addNode(projectName);
             });
         Object.keys(dependencies).forEach((projectName) => {

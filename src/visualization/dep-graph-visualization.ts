@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { YaniceArgs } from '../config/args-parser';
 import { YaniceConfig } from '../config/config.interface';
-import { IDirectedGraph } from '../directed-graph/directed-graph';
+import { DirectedGraph } from '../directed-graph/directed-graph';
 import { FindFileUtil } from '../util/find-file';
 import { log } from '../util/log';
 import { GraphDagreRenderer } from './graph-dagre-renderer';
@@ -13,7 +13,7 @@ const http = require('http');
 
 export class DepGraphVisualization {
     public static createVisualizationHtml(
-        depGraph: IDirectedGraph,
+        depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
         yaniceArgs: YaniceArgs,
         affectedProjects: string[],
@@ -52,7 +52,7 @@ export class DepGraphVisualization {
     }
 
     private static createDagreVisualizationHtml(
-        depGraph: IDirectedGraph,
+        depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
         yaniceArgs: YaniceArgs,
         affectedProjects: string[],
@@ -73,7 +73,7 @@ export class DepGraphVisualization {
         return actualHtml;
     }
 
-    private static createVizJsVisualizationHtml(depGraph: IDirectedGraph): string {
+    private static createVizJsVisualizationHtml(depGraph: DirectedGraph): string {
         const templateHtml =
             '<!DOCTYPE html><meta charset="utf-8"><body> <script src="https://d3js.org/d3.v4.min.js"></script> <script src="https://unpkg.com/viz.js@1.8.1/viz.js" type="javascript/worker"></script> <script src="https://unpkg.com/d3-graphviz@2.6.1/build/d3-graphviz.js"></script> <div id="graph" style="text-align: center;"></div> <script>d3.select("#graph").graphviz().fade(false).renderDot(\'INSERT_DOT_REPRESENTATION_OF_GRAPH_HERE\');</script>';
         const actualHtml = templateHtml.replace('INSERT_DOT_REPRESENTATION_OF_GRAPH_HERE', GraphDotRenderer.getDotRepresentation(depGraph));
