@@ -1,0 +1,37 @@
+{
+    "name": "@yanice/assert-project-boundaries",
+    "version": "0.0.1",
+    "private": true,
+    "description": "Assert yanice project boundaries",
+    "engines": {
+        "node": ">=14"
+    },
+    "main": "dist/index.js",
+    "bin": {
+        "a": "dist/bin.js"
+    },
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {},
+    "keywords": [
+        "monorepo",
+        "change detection"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/abuob/yanice.git"
+    },
+    "author": "abuob",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/abuob/yanice/issues"
+    },
+    "homepage": "https://github.com/abuob/yanice#readme",
+    "dependencies": {},
+    "devDependencies": {},
+    "peerDependencies": {
+        "yanice": "*"
+    }
+}
