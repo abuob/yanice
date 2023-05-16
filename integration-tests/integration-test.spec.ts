@@ -34,4 +34,15 @@ describe('yanice', () => {
             IntegrationTestUtil.resetChanges();
         });
     });
+
+    describe('--responsibles', () => {
+        it('should print the listed responsibles for the changed project and all its dependents', () => {
+            IntegrationTestUtil.touchProject('project-B');
+            const output: string = IntegrationTestUtil.executeYaniceWithArgs('a-depends-on-b --responsibles --rev=HEAD');
+            const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(output);
+            expect(printedProjects).to.have.length(2);
+            expect(printedProjects).to.have.same.members(['Alice', 'Bob']);
+            IntegrationTestUtil.resetChanges();
+        });
+    });
 });

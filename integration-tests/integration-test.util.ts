@@ -6,6 +6,9 @@ import { expect } from 'chai';
 type allProjectsType = 'project-A' | 'project-B' | 'project-C';
 
 export class IntegrationTestUtil {
+    private static readonly allProjects: allProjectsType[] = ['project-A', 'project-B', 'project-C'];
+    private static readonly repoRoot: string = path.join(__dirname, '../');
+
     public static executeYaniceWithArgs(args: string): string {
         const pathToBin: string = path.join(__dirname, '../dist/bin.js');
         const pathToTestProject: string = path.join(__dirname, './test-project');
@@ -33,14 +36,23 @@ export class IntegrationTestUtil {
     }
 
     public static resetChanges(): void {
-        const allFilePaths: string[] = IntegrationTestUtil.getAllEmptyFilePaths();
-        allFilePaths.forEach((filePath): void => {
-            fs.writeFileSync(filePath, '', { encoding: 'utf-8' });
+        const relativeToRootPaths: string[] = IntegrationTestUtil.getAllEmptyFilePathsRelativeToRoot();
+        relativeToRootPaths.forEach((relativePath: string): void => {
+            execSync(`git checkout -- ${relativePath}`, { cwd: IntegrationTestUtil.repoRoot });
         });
     }
 
+    private static getAllEmptyFilePathsRelativeToRoot(): string[] {
+        const allProjects: allProjectsType[] = IntegrationTestUtil.allProjects;
+        return allProjects.map((project: allProjectsType) => IntegrationTestUtil.mapProjectNameToRelativePathToRoot(project));
+    }
+
+    private static mapProjectNameToRelativePathToRoot(project: allProjectsType): string {
+        return path.join(`integration-tests/test-project/${project}/empty.txt`);
+    }
+
     private static getAllEmptyFilePaths(): string[] {
-        const allProjects: allProjectsType[] = ['project-A', 'project-B', 'project-C'];
+        const allProjects: allProjectsType[] = IntegrationTestUtil.allProjects;
         return allProjects.map((project: allProjectsType) => IntegrationTestUtil.mapProjectNameToAbsoluteFileName(project));
     }
 
