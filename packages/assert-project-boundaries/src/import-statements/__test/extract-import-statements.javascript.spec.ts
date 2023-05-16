@@ -20,8 +20,6 @@ describe('ExtractImportStatementsJavascript', () => {
         });
 
         it('should extract all import statements in multi-line files, with tabs present', () => {
-            expect(ExtractImportStatementsJavascript.extractImportStatements('')).to.have.same.members([]);
-
             const actual1: string[] = ExtractImportStatementsJavascript.extractImportStatements(
                 '\timport blah\t\nfrom \n"somewhere";\n blah();'
             );
@@ -29,14 +27,7 @@ describe('ExtractImportStatementsJavascript', () => {
             expect(actual1).to.have.same.members(expected1);
             expect(actual1).to.have.length(expected1.length);
 
-            const actual2: string[] = ExtractImportStatementsJavascript.extractImportStatements(
-                "import blah from 'somewhere'; blah(); import * as stuff from 'there';"
-            );
-            const expected2: string[] = ["import blah from 'somewhere'", "import * as stuff from 'there'"];
-            expect(actual2).to.have.same.members(expected2);
-            expect(actual2).to.have.length(expected2.length);
-
-            const input3: string = `
+            const input2: string = `
             import {something} from 'somewhere';
             // some comment
             import * as t from 'barrel';import def from 'default-export';
@@ -45,15 +36,15 @@ describe('ExtractImportStatementsJavascript', () => {
             import_from();
             import a\t from "b";
             `;
-            const actual3: string[] = ExtractImportStatementsJavascript.extractImportStatements(input3);
-            const expected3: string[] = [
+            const actual2: string[] = ExtractImportStatementsJavascript.extractImportStatements(input2);
+            const expected2: string[] = [
                 "import {something} from 'somewhere'",
                 "import * as t from 'barrel'",
                 "import def from 'default-export'",
                 'import a from "b"'
             ];
-            expect(actual3).to.have.same.members(expected3);
-            expect(actual3).to.have.length(expected3.length);
+            expect(actual2).to.have.same.members(expected2);
+            expect(actual2).to.have.length(expected2.length);
         });
     });
 

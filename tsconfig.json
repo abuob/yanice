@@ -9,6 +9,5 @@
         "resolveJsonModule": true,
         "esModuleInterop": true
     },
-    "include": ["**/*.ts"],
-    "exclude": ["**/__test/**", "dist/**"]
+    "exclude": ["dist/**"]
 }

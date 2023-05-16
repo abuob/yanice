@@ -63,7 +63,6 @@ const defaultTsRules = {
         },
     ],
     '@typescript-eslint/no-var-requires': 'off',
-    '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/prefer-function-type': 'error',
     '@typescript-eslint/quotes': 'off',
     '@typescript-eslint/semi': 'off',

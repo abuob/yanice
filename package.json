@@ -16,7 +16,7 @@
         "graph-display-template.html"
     ],
     "scripts": {
-        "build": "tsc",
+        "build": "tsc -p tsconfig.build.json",
         "format": "prettier --write --loglevel warn \"**/*.+(ts|json|html)\"",
         "format:check": "prettier --check --loglevel warn \"**/*.+(ts|json|html)\"",
         "lint": "eslint .",
