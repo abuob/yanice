@@ -1,0 +1,58 @@
+{
+    "$schema": "../../schema.json",
+    "schemaVersion": 2,
+    "projects": [
+        {
+            "projectName": "A",
+            "pathGlob": "project-A",
+            "commands": {
+                "flat-all-projects-have-commands": {
+                    "command": "sleep 0"
+                },
+                "flat-projects-one-command": {
+                    "command": "sleep 0"
+                }
+            },
+            "responsibles": ["Alice"]
+        },
+        {
+            "projectName": "B",
+            "pathGlob": "project-B",
+            "commands": {
+                "flat-all-projects-have-commands": {
+                    "command": "sleep 0"
+                }
+            },
+            "responsibles": ["Bob"]
+        },
+        {
+            "projectName": "C",
+            "pathGlob": "project-C",
+            "commands": {
+                "flat-all-projects-have-commands": {
+                    "command": "sleep 0"
+                }
+            },
+            "responsibles": ["Claire"]
+        }
+    ],
+    "dependencyScopes": {
+        "flat-all-projects-have-commands": {
+            "dependencies": {
+                "A": [],
+                "B": [],
+                "C": []
+            }
+        },
+        "flat-projects-one-command": {
+            "dependencies": {}
+        },
+        "a-depends-on-b": {
+            "dependencies": {
+                "A": ["B"],
+                "B": [],
+                "C": []
+            }
+        }
+    }
+}

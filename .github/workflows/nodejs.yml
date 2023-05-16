@@ -3,28 +3,28 @@ name: Node CI
 on: [push]
 
 jobs:
-  build:
+    build:
+        runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [14.x, 16.x, 18.x]
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: format, lint, build & test
-      run: |
-        npm ci
-        npm run format:check
-        npm run lint
-        npm run build
-        npm test
-      env:
-        CI: true
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: format, lint, build & test
+              run: |
+                  npm ci
+                  npm run format:check
+                  npm run lint
+                  npm test
+                  npm run build
+                  npm run integration-tests
+              env:
+                  CI: true
