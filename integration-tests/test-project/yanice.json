@@ -4,12 +4,15 @@
     "projects": [
         {
             "projectName": "A",
-            "pathGlob": "project-A",
+            "pathGlob": "integration-tests/test-project/project-A/**/*",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "sleep 0"
                 },
                 "flat-projects-one-command": {
+                    "command": "sleep 0"
+                },
+                "a-depends-on-b": {
                     "command": "sleep 0"
                 }
             },
@@ -17,9 +20,12 @@
         },
         {
             "projectName": "B",
-            "pathGlob": "project-B",
+            "pathGlob": "integration-tests/test-project/project-B/**/*",
             "commands": {
                 "flat-all-projects-have-commands": {
+                    "command": "sleep 0"
+                },
+                "a-depends-on-b": {
                     "command": "sleep 0"
                 }
             },
@@ -27,7 +33,7 @@
         },
         {
             "projectName": "C",
-            "pathGlob": "project-C",
+            "pathGlob": "integration-tests/test-project/project-C/**/*",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "sleep 0"
