@@ -3,15 +3,21 @@ import path from 'path';
 import fs from 'fs';
 import { expect } from 'chai';
 
+interface TestLogEntry {
+    cwd: string;
+    identifier: string;
+}
 type allProjectsType = 'project-A' | 'project-B' | 'project-C';
+type TestLog = Partial<Record<allProjectsType, TestLogEntry[]>>;
 
 export class IntegrationTestUtil {
     private static readonly allProjects: allProjectsType[] = ['project-A', 'project-B', 'project-C'];
-    private static readonly repoRoot: string = path.join(__dirname, '../');
+    private static readonly repoRoot: string = path.join(__dirname, '../../');
+    private static readonly testLogPath: string = path.join(__dirname, './test-log.json');
 
     public static executeYaniceWithArgs(args: string): string {
-        const pathToBin: string = path.join(__dirname, '../dist/bin.js');
-        const pathToTestProject: string = path.join(__dirname, './test-project');
+        const pathToBin: string = path.join(__dirname, '../../dist/bin.js');
+        const pathToTestProject: string = path.join(__dirname, '../test-project');
         return execSync(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }).toString();
     }
 
@@ -28,6 +34,8 @@ export class IntegrationTestUtil {
         fileContents.forEach((fileContent: string) => {
             expect(fileContent).to.equal('');
         });
+        const testLog: TestLog = IntegrationTestUtil.getTestLog();
+        expect(testLog).to.deep.equal({});
     }
 
     public static touchProject(project: allProjectsType): void {
@@ -40,6 +48,12 @@ export class IntegrationTestUtil {
         relativeToRootPaths.forEach((relativePath: string): void => {
             execSync(`git checkout -- ${relativePath}`, { cwd: IntegrationTestUtil.repoRoot });
         });
+        execSync(`git checkout -- integration-tests/test-utils/test-log.json`, { cwd: IntegrationTestUtil.repoRoot });
+    }
+
+    public static getTestLogByProject(project: allProjectsType): TestLogEntry[] {
+        const testLog: TestLog = IntegrationTestUtil.getTestLog();
+        return testLog[project] ?? [];
     }
 
     private static getAllEmptyFilePathsRelativeToRoot(): string[] {
@@ -57,6 +71,11 @@ export class IntegrationTestUtil {
     }
 
     private static mapProjectNameToAbsoluteFileName(project: allProjectsType): string {
-        return path.join(__dirname, 'test-project', project, 'empty.txt');
+        return path.join(__dirname, '../test-project', project, 'empty.txt');
+    }
+
+    private static getTestLog(): TestLog {
+        const existingTestLogRaw: string = fs.readFileSync(IntegrationTestUtil.testLogPath, { encoding: 'utf-8' }).toString().trim();
+        return JSON.parse(existingTestLogRaw);
     }
 }

@@ -17,14 +17,15 @@
     ],
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
-        "format": "prettier --write --loglevel warn \"**/*.+(ts|json|html|yml)\"",
-        "format:check": "prettier --check --loglevel warn \"**/*.+(ts|json|html|yml)\"",
+        "format": "prettier --write --loglevel warn \"**/*.+(ts|json|html|yml|js)\"",
+        "format:check": "prettier --check --loglevel warn \"**/*.+(ts|json|html|yml|js)\"",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "mocha -r ts-node/register \"+(src|packages)/**/*.spec.ts\"",
         "integration-tests": "npm run build && mocha -r ts-node/register \"integration-tests/**/*.spec.ts\"",
         "prepublishOnly": "npm test && npm run lint && npm run integration-tests",
-        "prep-pr": "npm run format && npm run lint:fix && npm run test && npm run integration-tests"
+        "prep-pr": "npm run format && npm run lint:fix && npm run test && npm run integration-tests",
+        "test-log": "node integration-tests/test-utils/test-log-execution.js"
     },
     "keywords": [
         "monorepo",
