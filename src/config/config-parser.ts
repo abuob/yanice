@@ -1,13 +1,6 @@
 import { DirectedGraphUtil, DirectedGraph } from '../directed-graph/directed-graph';
 import { YaniceArgs } from './args-parser';
-import {
-    YaniceCommandPerScope,
-    YaniceProjectDependencies,
-    YaniceConfig,
-    YaniceConfigOptions,
-    YaniceJsonType,
-    YaniceProject
-} from './config.interface';
+import { YaniceCommandPerScope, YaniceConfig, YaniceConfigOptions, YaniceJsonType, YaniceProject } from './config.interface';
 
 export class ConfigParser {
     public static readonly DEFAULT_CONFIG_OPTIONS: YaniceConfigOptions = {
@@ -40,7 +33,7 @@ export class ConfigParser {
     }
 
     public static getDepGraphFromConfig(yaniceConfig: YaniceConfig): DirectedGraph | null {
-        const dependencies: YaniceProjectDependencies = yaniceConfig.dependencies;
+        const dependencies: Record<string, string[] | undefined> = yaniceConfig.dependencies;
         const graphBuilder = DirectedGraphUtil.directedGraphBuilder;
         yaniceConfig.projects
             .map((p: YaniceProject): string => p.projectName)
@@ -48,7 +41,8 @@ export class ConfigParser {
                 graphBuilder.addNode(projectName);
             });
         Object.keys(dependencies).forEach((projectName) => {
-            dependencies[projectName].forEach((dependencyName) => {
+            const dependenciesForProject: string[] = dependencies?.[projectName] ?? [];
+            dependenciesForProject.forEach((dependencyName: string) => {
                 graphBuilder.createDirectedEdge(projectName, dependencyName);
             });
         });
@@ -60,12 +54,12 @@ export class ConfigParser {
             const commandsRaw = project.commands || {};
             const commands: YaniceCommandPerScope = {};
             Object.keys(commandsRaw).forEach((scope: string) => {
-                const singleCommand: string | null = commandsRaw[scope].command ?? null;
-                const multiCommand: string[] = commandsRaw[scope].commands ?? [];
+                const singleCommand: string | null = commandsRaw[scope]?.command ?? null;
+                const multiCommand: string[] = commandsRaw[scope]?.commands ?? [];
                 const allCommands: string[] = singleCommand ? [singleCommand, ...multiCommand] : multiCommand;
                 commands[scope] = {
                     commands: allCommands,
-                    cwd: commandsRaw[scope].cwd || './'
+                    cwd: commandsRaw[scope]?.cwd || './'
                 };
             });
             return {
@@ -79,7 +73,7 @@ export class ConfigParser {
     }
 
     private static getConfigOptions(yaniceJson: YaniceJsonType, yaniceArgs: YaniceArgs): YaniceConfigOptions {
-        const scopeOptions = yaniceJson.dependencyScopes[yaniceArgs.givenScope].options;
+        const scopeOptions = yaniceJson.dependencyScopes[yaniceArgs.givenScope]?.options;
         const yaniceConfigOptions: YaniceConfigOptions = {
             port: scopeOptions?.port || yaniceJson.options?.port || ConfigParser.DEFAULT_CONFIG_OPTIONS.port,
             commandOutput:
@@ -105,26 +99,26 @@ export class ConfigParser {
      *       "dependencies: { "A": [], "B": ["C"], "C": ["A"]}"
      *
      */
-    private static getDefaultDependencies(yaniceJson: YaniceJsonType, givenScope: string): YaniceProjectDependencies {
-        const initialDependencies: YaniceProjectDependencies = {};
-        const defaultDependencies: string[] = yaniceJson.dependencyScopes[givenScope].defaultDependencies || [];
+    private static getDefaultDependencies(yaniceJson: YaniceJsonType, givenScope: string): Record<string, string[] | undefined> {
+        const initialDependencies: Record<string, string[] | undefined> = {};
+        const defaultDependencies: string[] = yaniceJson.dependencyScopes[givenScope]?.defaultDependencies || [];
         yaniceJson.projects
-            .map((p) => p.projectName)
-            .forEach((projectName) => {
+            .map((project: YaniceJsonType['projects'][number]) => project.projectName)
+            .forEach((projectName: string) => {
                 initialDependencies[projectName] = defaultDependencies.includes(projectName) ? [] : defaultDependencies;
             });
         return initialDependencies;
     }
 
-    private static getExtendedDependencies(yaniceJson: YaniceJsonType, givenScope: string): YaniceProjectDependencies {
-        const extendedScope: string | undefined = yaniceJson.dependencyScopes[givenScope].extends;
+    private static getExtendedDependencies(yaniceJson: YaniceJsonType, givenScope: string): Record<string, string[] | undefined> {
+        const extendedScope: string | undefined = yaniceJson.dependencyScopes[givenScope]?.extends;
         if (!extendedScope) {
             return {};
         }
-        return yaniceJson.dependencyScopes[extendedScope].dependencies;
+        return yaniceJson.dependencyScopes[extendedScope]?.dependencies ?? {};
     }
 
-    private static getDirectDependencies(yaniceJson: YaniceJsonType, givenScope: string): YaniceProjectDependencies {
-        return yaniceJson.dependencyScopes[givenScope].dependencies;
+    private static getDirectDependencies(yaniceJson: YaniceJsonType, givenScope: string): Record<string, string[] | undefined> {
+        return yaniceJson.dependencyScopes[givenScope]?.dependencies ?? {};
     }
 }

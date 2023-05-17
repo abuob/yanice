@@ -1,13 +1,8 @@
 {
+    "extends": "@tsconfig/node14/tsconfig.json",
     "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "lib": ["es2015"],
-        "declaration": true,
-        "outDir": "./dist",
-        "strict": true,
         "resolveJsonModule": true,
-        "esModuleInterop": true
+        "outDir": "./dist"
     },
     "exclude": ["dist/**"]
 }

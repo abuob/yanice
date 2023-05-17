@@ -164,8 +164,11 @@ export class YaniceExecutor {
             const scope: string = this.yaniceArgs.givenScope;
             const parallelExecutionCommands: ParallelExecutionCommand[] = this.yaniceConfig.projects
                 .filter((project: YaniceProject) => this.affectedProjects.includes(project.projectName))
-                .map((project: YaniceProject) => project.commands[scope])
-                .reduce((prev: ParallelExecutionCommand[], curr: YaniceCommand): ParallelExecutionCommand[] => {
+                .map((project: YaniceProject): YaniceCommand | undefined => project.commands[scope])
+                .reduce((prev: ParallelExecutionCommand[], curr: YaniceCommand | undefined): ParallelExecutionCommand[] => {
+                    if (!curr) {
+                        return prev;
+                    }
                     const commands: ParallelExecutionCommand[] = curr.commands.map(
                         (command: string): ParallelExecutionCommand => ({ command, cwd: curr.cwd })
                     );
@@ -196,12 +199,6 @@ export class YaniceExecutor {
                 }
             );
         }
-        return this;
-    }
-
-    private loadYaniceJson(yaniceJson: YaniceJsonType): YaniceExecutor {
-        this.yaniceJson = yaniceJson;
-        this.validateYaniceJson(this.yaniceJson);
         return this;
     }
 
@@ -271,6 +268,5 @@ export class YaniceExecutor {
             log(message);
         }
         process.exit(exitCode);
-        return;
     }
 }

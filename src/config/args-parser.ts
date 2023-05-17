@@ -29,7 +29,7 @@ export class ArgsParser {
      */
     public static parseArgs(argv: string[]): YaniceArgs {
         const resultArgs: YaniceArgs = {
-            givenScope: argv[0],
+            givenScope: argv[0] ?? '',
             diffTarget: {
                 branch: null,
                 commit: null,

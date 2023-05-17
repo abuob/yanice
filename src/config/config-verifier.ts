@@ -56,24 +56,28 @@ export class ConfigVerifier {
     public static verifyDependencyScopeProjectNames(yaniceJson: YaniceJsonType): boolean {
         const allProjectNames = yaniceJson.projects.map((project) => project.projectName);
         return Object.keys(yaniceJson.dependencyScopes).every((scope) =>
-            Object.keys(yaniceJson.dependencyScopes[scope].dependencies).every(
-                (project) =>
-                    allProjectNames.includes(project) &&
-                    yaniceJson.dependencyScopes[scope].dependencies[project].every((dependency) => allProjectNames.includes(dependency))
-            )
+            Object.keys(yaniceJson.dependencyScopes?.[scope]?.dependencies ?? {}).every((project) => {
+                const allDependencies: string[] = yaniceJson.dependencyScopes?.[scope]?.dependencies?.[project] ?? [];
+                return (
+                    allProjectNames.includes(project) && allDependencies.every((dependency: string) => allProjectNames.includes(dependency))
+                );
+            })
         );
     }
 
     public static printErrorOnVerifyDependencyScopeProjectNamesFailure(yaniceConfig: YaniceJsonType): void {
-        const allProjectNames = yaniceConfig.projects.map((project) => project.projectName);
-        Object.keys(yaniceConfig.dependencyScopes).forEach((scope) => {
-            Object.keys(yaniceConfig.dependencyScopes[scope].dependencies).forEach((project) => {
+        const allProjectNames: string[] = yaniceConfig.projects.map(
+            (project: YaniceJsonType['projects'][number]): string => project.projectName
+        );
+        Object.keys(yaniceConfig.dependencyScopes).forEach((scope: string): void => {
+            Object.keys(yaniceConfig.dependencyScopes?.[scope]?.dependencies ?? {}).forEach((project) => {
                 if (!allProjectNames.includes(project)) {
                     log(
                         `Within scope "${scope}": There is no project with projectName "${project}" defined; only defined projects are allowed.`
                     );
                 }
-                yaniceConfig.dependencyScopes[scope].dependencies[project].forEach((projectDependency) => {
+                const dependencies: string[] = yaniceConfig.dependencyScopes?.[scope]?.dependencies?.[project] ?? [];
+                dependencies.forEach((projectDependency: string): void => {
                     if (!allProjectNames.includes(projectDependency)) {
                         log(
                             `Within scope "${scope}": For project "${project}": There is no project with projectName "${projectDependency}" defined; only defined projects are allowed.`
@@ -89,7 +93,7 @@ export class ConfigVerifier {
     // A graph can only extend a graph that does not extend another graph (maximum one level of extension)
     public static verifyMaxOneLevelGraphExtension(yaniceJson: YaniceJsonType): boolean {
         return Object.keys(yaniceJson.dependencyScopes).every((scope) => {
-            const extendsOrUndefined = yaniceJson.dependencyScopes[scope].extends;
+            const extendsOrUndefined: string | undefined = yaniceJson.dependencyScopes[scope]?.extends;
             if (!extendsOrUndefined) {
                 return true;
             } else {
@@ -105,8 +109,8 @@ export class ConfigVerifier {
     }
 
     public static printErrorOnVerifyMaxOneLevelGraphExtension(yaniceJson: YaniceJsonType): void {
-        Object.keys(yaniceJson.dependencyScopes).forEach((scope) => {
-            const extendsOrUndefined = yaniceJson.dependencyScopes[scope].extends;
+        Object.keys(yaniceJson.dependencyScopes).forEach((scope: string) => {
+            const extendsOrUndefined: string | undefined = yaniceJson.dependencyScopes[scope]?.extends;
             if (!extendsOrUndefined) {
                 return;
             } else {

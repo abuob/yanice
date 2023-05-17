@@ -46,6 +46,8 @@
         "minimatch": "^8.0.3"
     },
     "devDependencies": {
+        "@tsconfig/node14": "^1.0.3",
+        "@tsconfig/strictest": "^2.0.1",
         "@types/async": "^3.2.18",
         "@types/chai": "^4.3.4",
         "@types/minimatch": "^5.1.2",

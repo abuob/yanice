@@ -33,7 +33,7 @@ export interface YaniceJsonType {
             defaultDependencies?: string[];
             extends?: string;
             options?: YaniceOptionalOptions;
-            dependencies: YaniceProjectDependencies;
+            dependencies: Record<string, string[] | undefined>;
         };
     };
 }
@@ -44,10 +44,6 @@ export interface YaniceProject {
     pathGlob: string;
     commands: YaniceCommandPerScope;
     responsibles: string[];
-}
-
-export interface YaniceProjectDependencies {
-    [projectName: string]: string[];
 }
 
 export interface YaniceCommand {
@@ -69,5 +65,5 @@ export interface YaniceConfigOptions {
 export interface YaniceConfig {
     options: YaniceConfigOptions;
     projects: YaniceProject[];
-    dependencies: YaniceProjectDependencies;
+    dependencies: Record<string, string[] | undefined>;
 }
