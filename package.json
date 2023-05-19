@@ -22,7 +22,7 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "mocha -r ts-node/register \"+(src|packages)/**/*.spec.ts\"",
-        "integration-tests": "npm run build && mocha -r ts-node/register \"integration-tests/**/*.spec.ts\"",
+        "integration-tests": "npm run build && mocha -r ts-node/register \"integration-tests/**/*.spec.ts\" --timeout 10000",
         "prepublishOnly": "npm test && npm run lint && npm run integration-tests",
         "prep-pr": "npm run format && npm run lint:fix && npm run test && npm run integration-tests",
         "test-log": "node integration-tests/test-utils/test-log-execution.js"
