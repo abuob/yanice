@@ -19,16 +19,12 @@ export class Phase4ResponsiblesExecutor extends AbstractPhase4Executor {
         this.responsibles = yaniceConfig.projects
             .filter((project) => affectedProjectsUnfiltered.includes(project.projectName))
             .map((project) => project.responsibles)
-            .reduce((prev, curr) => prev.concat(curr), [])
+            .reduce((prev: string[], curr: string[]) => prev.concat(curr), [])
             .reduce((prev: string[], curr: string): string[] => (prev.includes(curr) ? prev : prev.concat(curr)), []);
         return this;
     }
 
     public outputResponsiblesAndExitIfShowResponsiblesMode(): void {
-        const yaniceArgs = this.phase3Result.phase2Result.phase1Result.yaniceArgs;
-        if (!yaniceArgs.outputResponsibles) {
-            return;
-        }
         this.responsibles.forEach((responsible: string) => log(responsible));
         this.exitYanice(0, null);
     }

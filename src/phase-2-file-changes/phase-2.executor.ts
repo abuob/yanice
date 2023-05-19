@@ -28,7 +28,7 @@ export class Phase2Executor extends PhaseExecutor {
         }
         const yaniceArgs: YaniceArgs = this.phase1Result.yaniceArgs;
         if (yaniceArgs.diffTarget.branch || yaniceArgs.diffTarget.rev) {
-            const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(
+            const commitSHA: string = ChangedFiles.gitCommandWithRevisionShaAsOutput(
                 `git rev-parse ${yaniceArgs.diffTarget.branch || yaniceArgs.diffTarget.rev}`
             );
             this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, yaniceArgs.includeUncommitted);

@@ -11,13 +11,9 @@ export class Phase4OutputOnlyExecutor extends AbstractPhase4Executor {
         new Phase4OutputOnlyExecutor(phase3Result).outputAffectedAndExitIfOutputOnlyMode();
     }
 
-    public outputAffectedAndExitIfOutputOnlyMode(): Phase4OutputOnlyExecutor {
-        const yaniceArgs = this.phase3Result.phase2Result.phase1Result.yaniceArgs;
+    public outputAffectedAndExitIfOutputOnlyMode(): void {
         const affectedProjects = this.phase3Result.affectedProjects;
-        if (yaniceArgs && yaniceArgs.outputOnly) {
-            affectedProjects.forEach((projectName: string) => log(projectName));
-            this.exitYanice(0, null);
-        }
-        return this;
+        affectedProjects.forEach((projectName: string) => log(projectName));
+        this.exitYanice(0, null);
     }
 }
