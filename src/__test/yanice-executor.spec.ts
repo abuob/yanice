@@ -15,202 +15,202 @@ describe('YaniceExecutor', () => {
     describe('some changed projects', () => {
         beforeEach(() => {
             yaniceExecutor = new YaniceExecutor();
-            (yaniceExecutor as any).changedFiles = ['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'];
         });
 
         it('should calculate all changed projects correctly', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
-                .calculateChangedProjects();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
+                .executePhase1(['lint', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+            const changedProjects: string[] | undefined = yaniceExecutor.phase3Result?.changedProjects;
+            expect(changedProjects).to.have.length(3);
+            expect(changedProjects).to.have.same.members(['A', 'B', 'E']);
         });
 
         it('should calculate all affected projects correctly when including unsupported commands', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(
+                .executePhase1(
                     ['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=false'],
                     baseDirectory,
                     yaniceJson1
                 )
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
         });
 
         it('should calculate all affected projects correctly when not including unsupported commands', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(
+                .executePhase1(
                     ['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=true'],
                     baseDirectory,
                     yaniceJson1
                 )
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['B', 'C', 'D']);
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['B', 'C', 'D']);
         });
 
         it('should calculate affected projects correctly before filtering', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['d-depends-on-a', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'D', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members([]);
+                .executePhase1(['d-depends-on-a', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(4);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(0);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members([]);
         });
 
         it('should set affectedProjects to all projects when --all parameter is given', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--all', '--outputOnly=true'], baseDirectory, yaniceJson1)
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B', 'C']);
+                .executePhase1(['lint', '--all', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['A', 'B', 'C']);
         });
 
         it('should filter unsupported commands when --all and outputOnly=false even when includeCommandSupportedOnly=true', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(
-                    ['lint', '--all', '--outputOnly=false', '--includeCommandSupportedOnly=false'],
-                    baseDirectory,
-                    yaniceJson1
-                )
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B', 'C']);
+                .executePhase1(['lint', '--all', '--outputOnly=false', '--includeCommandSupportedOnly=false'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['A', 'B', 'C']);
         });
 
         it('should set affectedProjects to all projects that support the given scope when --all parameter is given', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(
-                    ['lint', '--all', '--outputOnly=true', '--includeCommandSupportedOnly=true'],
-                    baseDirectory,
-                    yaniceJson1
-                )
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B', 'C']);
+                .executePhase1(['lint', '--all', '--outputOnly=true', '--includeCommandSupportedOnly=true'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['A', 'B', 'C']);
         });
 
         it('should filter out projects according to parameters', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(
+                .executePhase1(
                     ['test', '--rev=HEAD', '--outputOnly=true', '--includeCommandSupportedOnly=true'],
                     baseDirectory,
                     yaniceJson1
                 )
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['B', 'C', 'D']);
-            // D must be before B/C (topologically sorted):
-            expect((yaniceExecutor as any).affectedProjects[0]).to.equal('D');
-        });
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
+                .executePhase3();
 
-        it('should calculate responsibles correctly', () => {
-            yaniceExecutor
-                .loadConfigAndParseArgs(
-                    ['lint', '--rev=HEAD', '--responsibles', '--includeCommandSupportedOnly=true'],
-                    baseDirectory,
-                    yaniceJson1
-                )
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .calculateResponsibles()
-                .filterOutUnsupportedProjectsIfNeeded();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'E']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A', 'B']);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'Bob', 'Edith']);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'B', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['B', 'C', 'D']);
+            // D must be before B/C (topologically sorted):
+            expect(yaniceExecutor.phase3Result?.affectedProjects[0]).to.equal('D');
         });
     });
 
     describe('some changed projects', () => {
         beforeEach(() => {
             yaniceExecutor = new YaniceExecutor();
-            (yaniceExecutor as any).changedFiles = ['path/to/dir/A/some-A-file', 'path/to/dir/D/some-D-file'];
         });
 
         it('should detect directly changed projects correctly', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded()
-                .calculateResponsibles();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['A', 'D']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'D']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['A']);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'David']);
+                .executePhase1(['lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/D/some-D-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(2);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['A', 'D']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(2);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'D']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(1);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['A']);
         });
     });
 
     describe('one single project changed', () => {
         beforeEach(() => {
             yaniceExecutor = new YaniceExecutor();
-            (yaniceExecutor as any).changedFiles = ['path/to/dir/D/some-D-file'];
         });
 
         it('should calculate affected projects for a simple scope properly when just one project changed', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded()
-                .calculateResponsibles();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['D']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['D']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members([]);
-            expect((yaniceExecutor as any).responsibles).to.have.same.ordered.members(['David']);
+                .executePhase1(['lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/D/some-D-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(1);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['D']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(1);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['D']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(0);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members([]);
         });
 
         it('should calculate affected projects for a scope with some dependencies properly when just one project changed', () => {
             yaniceExecutor
-                .loadConfigAndParseArgs(['test', '--rev=HEAD'], baseDirectory, yaniceJson1)
-                .calculateChangedProjects()
-                .calculateDepGraphForGivenScope()
-                .verifyDepGraphValidity()
-                .calculateAffectedProjectsUnfiltered()
-                .filterOutUnsupportedProjectsIfNeeded()
-                .calculateResponsibles();
-            expect((yaniceExecutor as any).changedProjects).to.have.same.members(['D']);
-            expect((yaniceExecutor as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D']);
-            expect((yaniceExecutor as any).affectedProjects).to.have.same.members(['B', 'C', 'D']);
-            expect((yaniceExecutor as any).responsibles).to.have.same.members(['Alice', 'Bob', 'Clara', 'David']);
+                .executePhase1(['test', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .skipPhase2ForTests(['path/to/dir/D/some-D-file'])
+                .executePhase3();
+
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.length(1);
+            expect(yaniceExecutor.phase3Result?.changedProjects).to.have.same.members(['D']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.length(4);
+            expect(yaniceExecutor.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D']);
+
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.length(3);
+            expect(yaniceExecutor.phase3Result?.affectedProjects).to.have.same.members(['B', 'C', 'D']);
         });
     });
 
@@ -218,110 +218,117 @@ describe('YaniceExecutor', () => {
         describe('scope-1', () => {
             it('should handle changes in project A for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['A/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['A']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['A']);
+                    .executePhase1(['scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['A/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['A']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.members(['A']);
             });
             it('should handle changes in project B for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['B/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['B']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['B', 'A']);
+                    .executePhase1(['scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['B/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['B']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(2);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(2);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.ordered.members(['B', 'A']);
             });
             it('should handle changes in project C for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['C/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['C']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['C', 'B', 'A']);
+                    .executePhase1(['scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['C/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['C']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(3);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(3);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.ordered.members(['C', 'B', 'A']);
             });
         });
         describe('scope-2', () => {
             it('should handle changes in project A for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['A/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['A']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.members(['A']);
+                    .executePhase1(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['A/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['A']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.ordered.members(['A']);
             });
             it('should handle changes in project B for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['B/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['B']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['B', 'A']);
+                    .executePhase1(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['B/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['B']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(2);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(2);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.ordered.members(['B', 'A']);
             });
             it('should handle changes in project C for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['C/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['C']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'C']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['A']);
+                    .executePhase1(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['C/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['C']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(2);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'C']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.ordered.members(['A']);
             });
             it('should handle changes in project D for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
-                (yaniceExecutor4 as any).changedFiles = ['D/some.file'];
                 yaniceExecutor4
-                    .loadConfigAndParseArgs(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutor4 as any).changedProjects).to.have.same.members(['D']);
-                expect((yaniceExecutor4 as any).affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D']);
-                expect((yaniceExecutor4 as any).affectedProjects).to.have.same.ordered.members(['D', 'B', 'A']);
+                    .executePhase1(['scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .skipPhase2ForTests(['D/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutor4.phase3Result?.changedProjects).to.have.same.members(['D']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.length(4);
+                expect(yaniceExecutor4.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['A', 'B', 'C', 'D']);
+
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.length(3);
+                expect(yaniceExecutor4.phase3Result?.affectedProjects).to.have.same.ordered.members(['D', 'B', 'A']);
             });
         });
     });
@@ -330,39 +337,41 @@ describe('YaniceExecutor', () => {
         describe('test-scope', () => {
             it('should test all projects in topologically ordering', () => {
                 const yaniceExecutorReadme = new YaniceExecutor();
-                (yaniceExecutorReadme as any).changedFiles = ['yanice.json'];
                 yaniceExecutorReadme
-                    .loadConfigAndParseArgs(['test', '--rev=HEAD'], baseDirectory, readmeYaniceJson)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutorReadme as any).changedProjects).to.have.same.members(['important-repo-files']);
-                expect((yaniceExecutorReadme as any).affectedProjectsUnfiltered).to.have.same.members([
+                    .executePhase1(['test', '--rev=HEAD'], baseDirectory, readmeYaniceJson)
+                    .skipPhase2ForTests(['yanice.json'])
+                    .executePhase3();
+
+                expect(yaniceExecutorReadme.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutorReadme.phase3Result?.changedProjects).to.have.same.members(['important-repo-files']);
+
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjectsUnfiltered).to.have.length(5);
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjectsUnfiltered).to.have.same.members([
                     'project-A',
                     'project-B',
                     'lib-1',
                     'lib-2',
                     'important-repo-files'
                 ]);
-                expect((yaniceExecutorReadme as any).affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
+
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjects).to.have.length(2);
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
             });
             it('should test project-A and lib-1 if lib-1 has changed', () => {
                 const yaniceExecutorReadme = new YaniceExecutor();
-                (yaniceExecutorReadme as any).changedFiles = ['libs/lib-1/some.file'];
                 yaniceExecutorReadme
-                    .loadConfigAndParseArgs(['test', '--rev=HEAD'], baseDirectory, readmeYaniceJson)
-                    .calculateChangedProjects()
-                    .calculateDepGraphForGivenScope()
-                    .verifyDepGraphValidity()
-                    .calculateAffectedProjectsUnfiltered()
-                    .filterOutUnsupportedProjectsIfNeeded()
-                    .calculateResponsibles();
-                expect((yaniceExecutorReadme as any).changedProjects).to.have.same.members(['lib-1']);
-                expect((yaniceExecutorReadme as any).affectedProjectsUnfiltered).to.have.same.members(['project-A', 'lib-1']);
-                expect((yaniceExecutorReadme as any).affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
+                    .executePhase1(['test', '--rev=HEAD'], baseDirectory, readmeYaniceJson)
+                    .skipPhase2ForTests(['libs/lib-1/some.file'])
+                    .executePhase3();
+
+                expect(yaniceExecutorReadme.phase3Result?.changedProjects).to.have.length(1);
+                expect(yaniceExecutorReadme.phase3Result?.changedProjects).to.have.same.members(['lib-1']);
+
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjectsUnfiltered).to.have.length(2);
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjectsUnfiltered).to.have.same.members(['project-A', 'lib-1']);
+
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjects).to.have.length(2);
+                expect(yaniceExecutorReadme.phase3Result?.affectedProjects).to.have.same.ordered.members(['lib-1', 'project-A']);
             });
         });
     });

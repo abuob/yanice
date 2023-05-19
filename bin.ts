@@ -13,16 +13,4 @@ if (!yaniceConfigPath) {
 const baseDirectory = yaniceConfigPath.replace(/yanice\.json/, '');
 const yaniceJson = require(yaniceConfigPath);
 
-new YaniceExecutor()
-    .loadConfigAndParseArgs(process.argv.slice(2), baseDirectory, yaniceJson)
-    .calculateChangedFiles()
-    .calculateChangedProjects()
-    .calculateDepGraphForGivenScope()
-    .verifyDepGraphValidity()
-    .calculateAffectedProjectsUnfiltered()
-    .calculateResponsibles()
-    .outputResponsiblesAndExitIfShowResponsiblesMode()
-    .filterOutUnsupportedProjectsIfNeeded()
-    .outputAffectedAndExitIfOutputOnlyMode()
-    .visualizeDepGraphIfInVisualizationMode()
-    .executeCommands();
+new YaniceExecutor().executePhase1(process.argv.slice(2), baseDirectory, yaniceJson).executePhase2().executePhase3().executePhase4();
