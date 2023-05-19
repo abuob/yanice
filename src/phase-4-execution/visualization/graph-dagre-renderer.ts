@@ -1,7 +1,7 @@
-import { YaniceArgs } from '../config/args-parser';
-import { YaniceCommand, YaniceConfig, YaniceProject } from '../config/config.interface';
-import { DirectedGraphNode, DirectedGraphUtil, DirectedGraph } from '../directed-graph/directed-graph';
-import { ChangedProjects } from '../git-diff/changed-projects';
+import { YaniceArgs } from '../../phase-1-config/config/args-parser';
+import { YaniceCommand, YaniceConfig, YaniceProject } from '../../phase-1-config/config/config.interface';
+import { DirectedGraphNode, DirectedGraphUtil, DirectedGraph } from '../../phase-1-config/directed-graph/directed-graph';
+import { ChangedProjects } from '../../phase-3-project-changes/changed-projects';
 
 interface YaniceGraphNodeInfo {
     projectName: string;

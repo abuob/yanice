@@ -1,4 +1,4 @@
-import { DirectedGraph } from '../directed-graph/directed-graph';
+import { DirectedGraph } from '../../phase-1-config/directed-graph/directed-graph';
 
 export class GraphDotRenderer {
     public static getDotRepresentation(directedGraph: DirectedGraph): string {

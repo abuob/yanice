@@ -1,4 +1,4 @@
-import { YaniceConfig } from '../config/config.interface';
+import { YaniceConfig } from '../phase-1-config/config/config.interface';
 import { ICommandExecutionResult, ParallelExecutionCommand } from './execute-in-parallel-limited';
 import { log } from './log';
 import { commandOutputFilterType, OutputFilter } from './output-filter';

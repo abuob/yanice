@@ -3,7 +3,7 @@ import { YaniceExecutor } from '../yanice-executor';
 import validYaniceJson1 from '../__fixtures/valid-1.yanice.json';
 import validYaniceJson4 from '../__fixtures/valid-4.yanice.json';
 import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
-import { YaniceJsonType } from '../config/config.interface';
+import { YaniceJsonType } from '../phase-1-config/config/config.interface';
 
 describe('YaniceExecutor', () => {
     let yaniceExecutor: YaniceExecutor;

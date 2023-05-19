@@ -1,4 +1,4 @@
-import { YaniceProject } from '../config/config.interface';
+import { YaniceProject } from '../phase-1-config/config/config.interface';
 
 const minimatch = require('minimatch');
 

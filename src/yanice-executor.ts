@@ -1,14 +1,14 @@
-import { ArgsParser, YaniceArgs } from './config/args-parser';
-import { ConfigParser } from './config/config-parser';
-import { ConfigVerifier } from './config/config-verifier';
-import { YaniceCommand, YaniceConfig, YaniceJsonType, YaniceProject } from './config/config.interface';
-import { DirectedGraphUtil, DirectedGraph } from './directed-graph/directed-graph';
-import { ChangedFiles } from './git-diff/changed-files';
-import { ChangedProjects } from './git-diff/changed-projects';
+import { ArgsParser, YaniceArgs } from './phase-1-config/config/args-parser';
+import { ConfigParser } from './phase-1-config/config/config-parser';
+import { ConfigVerifier } from './phase-1-config/config/config-verifier';
+import { YaniceCommand, YaniceConfig, YaniceJsonType, YaniceProject } from './phase-1-config/config/config.interface';
+import { DirectedGraphUtil, DirectedGraph } from './phase-1-config/directed-graph/directed-graph';
+import { ChangedFiles } from './phase-2-file-changes/changed-files';
+import { ChangedProjects } from './phase-3-project-changes/changed-projects';
 import { execucteInParallelLimited, ICommandExecutionResult, ParallelExecutionCommand } from './util/execute-in-parallel-limited';
 import { log } from './util/log';
 import { LogUtil } from './util/log-util';
-import { DepGraphVisualization } from './visualization/dep-graph-visualization';
+import { DepGraphVisualization } from './phase-4-execution/visualization/dep-graph-visualization';
 
 export class YaniceExecutor {
     private baseDirectory: string | null = null;

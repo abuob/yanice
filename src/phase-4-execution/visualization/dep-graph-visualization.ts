@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { YaniceArgs } from '../config/args-parser';
-import { YaniceConfig } from '../config/config.interface';
-import { DirectedGraph } from '../directed-graph/directed-graph';
-import { FindFileUtil } from '../util/find-file';
-import { log } from '../util/log';
+import { YaniceArgs } from '../../phase-1-config/config/args-parser';
+import { YaniceConfig } from '../../phase-1-config/config/config.interface';
+import { DirectedGraph } from '../../phase-1-config/directed-graph/directed-graph';
+import { FindFileUtil } from '../../util/find-file';
+import { log } from '../../util/log';
 import { GraphDagreRenderer } from './graph-dagre-renderer';
 import { GraphDotRenderer } from './graph-dot-renderer';
 

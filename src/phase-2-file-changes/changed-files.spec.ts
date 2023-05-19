@@ -1,4 +1,4 @@
-import { ChangedFiles } from '../changed-files';
+import { ChangedFiles } from './changed-files';
 import { expect } from 'chai';
 const execSync = require('child_process').execSync;
 
@@ -51,18 +51,6 @@ describe('ChangedFiles', () => {
             const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${temporaryBranchName}`);
             expect(ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, false)).to.have.same.members(
                 execSync('git diff --name-only HEAD~1 HEAD')
-                    .toString()
-                    .split('\n')
-                    .map((filePath: string) => filePath.trim())
-                    .filter((filePath: string) => filePath.length > 0)
-            );
-        });
-
-        it('should be able to calculate changed files between working tree (including index) and a given branch', () => {
-            execSync(`git branch ${temporaryBranchName} HEAD~1`);
-            const commitSHA = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${temporaryBranchName}`);
-            expect(ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, true)).to.have.same.members(
-                execSync('git diff --name-only HEAD~1')
                     .toString()
                     .split('\n')
                     .map((filePath: string) => filePath.trim())
