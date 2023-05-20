@@ -5,12 +5,15 @@ import { YaniceConfig, YaniceJsonType } from './config/config.interface';
 import { ArgsParser, YaniceArgs } from './config/args-parser';
 import { Phase1Result } from './phase1.result.type';
 import { DirectedGraph, DirectedGraphUtil } from './directed-graph/directed-graph';
+import { YaniceCliArgsV2 } from './args-parser/cli-args.interface';
+import { YaniceCliArgsParserV2 } from './args-parser/cli-args-parser.v2';
 
 export class Phase1Executor extends PhaseExecutor {
     private baseDirectory: string | null = null;
     private yaniceJson: YaniceJsonType | null = null;
     private yaniceConfig: YaniceConfig | null = null;
     private yaniceArgs: YaniceArgs | null = null;
+    private yaniceArgsV2: YaniceCliArgsV2 | null = null;
     private depGraph: DirectedGraph | null = null;
 
     public static execute(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Result {
@@ -24,16 +27,18 @@ export class Phase1Executor extends PhaseExecutor {
     private loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Executor {
         this.baseDirectory = baseDirectory;
         this.yaniceJson = yaniceJson;
-        return this.validateYaniceJson(yaniceJson).parseArgs(args).verifyArgs().parseYaniceJson();
+        return this.validateYaniceJson(yaniceJson).parseArgs(args).parseArgsV2(args).verifyArgs().parseYaniceJson();
     }
 
     private createPhaseResult(): Phase1Result {
+        // TODO: Ensure yaniceArgsV2 is non-null once the switch has been done
         if (!this.yaniceConfig || !this.yaniceArgs || !this.depGraph || !this.baseDirectory) {
             this.exitYanice(1, `[phase-1] Failed to create phase result`);
         }
         return {
             yaniceConfig: this.yaniceConfig,
             yaniceArgs: this.yaniceArgs,
+            yaniceArgsV2: this.yaniceArgsV2,
             depGraph: this.depGraph,
             baseDirectory: this.baseDirectory
         };
@@ -72,6 +77,11 @@ export class Phase1Executor extends PhaseExecutor {
     private parseArgs(args: string[]): Phase1Executor {
         this.yaniceArgs = ArgsParser.parseArgs(args);
         ArgsParser.verifyDiffTargetPresence(this.yaniceArgs);
+        return this;
+    }
+
+    private parseArgsV2(args: string[]): Phase1Executor {
+        this.yaniceArgsV2 = YaniceCliArgsParserV2.parseArgsV2(args);
         return this;
     }
 
