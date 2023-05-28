@@ -14,6 +14,7 @@ export interface YaniceCliArgsVisualize {
     type: 'visualize';
     defaultArgs: YaniceCliDefaultArgs;
     renderer: 'dagrejs' | 'vizjs';
+    saveVisualization: boolean;
 }
 
 export interface YaniceCliArgsPlugin {

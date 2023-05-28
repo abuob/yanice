@@ -36,13 +36,16 @@ describe('YaniceCliArgsParserV2', () => {
         const expected: YaniceCliArgsV2 = {
             type: 'visualize',
             renderer: 'vizjs',
+            saveVisualization: true,
             defaultArgs: {
                 scope: 'some-scope',
                 diffTarget: 'HEAD',
                 includeAllProjects: false
             }
         };
-        expect(YaniceCliArgsParserV2.parseArgsV2(['visualize', 'some-scope', '--rev=HEAD', '--renderer=vizjs'])).to.deep.equal(expected);
+        expect(
+            YaniceCliArgsParserV2.parseArgsV2(['visualize', 'some-scope', '--rev=HEAD', '--renderer=vizjs', '--save-visualization'])
+        ).to.deep.equal(expected);
     });
 
     it('should handle input for plugin', () => {

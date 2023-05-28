@@ -44,10 +44,12 @@ export class YaniceCliArgsParserV2 {
         const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
         const isSomeArgRendererVizJs: boolean = args.some((arg: string) => /^--renderer=vizjs$/.test(arg));
         const renderer: 'dagrejs' | 'vizjs' = isSomeArgRendererVizJs ? 'vizjs' : 'dagrejs';
+        const saveVisualization: boolean = args.some((arg: string) => /^--save-visualization$/.test(arg));
         return {
             type: 'visualize',
             defaultArgs,
-            renderer
+            renderer,
+            saveVisualization
         };
     }
 
