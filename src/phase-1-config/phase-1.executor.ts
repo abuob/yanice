@@ -4,14 +4,14 @@ import { ConfigParser } from './config/config-parser';
 import { YaniceConfig, YaniceJsonType } from './config/config.interface';
 import { Phase1Result } from './phase1.result.type';
 import { DirectedGraph, DirectedGraphUtil } from './directed-graph/directed-graph';
-import { YaniceCliArgsV2 } from './args-parser/cli-args.interface';
-import { YaniceCliArgsParserV2 } from './args-parser/cli-args-parser.v2';
+import { YaniceCliArgs } from './args-parser/cli-args.interface';
+import { YaniceCliArgsParser } from './args-parser/cli-args-parser';
 
 export class Phase1Executor extends PhaseExecutor {
     private baseDirectory: string | null = null;
     private yaniceJson: YaniceJsonType | null = null;
     private yaniceConfig: YaniceConfig | null = null;
-    private yaniceArgsV2: YaniceCliArgsV2 | null = null;
+    private yaniceCliArgs: YaniceCliArgs | null = null;
     private depGraph: DirectedGraph | null = null;
 
     public static execute(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Result {
@@ -25,16 +25,16 @@ export class Phase1Executor extends PhaseExecutor {
     private loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Executor {
         this.baseDirectory = baseDirectory;
         this.yaniceJson = yaniceJson;
-        return this.validateYaniceJson(yaniceJson).parseArgsV2(args).verifyArgs().parseYaniceJson();
+        return this.validateYaniceJson(yaniceJson).parseCliArgs(args).verifyArgs().parseYaniceJson();
     }
 
     private createPhaseResult(): Phase1Result {
-        if (!this.yaniceConfig || !this.yaniceArgsV2 || !this.depGraph || !this.baseDirectory) {
+        if (!this.yaniceConfig || !this.yaniceCliArgs || !this.depGraph || !this.baseDirectory) {
             this.exitYanice(1, `[phase-1] Failed to create phase result`);
         }
         return {
             yaniceConfig: this.yaniceConfig,
-            yaniceArgsV2: this.yaniceArgsV2,
+            yaniceCliArgs: this.yaniceCliArgs,
             depGraph: this.depGraph,
             baseDirectory: this.baseDirectory
         };
@@ -64,20 +64,20 @@ export class Phase1Executor extends PhaseExecutor {
     }
 
     private parseYaniceJson(): Phase1Executor {
-        if (this.yaniceJson && this.yaniceArgsV2) {
-            this.yaniceConfig = ConfigParser.getYaniceConfig(this.yaniceJson, this.yaniceArgsV2);
+        if (this.yaniceJson && this.yaniceCliArgs) {
+            this.yaniceConfig = ConfigParser.getYaniceConfig(this.yaniceJson, this.yaniceCliArgs);
         }
         return this;
     }
 
-    private parseArgsV2(args: string[]): Phase1Executor {
-        this.yaniceArgsV2 = YaniceCliArgsParserV2.parseArgsV2(args);
+    private parseCliArgs(args: string[]): Phase1Executor {
+        this.yaniceCliArgs = YaniceCliArgsParser.parseArgs(args);
         return this;
     }
 
     private verifyArgs(): Phase1Executor {
-        if (this.yaniceArgsV2 && this.yaniceJson) {
-            this.verifyScopeParam(this.yaniceArgsV2.defaultArgs.scope, this.yaniceJson);
+        if (this.yaniceCliArgs && this.yaniceJson) {
+            this.verifyScopeParam(this.yaniceCliArgs.defaultArgs.scope, this.yaniceJson);
         }
         return this;
     }

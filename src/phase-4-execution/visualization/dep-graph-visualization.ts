@@ -15,16 +15,16 @@ export class DepGraphVisualization {
     public static createVisualizationHtml(
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
-        yaniceArgs: YaniceCliArgsVisualize,
+        yaniceCliArgsVisualize: YaniceCliArgsVisualize,
         affectedProjects: string[],
         changedFiles: string[]
     ): string {
-        switch (yaniceArgs.renderer) {
+        switch (yaniceCliArgsVisualize.renderer) {
             case 'dagrejs':
                 return DepGraphVisualization.createDagreVisualizationHtml(
                     depGraph,
                     yaniceConfig,
-                    yaniceArgs,
+                    yaniceCliArgsVisualize,
                     affectedProjects,
                     changedFiles
                 );
@@ -54,17 +54,17 @@ export class DepGraphVisualization {
     private static createDagreVisualizationHtml(
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
-        yaniceArgs: YaniceCliArgsVisualize,
+        yaniceCliArgsVisualize: YaniceCliArgsVisualize,
         affectedProjects: string[],
         changedFiles: string[]
     ): string {
         const templateHtml = DepGraphVisualization.getDagreTemplateHtml();
-        const graphData = GraphDagreRenderer.getGraphData(depGraph, yaniceConfig, yaniceArgs, affectedProjects, changedFiles);
-        const diffTargetInfo: string = yaniceArgs.defaultArgs.diffTarget ?? 'None provided (use e.g. --rev=HEAD)';
+        const graphData = GraphDagreRenderer.getGraphData(depGraph, yaniceConfig, yaniceCliArgsVisualize, affectedProjects, changedFiles);
+        const diffTargetInfo: string = yaniceCliArgsVisualize.defaultArgs.diffTarget ?? 'None provided (use e.g. --rev=HEAD)';
         const actualHtml = templateHtml
             .replace('INSERT_GRAPH_DATA_OBJECT_HERE', JSON.stringify(graphData))
             .replace('INSERT_GIT_REVISION', diffTargetInfo)
-            .replace('INSERT_SCOPE', yaniceArgs.defaultArgs.scope ?? 'none provided');
+            .replace('INSERT_SCOPE', yaniceCliArgsVisualize.defaultArgs.scope ?? 'none provided');
         return actualHtml;
     }
 

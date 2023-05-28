@@ -2,31 +2,31 @@ import {
     YaniceCliArgsOutputOnly,
     YaniceCliArgsPlugin,
     YaniceCliArgsRun,
-    YaniceCliArgsV2,
+    YaniceCliArgs,
     YaniceCliArgsVisualize,
     YaniceCliDefaultArgs
 } from './cli-args.interface';
 import { commandOutputOptionsType } from '../config/config.interface';
 
-export class YaniceCliArgsParserV2 {
-    public static parseArgsV2(args: string[]): YaniceCliArgsV2 | null {
+export class YaniceCliArgsParser {
+    public static parseArgs(args: string[]): YaniceCliArgs | null {
         const firstParameter: string | undefined = args[0];
         switch (firstParameter) {
             case 'run':
-                return YaniceCliArgsParserV2.handleRunArgs(args);
+                return YaniceCliArgsParser.handleRunArgs(args);
             case 'output-only':
-                return YaniceCliArgsParserV2.handleOutputOnlyArgs(args);
+                return YaniceCliArgsParser.handleOutputOnlyArgs(args);
             case 'visualize':
-                return YaniceCliArgsParserV2.handleVisualizeArgs(args);
+                return YaniceCliArgsParser.handleVisualizeArgs(args);
             case 'plugin':
-                return YaniceCliArgsParserV2.handlePluginArgs(args);
+                return YaniceCliArgsParser.handlePluginArgs(args);
             default:
                 return null;
         }
     }
 
     private static handleRunArgs(args: string[]): YaniceCliArgsRun {
-        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
+        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
         const concurrencyParameter: string | undefined = args.find((arg: string) => {
             return /^--concurrency=(\d)+$/.test(arg);
         });
@@ -36,7 +36,7 @@ export class YaniceCliArgsParserV2 {
             return /^--output-mode=/.test(arg);
         });
 
-        const outputMode: YaniceCliArgsRun['outputMode'] = YaniceCliArgsParserV2.getOutputMode(outputModeParameter);
+        const outputMode: YaniceCliArgsRun['outputMode'] = YaniceCliArgsParser.getOutputMode(outputModeParameter);
         return {
             type: 'run',
             defaultArgs,
@@ -46,7 +46,7 @@ export class YaniceCliArgsParserV2 {
     }
 
     private static handleOutputOnlyArgs(args: string[]): YaniceCliArgsOutputOnly {
-        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
+        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
         const isResponsiblesMode: boolean = args.some((arg) => /^--responsibles$/.test(arg));
         const includeFiltered: boolean = args.some((arg) => /^--include-filtered$/.test(arg));
         return {
@@ -58,7 +58,7 @@ export class YaniceCliArgsParserV2 {
     }
 
     private static handleVisualizeArgs(args: string[]): YaniceCliArgsVisualize {
-        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
+        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
         const isSomeArgRendererVizJs: boolean = args.some((arg: string) => /^--renderer=vizjs$/.test(arg));
         const renderer: 'dagrejs' | 'vizjs' = isSomeArgRendererVizJs ? 'vizjs' : 'dagrejs';
         const saveVisualization: boolean = args.some((arg: string) => /^--save-visualization$/.test(arg));
@@ -71,7 +71,7 @@ export class YaniceCliArgsParserV2 {
     }
 
     private static handlePluginArgs(args: string[]): YaniceCliArgsPlugin {
-        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
+        const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
         return {
             type: 'plugin',
             defaultArgs

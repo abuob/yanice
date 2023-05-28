@@ -1,6 +1,6 @@
 import { commandOutputOptionsType } from '../config/config.interface';
 
-export type YaniceCliArgsV2 = YaniceCliArgsOutputOnly | YaniceCliArgsPlugin | YaniceCliArgsRun | YaniceCliArgsVisualize;
+export type YaniceCliArgs = YaniceCliArgsOutputOnly | YaniceCliArgsPlugin | YaniceCliArgsRun | YaniceCliArgsVisualize;
 
 export interface YaniceCliArgsRun {
     type: 'run';

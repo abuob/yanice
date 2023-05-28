@@ -1,17 +1,17 @@
-import { YaniceCliArgsParserV2 } from '../cli-args-parser.v2';
+import { YaniceCliArgsParser } from '../cli-args-parser';
 import { expect } from 'chai';
-import { YaniceCliArgsV2 } from '../cli-args.interface';
+import { YaniceCliArgs } from '../cli-args.interface';
 
-describe('YaniceCliArgsParserV2', () => {
+describe('YaniceCliArgsParser', () => {
     describe('bad input', () => {});
     it('should handle bad input properly', () => {
-        expect(YaniceCliArgsParserV2.parseArgsV2([])).to.equal(null);
-        expect(YaniceCliArgsParserV2.parseArgsV2(['invalid'])).to.equal(null);
+        expect(YaniceCliArgsParser.parseArgs([])).to.equal(null);
+        expect(YaniceCliArgsParser.parseArgs(['invalid'])).to.equal(null);
     });
 
     describe('run', () => {
         it('should handle input for run', () => {
-            const expected: YaniceCliArgsV2 = {
+            const expected: YaniceCliArgs = {
                 type: 'run',
                 concurrency: 4,
                 outputMode: null,
@@ -22,11 +22,11 @@ describe('YaniceCliArgsParserV2', () => {
                     includeUncommitted: true
                 }
             };
-            expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope', '--concurrency=4'])).to.deep.equal(expected);
+            expect(YaniceCliArgsParser.parseArgs(['run', 'some-scope', '--concurrency=4'])).to.deep.equal(expected);
         });
 
         it('should parse --output-mode correctly', () => {
-            const expectedAppendAtEnd: YaniceCliArgsV2 = {
+            const expectedAppendAtEnd: YaniceCliArgs = {
                 type: 'run',
                 concurrency: 1,
                 outputMode: 'append-at-end',
@@ -37,32 +37,30 @@ describe('YaniceCliArgsParserV2', () => {
                     includeUncommitted: true
                 }
             };
-            const expectedAppendAtEndOnError: YaniceCliArgsV2 = {
+            const expectedAppendAtEndOnError: YaniceCliArgs = {
                 ...expectedAppendAtEnd,
                 outputMode: 'append-at-end-on-error'
             };
-            const expectedIgnore: YaniceCliArgsV2 = {
+            const expectedIgnore: YaniceCliArgs = {
                 ...expectedAppendAtEnd,
                 outputMode: 'ignore'
             };
-            const expectedNull: YaniceCliArgsV2 = {
+            const expectedNull: YaniceCliArgs = {
                 ...expectedAppendAtEnd,
                 outputMode: null
             };
-            expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope', '--output-mode=append-at-end-on-error'])).to.deep.equal(
+            expect(YaniceCliArgsParser.parseArgs(['run', 'some-scope', '--output-mode=append-at-end-on-error'])).to.deep.equal(
                 expectedAppendAtEndOnError
             );
-            expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope', '--output-mode=append-at-end'])).to.deep.equal(
-                expectedAppendAtEnd
-            );
-            expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope', '--output-mode=ignore'])).to.deep.equal(expectedIgnore);
-            expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope'])).to.deep.equal(expectedNull);
+            expect(YaniceCliArgsParser.parseArgs(['run', 'some-scope', '--output-mode=append-at-end'])).to.deep.equal(expectedAppendAtEnd);
+            expect(YaniceCliArgsParser.parseArgs(['run', 'some-scope', '--output-mode=ignore'])).to.deep.equal(expectedIgnore);
+            expect(YaniceCliArgsParser.parseArgs(['run', 'some-scope'])).to.deep.equal(expectedNull);
         });
     });
 
     describe('output-only', () => {
         it('should handle input for output-only', () => {
-            const expected: YaniceCliArgsV2 = {
+            const expected: YaniceCliArgs = {
                 type: 'output-only',
                 isResponsiblesMode: true,
                 includeFiltered: false,
@@ -73,13 +71,13 @@ describe('YaniceCliArgsParserV2', () => {
                     includeUncommitted: true
                 }
             };
-            expect(YaniceCliArgsParserV2.parseArgsV2(['output-only', 'some-scope', '--all', '--responsibles'])).to.deep.equal(expected);
+            expect(YaniceCliArgsParser.parseArgs(['output-only', 'some-scope', '--all', '--responsibles'])).to.deep.equal(expected);
         });
     });
 
     describe('visualize', () => {
         it('should handle input for visualize', () => {
-            const expected: YaniceCliArgsV2 = {
+            const expected: YaniceCliArgs = {
                 type: 'visualize',
                 renderer: 'vizjs',
                 saveVisualization: true,
@@ -91,14 +89,14 @@ describe('YaniceCliArgsParserV2', () => {
                 }
             };
             expect(
-                YaniceCliArgsParserV2.parseArgsV2(['visualize', 'some-scope', '--rev=HEAD', '--renderer=vizjs', '--save-visualization'])
+                YaniceCliArgsParser.parseArgs(['visualize', 'some-scope', '--rev=HEAD', '--renderer=vizjs', '--save-visualization'])
             ).to.deep.equal(expected);
         });
     });
 
     describe('plugin', () => {
         it('should handle input for plugin', () => {
-            const expected: YaniceCliArgsV2 = {
+            const expected: YaniceCliArgs = {
                 type: 'plugin',
                 defaultArgs: {
                     scope: 'some-scope',
@@ -107,9 +105,9 @@ describe('YaniceCliArgsParserV2', () => {
                     includeUncommitted: false
                 }
             };
-            expect(
-                YaniceCliArgsParserV2.parseArgsV2(['plugin', 'some-scope', '--branch=origin/main', '--exclude-uncommitted'])
-            ).to.deep.equal(expected);
+            expect(YaniceCliArgsParser.parseArgs(['plugin', 'some-scope', '--branch=origin/main', '--exclude-uncommitted'])).to.deep.equal(
+                expected
+            );
         });
     });
 });

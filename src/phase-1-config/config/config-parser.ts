@@ -7,7 +7,7 @@ import {
     YaniceJsonType,
     YaniceProject
 } from './config.interface';
-import { YaniceCliArgsV2 } from '../args-parser/cli-args.interface';
+import { YaniceCliArgs } from '../args-parser/cli-args.interface';
 
 export class ConfigParser {
     public static readonly DEFAULT_CONFIG_OPTIONS: YaniceConfigOptions = {
@@ -20,14 +20,14 @@ export class ConfigParser {
     /**
      * Ensure that a valid yaniceJson is entered here (jsonschema-verified).
      */
-    public static getYaniceConfig(yaniceJson: YaniceJsonType, yaniceArgs: YaniceCliArgsV2): YaniceConfig {
+    public static getYaniceConfig(yaniceJson: YaniceJsonType, yaniceCliArgs: YaniceCliArgs): YaniceConfig {
         return {
-            options: ConfigParser.getConfigOptions(yaniceJson, yaniceArgs),
+            options: ConfigParser.getConfigOptions(yaniceJson, yaniceCliArgs),
             projects: ConfigParser.getProjects(yaniceJson),
             dependencies: {
-                ...ConfigParser.getDefaultDependencies(yaniceJson, yaniceArgs.defaultArgs.scope),
-                ...ConfigParser.getExtendedDependencies(yaniceJson, yaniceArgs.defaultArgs.scope),
-                ...ConfigParser.getDirectDependencies(yaniceJson, yaniceArgs.defaultArgs.scope)
+                ...ConfigParser.getDefaultDependencies(yaniceJson, yaniceCliArgs.defaultArgs.scope),
+                ...ConfigParser.getExtendedDependencies(yaniceJson, yaniceCliArgs.defaultArgs.scope),
+                ...ConfigParser.getDirectDependencies(yaniceJson, yaniceCliArgs.defaultArgs.scope)
             }
         };
     }
@@ -79,9 +79,9 @@ export class ConfigParser {
         });
     }
 
-    private static getConfigOptions(yaniceJson: YaniceJsonType, yaniceArgs: YaniceCliArgsV2): YaniceConfigOptions {
-        const scope: string | null = yaniceArgs.defaultArgs.scope;
-        const outputModeFromArgs: commandOutputOptionsType | null = yaniceArgs.type === 'run' ? yaniceArgs.outputMode : null;
+    private static getConfigOptions(yaniceJson: YaniceJsonType, yaniceCliArgs: YaniceCliArgs): YaniceConfigOptions {
+        const scope: string | null = yaniceCliArgs.defaultArgs.scope;
+        const outputModeFromArgs: commandOutputOptionsType | null = yaniceCliArgs.type === 'run' ? yaniceCliArgs.outputMode : null;
         const scopeOptions = !!scope ? yaniceJson.dependencyScopes[scope]?.options : undefined;
         const yaniceConfigOptions: YaniceConfigOptions = {
             port: scopeOptions?.port || yaniceJson.options?.port || ConfigParser.DEFAULT_CONFIG_OPTIONS.port,

@@ -39,19 +39,19 @@ export class YaniceExecutor {
         if (!this.phase3Result) {
             return;
         }
-        const yaniceArgs = this.phase3Result.phase2Result.phase1Result.yaniceArgsV2;
-        if (yaniceArgs.type === 'output-only') {
-            Phase4OutputOnlyExecutor.execute(this.phase3Result, yaniceArgs);
+        const yaniceCliArgs = this.phase3Result.phase2Result.phase1Result.yaniceCliArgs;
+        if (yaniceCliArgs.type === 'output-only') {
+            Phase4OutputOnlyExecutor.execute(this.phase3Result, yaniceCliArgs);
             return;
         }
-        if (yaniceArgs.type === 'visualize') {
-            Phase4VisualizerExecutor.execute(this.phase3Result, yaniceArgs);
+        if (yaniceCliArgs.type === 'visualize') {
+            Phase4VisualizerExecutor.execute(this.phase3Result, yaniceCliArgs);
             return;
         }
-        if (yaniceArgs.type === 'plugin') {
+        if (yaniceCliArgs.type === 'plugin') {
             return;
         }
-        Phase4CommandExecutor.execute(this.phase3Result, yaniceArgs);
+        Phase4CommandExecutor.execute(this.phase3Result, yaniceCliArgs);
     }
 
     /**

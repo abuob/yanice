@@ -48,7 +48,7 @@ export class Phase3Executor extends PhaseExecutor {
         if (this.changedProjects) {
             const depGraph: DirectedGraph = this.phase2Result.phase1Result.depGraph;
             const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
-            const includeAllProjects: boolean = this.phase2Result.phase1Result.yaniceArgsV2.defaultArgs.includeAllProjects;
+            const includeAllProjects: boolean = this.phase2Result.phase1Result.yaniceCliArgs.defaultArgs.includeAllProjects;
             if (!includeAllProjects) {
                 const affected: string[] = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(depGraph, this.changedProjects);
                 this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySortedReverse(depGraph, affected);
@@ -64,9 +64,9 @@ export class Phase3Executor extends PhaseExecutor {
             return this;
         }
         const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
-        const yaniceArgs = this.phase2Result.phase1Result.yaniceArgsV2;
-        const scope: string | null = yaniceArgs.defaultArgs.scope;
-        const includeUnfiltered: boolean = yaniceArgs.type === 'output-only' && yaniceArgs.includeFiltered;
+        const yaniceCliArgs = this.phase2Result.phase1Result.yaniceCliArgs;
+        const scope: string | null = yaniceCliArgs.defaultArgs.scope;
+        const includeUnfiltered: boolean = yaniceCliArgs.type === 'output-only' && yaniceCliArgs.includeFiltered;
         if (includeUnfiltered) {
             this.affectedProjects = this.affectedProjectsUnfiltered;
         } else {
