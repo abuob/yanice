@@ -94,8 +94,9 @@ export class YaniceCliArgsParserV2 {
         };
     }
 
-    private static getOutputMode(outputModeParameter: string | undefined): commandOutputOptionsType | null {
-        switch (outputModeParameter) {
+    private static getOutputMode(outputModeArg: string | undefined): commandOutputOptionsType | null {
+        const outputModeValue: string | undefined = outputModeArg?.replace('--output-mode=', '');
+        switch (outputModeValue) {
             case 'append-at-end':
                 return 'append-at-end';
             case 'append-at-end-on-error':
