@@ -1,11 +1,11 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { YaniceArgs } from '../../phase-1-config/config/args-parser';
 import { YaniceConfig } from '../../phase-1-config/config/config.interface';
 import { DirectedGraph } from '../../phase-1-config/directed-graph/directed-graph';
 import { FindFileUtil } from '../../util/find-file';
 import { log } from '../../util/log';
 import { GraphDagreRenderer } from './graph-dagre-renderer';
 import { GraphDotRenderer } from './graph-dot-renderer';
+import { YaniceCliArgsVisualize } from '../../phase-1-config/args-parser/cli-args.interface';
 
 const fs = require('fs');
 const path = require('path');
@@ -15,12 +15,12 @@ export class DepGraphVisualization {
     public static createVisualizationHtml(
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
-        yaniceArgs: YaniceArgs,
+        yaniceArgs: YaniceCliArgsVisualize,
         affectedProjects: string[],
         changedFiles: string[]
     ): string {
-        switch (yaniceArgs.graphRenderer) {
-            case 'DAGREJS':
+        switch (yaniceArgs.renderer) {
+            case 'dagrejs':
                 return DepGraphVisualization.createDagreVisualizationHtml(
                     depGraph,
                     yaniceConfig,
@@ -28,7 +28,7 @@ export class DepGraphVisualization {
                     affectedProjects,
                     changedFiles
                 );
-            case 'VIZJS':
+            case 'vizjs':
                 return DepGraphVisualization.createVizJsVisualizationHtml(depGraph);
         }
     }
@@ -54,22 +54,17 @@ export class DepGraphVisualization {
     private static createDagreVisualizationHtml(
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
-        yaniceArgs: YaniceArgs,
+        yaniceArgs: YaniceCliArgsVisualize,
         affectedProjects: string[],
         changedFiles: string[]
     ): string {
         const templateHtml = DepGraphVisualization.getDagreTemplateHtml();
         const graphData = GraphDagreRenderer.getGraphData(depGraph, yaniceConfig, yaniceArgs, affectedProjects, changedFiles);
+        const diffTargetInfo: string = yaniceArgs.defaultArgs.diffTarget ?? 'None provided (use e.g. --rev=HEAD)';
         const actualHtml = templateHtml
             .replace('INSERT_GRAPH_DATA_OBJECT_HERE', JSON.stringify(graphData))
-            .replace(
-                'INSERT_GIT_REVISION',
-                yaniceArgs.diffTarget.branch ||
-                    yaniceArgs.diffTarget.commit ||
-                    yaniceArgs.diffTarget.rev ||
-                    'None provided (use e.g. --rev=HEAD)'
-            )
-            .replace('INSERT_SCOPE', yaniceArgs.givenScope);
+            .replace('INSERT_GIT_REVISION', diffTargetInfo)
+            .replace('INSERT_SCOPE', yaniceArgs.defaultArgs.scope ?? 'none provided');
         return actualHtml;
     }
 

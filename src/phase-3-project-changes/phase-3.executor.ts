@@ -4,7 +4,6 @@ import { Phase2Result } from '../phase-2-file-changes/phase-2.result.type';
 import { ChangedProjects } from './changed-projects';
 import { DirectedGraph, DirectedGraphUtil } from '../phase-1-config/directed-graph/directed-graph';
 import { ConfigParser } from '../phase-1-config/config/config-parser';
-import { YaniceArgs } from '../phase-1-config/config/args-parser';
 import { YaniceConfig } from '../phase-1-config/config/config.interface';
 
 export class Phase3Executor extends PhaseExecutor {
@@ -48,10 +47,10 @@ export class Phase3Executor extends PhaseExecutor {
         }
         if (this.changedProjects) {
             const depGraph: DirectedGraph = this.phase2Result.phase1Result.depGraph;
-            const yaniceArgs: YaniceArgs = this.phase2Result.phase1Result.yaniceArgs;
             const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
-            if (!yaniceArgs.includeAllProjects) {
-                const affected = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(depGraph, this.changedProjects);
+            const includeAllProjects: boolean = this.phase2Result.phase1Result.yaniceArgsV2.defaultArgs.includeAllProjects;
+            if (!includeAllProjects) {
+                const affected: string[] = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(depGraph, this.changedProjects);
                 this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySortedReverse(depGraph, affected);
             } else {
                 this.affectedProjectsUnfiltered = yaniceConfig.projects.map((project) => project.projectName);
@@ -64,14 +63,17 @@ export class Phase3Executor extends PhaseExecutor {
         if (!this.phase2Result) {
             return this;
         }
-        const yaniceArgs: YaniceArgs = this.phase2Result.phase1Result.yaniceArgs;
         const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
-        this.affectedProjects = this.affectedProjectsUnfiltered.filter((projectName: string) => {
-            return (
-                (!yaniceArgs.includeCommandSupportedOnly && yaniceArgs.outputOnly) ||
-                ConfigParser.supportsScopeCommand(yaniceConfig, projectName, yaniceArgs.givenScope)
-            );
-        });
+        const yaniceArgs = this.phase2Result.phase1Result.yaniceArgsV2;
+        const scope: string | null = yaniceArgs.defaultArgs.scope;
+        const includeUnfiltered: boolean = yaniceArgs.type === 'output-only' && yaniceArgs.includeFiltered;
+        if (includeUnfiltered) {
+            this.affectedProjects = this.affectedProjectsUnfiltered;
+        } else {
+            this.affectedProjects = this.affectedProjectsUnfiltered.filter((projectName: string) => {
+                return ConfigParser.supportsScopeCommand(yaniceConfig, projectName, scope);
+            });
+        }
         return this;
     }
 }

@@ -11,25 +11,31 @@ describe('YaniceCliArgsParserV2', () => {
     it('should handle input for run', () => {
         const expected: YaniceCliArgsV2 = {
             type: 'run',
+            concurrency: 4,
+            outputMode: null,
             defaultArgs: {
                 scope: 'some-scope',
                 diffTarget: null,
-                includeAllProjects: false
+                includeAllProjects: false,
+                includeUncommitted: true
             }
         };
-        expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope'])).to.deep.equal(expected);
+        expect(YaniceCliArgsParserV2.parseArgsV2(['run', 'some-scope', '--concurrency=4'])).to.deep.equal(expected);
     });
 
     it('should handle input for output-only', () => {
         const expected: YaniceCliArgsV2 = {
             type: 'output-only',
+            isResponsiblesMode: true,
+            includeFiltered: false,
             defaultArgs: {
                 scope: 'some-scope',
                 diffTarget: null,
-                includeAllProjects: true
+                includeAllProjects: true,
+                includeUncommitted: true
             }
         };
-        expect(YaniceCliArgsParserV2.parseArgsV2(['output-only', 'some-scope', '--all'])).to.deep.equal(expected);
+        expect(YaniceCliArgsParserV2.parseArgsV2(['output-only', 'some-scope', '--all', '--responsibles'])).to.deep.equal(expected);
     });
 
     it('should handle input for visualize', () => {
@@ -40,7 +46,8 @@ describe('YaniceCliArgsParserV2', () => {
             defaultArgs: {
                 scope: 'some-scope',
                 diffTarget: 'HEAD',
-                includeAllProjects: false
+                includeAllProjects: false,
+                includeUncommitted: true
             }
         };
         expect(
@@ -54,9 +61,12 @@ describe('YaniceCliArgsParserV2', () => {
             defaultArgs: {
                 scope: 'some-scope',
                 diffTarget: 'origin/main',
-                includeAllProjects: false
+                includeAllProjects: false,
+                includeUncommitted: false
             }
         };
-        expect(YaniceCliArgsParserV2.parseArgsV2(['plugin', 'some-scope', '--branch=origin/main'])).to.deep.equal(expected);
+        expect(YaniceCliArgsParserV2.parseArgsV2(['plugin', 'some-scope', '--branch=origin/main', '--exclude-uncommitted'])).to.deep.equal(
+            expected
+        );
     });
 });

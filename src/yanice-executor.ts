@@ -5,7 +5,6 @@ import { Phase2Result } from './phase-2-file-changes/phase-2.result.type';
 import { Phase2Executor } from './phase-2-file-changes/phase-2.executor';
 import { Phase3Executor } from './phase-3-project-changes/phase-3.executor';
 import { Phase3Result } from './phase-3-project-changes/phase-3.result.type';
-import { Phase4ResponsiblesExecutor } from './phase-4-execution/phase-4-responsibles.executor';
 import { Phase4VisualizerExecutor } from './phase-4-execution/phase-4-visualizer.executor';
 import { Phase4OutputOnlyExecutor } from './phase-4-execution/phase-4-output-only.executor';
 import { Phase4CommandExecutor } from './phase-4-execution/phase-4-command.executor';
@@ -40,20 +39,19 @@ export class YaniceExecutor {
         if (!this.phase3Result) {
             return;
         }
-        const yaniceArgs = this.phase3Result.phase2Result.phase1Result.yaniceArgs;
-        if (yaniceArgs.outputResponsibles) {
-            Phase4ResponsiblesExecutor.execute(this.phase3Result);
+        const yaniceArgs = this.phase3Result.phase2Result.phase1Result.yaniceArgsV2;
+        if (yaniceArgs.type === 'output-only') {
+            Phase4OutputOnlyExecutor.execute(this.phase3Result, yaniceArgs);
             return;
         }
-        if (yaniceArgs.outputOnly) {
-            Phase4OutputOnlyExecutor.execute(this.phase3Result);
+        if (yaniceArgs.type === 'visualize') {
+            Phase4VisualizerExecutor.execute(this.phase3Result, yaniceArgs);
             return;
         }
-        if (yaniceArgs.visualizeDepGraph || yaniceArgs.saveDepGraphVisualization) {
-            Phase4VisualizerExecutor.execute(this.phase3Result);
+        if (yaniceArgs.type === 'plugin') {
             return;
         }
-        Phase4CommandExecutor.execute(this.phase3Result);
+        Phase4CommandExecutor.execute(this.phase3Result, yaniceArgs);
     }
 
     /**

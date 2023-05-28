@@ -2,7 +2,6 @@ import { PhaseExecutor } from '../util/phase-executor';
 import { ConfigVerifier } from './config/config-verifier';
 import { ConfigParser } from './config/config-parser';
 import { YaniceConfig, YaniceJsonType } from './config/config.interface';
-import { ArgsParser, YaniceArgs } from './config/args-parser';
 import { Phase1Result } from './phase1.result.type';
 import { DirectedGraph, DirectedGraphUtil } from './directed-graph/directed-graph';
 import { YaniceCliArgsV2 } from './args-parser/cli-args.interface';
@@ -12,7 +11,6 @@ export class Phase1Executor extends PhaseExecutor {
     private baseDirectory: string | null = null;
     private yaniceJson: YaniceJsonType | null = null;
     private yaniceConfig: YaniceConfig | null = null;
-    private yaniceArgs: YaniceArgs | null = null;
     private yaniceArgsV2: YaniceCliArgsV2 | null = null;
     private depGraph: DirectedGraph | null = null;
 
@@ -27,17 +25,15 @@ export class Phase1Executor extends PhaseExecutor {
     private loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Executor {
         this.baseDirectory = baseDirectory;
         this.yaniceJson = yaniceJson;
-        return this.validateYaniceJson(yaniceJson).parseArgs(args).parseArgsV2(args).verifyArgs().parseYaniceJson();
+        return this.validateYaniceJson(yaniceJson).parseArgsV2(args).verifyArgs().parseYaniceJson();
     }
 
     private createPhaseResult(): Phase1Result {
-        // TODO: Ensure yaniceArgsV2 is non-null once the switch has been done
-        if (!this.yaniceConfig || !this.yaniceArgs || !this.depGraph || !this.baseDirectory) {
+        if (!this.yaniceConfig || !this.yaniceArgsV2 || !this.depGraph || !this.baseDirectory) {
             this.exitYanice(1, `[phase-1] Failed to create phase result`);
         }
         return {
             yaniceConfig: this.yaniceConfig,
-            yaniceArgs: this.yaniceArgs,
             yaniceArgsV2: this.yaniceArgsV2,
             depGraph: this.depGraph,
             baseDirectory: this.baseDirectory
@@ -68,15 +64,9 @@ export class Phase1Executor extends PhaseExecutor {
     }
 
     private parseYaniceJson(): Phase1Executor {
-        if (this.yaniceJson && this.yaniceArgs) {
-            this.yaniceConfig = ConfigParser.getYaniceConfig(this.yaniceJson, this.yaniceArgs);
+        if (this.yaniceJson && this.yaniceArgsV2) {
+            this.yaniceConfig = ConfigParser.getYaniceConfig(this.yaniceJson, this.yaniceArgsV2);
         }
-        return this;
-    }
-
-    private parseArgs(args: string[]): Phase1Executor {
-        this.yaniceArgs = ArgsParser.parseArgs(args);
-        ArgsParser.verifyDiffTargetPresence(this.yaniceArgs);
         return this;
     }
 
@@ -86,18 +76,18 @@ export class Phase1Executor extends PhaseExecutor {
     }
 
     private verifyArgs(): Phase1Executor {
-        if (this.yaniceArgs && this.yaniceJson) {
-            this.verifyScopeParam(this.yaniceArgs.givenScope, this.yaniceJson);
+        if (this.yaniceArgsV2 && this.yaniceJson) {
+            this.verifyScopeParam(this.yaniceArgsV2.defaultArgs.scope, this.yaniceJson);
         }
         return this;
     }
 
-    private verifyScopeParam(scopeParam: string, yaniceJson: YaniceJsonType): void {
+    private verifyScopeParam(scopeParam: string | null, yaniceJson: YaniceJsonType): void {
         const scopes = Object.keys(yaniceJson.dependencyScopes);
         if (!scopeParam) {
             this.exitYanice(
                 1,
-                `No scope was provided! Please select one of the following scopes as first input parameter: ${scopes.join(', ')}`
+                `No scope was provided! Please provide one of the following scopes as second input parameter: ${scopes.join(', ')}`
             );
         }
         if (!scopes.includes(scopeParam)) {

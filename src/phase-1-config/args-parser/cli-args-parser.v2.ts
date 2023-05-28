@@ -6,6 +6,7 @@ import {
     YaniceCliArgsVisualize,
     YaniceCliDefaultArgs
 } from './cli-args.interface';
+import { commandOutputOptionsType } from '../config/config.interface';
 
 export class YaniceCliArgsParserV2 {
     public static parseArgsV2(args: string[]): YaniceCliArgsV2 | null {
@@ -26,16 +27,32 @@ export class YaniceCliArgsParserV2 {
 
     private static handleRunArgs(args: string[]): YaniceCliArgsRun {
         const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
+        const concurrencyParameter: string | undefined = args.find((arg: string) => {
+            return /^--concurrency=(\d)+$/.test(arg);
+        });
+        const concurrency: number = (concurrencyParameter && parseInt(concurrencyParameter.replace(/--concurrency=/, ''), 10)) || 1;
+
+        const outputModeParameter: string | undefined = args.find((arg: string) => {
+            return /^--output-mode=/.test(arg);
+        });
+
+        const outputMode: YaniceCliArgsRun['outputMode'] = YaniceCliArgsParserV2.getOutputMode(outputModeParameter);
         return {
             type: 'run',
-            defaultArgs
+            defaultArgs,
+            concurrency,
+            outputMode
         };
     }
 
     private static handleOutputOnlyArgs(args: string[]): YaniceCliArgsOutputOnly {
         const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParserV2.handleDefaultArgs(args);
+        const isResponsiblesMode: boolean = args.some((arg) => /^--responsibles$/.test(arg));
+        const includeFiltered: boolean = args.some((arg) => /^--include-filtered$/.test(arg));
         return {
             type: 'output-only',
+            isResponsiblesMode,
+            includeFiltered,
             defaultArgs
         };
     }
@@ -68,10 +85,24 @@ export class YaniceCliArgsParserV2 {
             return /^--(commit|branch|rev)=/.test(arg);
         });
         const diffTarget: string | null = diffTargetParameter ? diffTargetParameter.replace(/--.*?=/, '') : null;
+        const includeUncommitted: boolean = !args.some((arg: string) => /^--exclude-uncommitted$/.test(arg));
         return {
             includeAllProjects: args.includes('--all'),
             diffTarget,
-            scope
+            scope,
+            includeUncommitted
         };
+    }
+
+    private static getOutputMode(outputModeParameter: string | undefined): commandOutputOptionsType | null {
+        switch (outputModeParameter) {
+            case 'append-at-end':
+                return 'append-at-end';
+            case 'append-at-end-on-error':
+                return 'append-at-end-on-error';
+            case 'ignore':
+                return 'ignore';
+        }
+        return null;
     }
 }

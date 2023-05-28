@@ -1,5 +1,4 @@
 import { PhaseExecutor } from '../util/phase-executor';
-import { YaniceArgs } from '../phase-1-config/config/args-parser';
 import { ChangedFiles } from './changed-files';
 import { Phase1Result } from '../phase-1-config/phase1.result.type';
 import { Phase2Result } from './phase-2.result.type';
@@ -26,18 +25,11 @@ export class Phase2Executor extends PhaseExecutor {
         if (!this.phase1Result) {
             return this;
         }
-        const yaniceArgs: YaniceArgs = this.phase1Result.yaniceArgs;
-        if (yaniceArgs.diffTarget.branch || yaniceArgs.diffTarget.rev) {
-            const commitSHA: string = ChangedFiles.gitCommandWithRevisionShaAsOutput(
-                `git rev-parse ${yaniceArgs.diffTarget.branch || yaniceArgs.diffTarget.rev}`
-            );
-            this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, yaniceArgs.includeUncommitted);
-        }
-        if (yaniceArgs.diffTarget.commit && this.changedFiles.length === 0) {
-            this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(
-                yaniceArgs.diffTarget.commit,
-                yaniceArgs.includeUncommitted
-            );
+        const diffTarget: string | null = this.phase1Result.yaniceArgsV2.defaultArgs.diffTarget;
+        const includeUncommitted: boolean = this.phase1Result.yaniceArgsV2.defaultArgs.includeUncommitted;
+        if (diffTarget) {
+            const commitSHA: string = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${diffTarget}`);
+            this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, includeUncommitted);
         }
         return this;
     }

@@ -1,12 +1,18 @@
+import { commandOutputOptionsType } from '../config/config.interface';
+
 export type YaniceCliArgsV2 = YaniceCliArgsOutputOnly | YaniceCliArgsPlugin | YaniceCliArgsRun | YaniceCliArgsVisualize;
 
 export interface YaniceCliArgsRun {
     type: 'run';
+    concurrency: number;
+    outputMode: commandOutputOptionsType | null;
     defaultArgs: YaniceCliDefaultArgs;
 }
 
 export interface YaniceCliArgsOutputOnly {
     type: 'output-only';
+    isResponsiblesMode: boolean;
+    includeFiltered: boolean;
     defaultArgs: YaniceCliDefaultArgs;
 }
 
@@ -25,5 +31,6 @@ export interface YaniceCliArgsPlugin {
 export interface YaniceCliDefaultArgs {
     diffTarget: string | null;
     includeAllProjects: boolean;
+    includeUncommitted: boolean;
     scope: string | null;
 }
