@@ -6,6 +6,10 @@ describe('yanice', () => {
         IntegrationTestUtil.assertCleanFiles();
     });
 
+    afterEach(() => {
+        IntegrationTestUtil.resetChanges();
+    });
+
     describe('--all --output-only', () => {
         it('should be able to read its config file and print out all project files for a given scope', () => {
             const output: string = IntegrationTestUtil.executeYaniceWithArgs(
