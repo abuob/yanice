@@ -8,35 +8,43 @@ import { YaniceCliArgs } from './args-parser/cli-args.interface';
 import { YaniceCliArgsParser } from './args-parser/cli-args-parser';
 
 export class Phase1Executor extends PhaseExecutor {
-    private baseDirectory: string | null = null;
+    private yaniceJsonDirectoryPath: string | null = null;
+    private gitRepoRootPath: string | null = null;
     private yaniceJson: YaniceJsonType | null = null;
     private yaniceConfig: YaniceConfig | null = null;
     private yaniceCliArgs: YaniceCliArgs | null = null;
     private depGraph: DirectedGraph | null = null;
 
-    public static execute(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Result {
+    public static execute(args: string[], baseDirectory: string, gitRepoRootPath: string, yaniceJson: YaniceJsonType): Phase1Result {
         return new Phase1Executor()
-            .loadConfigAndParseArgs(args, baseDirectory, yaniceJson)
+            .loadConfigAndParseArgs(args, baseDirectory, gitRepoRootPath, yaniceJson)
             .calculateDepGraphForGivenScope()
             .verifyDepGraphValidity()
             .createPhaseResult();
     }
 
-    private loadConfigAndParseArgs(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): Phase1Executor {
-        this.baseDirectory = baseDirectory;
+    private loadConfigAndParseArgs(
+        args: string[],
+        baseDirectory: string,
+        gitRepoRootPath: string,
+        yaniceJson: YaniceJsonType
+    ): Phase1Executor {
+        this.yaniceJsonDirectoryPath = baseDirectory;
         this.yaniceJson = yaniceJson;
+        this.gitRepoRootPath = gitRepoRootPath;
         return this.validateYaniceJson(yaniceJson).parseCliArgs(args).verifyArgs().parseYaniceJson();
     }
 
     private createPhaseResult(): Phase1Result {
-        if (!this.yaniceConfig || !this.yaniceCliArgs || !this.depGraph || !this.baseDirectory) {
+        if (!this.yaniceConfig || !this.yaniceCliArgs || !this.depGraph || !this.yaniceJsonDirectoryPath || !this.gitRepoRootPath) {
             this.exitYanice(1, `[phase-1] Failed to create phase result`);
         }
         return {
             yaniceConfig: this.yaniceConfig,
             yaniceCliArgs: this.yaniceCliArgs,
             depGraph: this.depGraph,
-            baseDirectory: this.baseDirectory
+            yaniceJsonDirectoryPath: this.yaniceJsonDirectoryPath,
+            gitRepoRootPath: this.gitRepoRootPath
         };
     }
 

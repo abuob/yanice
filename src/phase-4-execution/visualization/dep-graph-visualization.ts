@@ -76,7 +76,7 @@ export class DepGraphVisualization {
     }
 
     private static getDagreTemplateHtml(): string {
-        const templateHtmlPath = FindFileUtil.findFileInParentDirsFromInitialDir('graph-display-template.html', __dirname);
+        const templateHtmlPath = FindFileUtil.findFileInParentDirsRecursively(__dirname, 'graph-display-template.html');
         if (!templateHtmlPath) {
             throw new Error('Could not find graph-display-template.html to construct graph visualization, abort!');
         }

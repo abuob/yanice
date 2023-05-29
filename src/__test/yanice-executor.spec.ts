@@ -7,7 +7,8 @@ import { YaniceJsonType } from '../phase-1-config/config/config.interface';
 
 describe('YaniceExecutor', () => {
     let yaniceExecutor: YaniceExecutor;
-    const baseDirectory = process.cwd();
+    const yaniceJsonDirectory = 'some/mock/path/to/yanice';
+    const gitRepoRootPath: string = 'some/mock/path/to/git/repo';
     const yaniceJson1: YaniceJsonType = validYaniceJson1 as any;
     const yaniceJson4: YaniceJsonType = validYaniceJson4 as any;
     const readmeYaniceJson: YaniceJsonType = validReadmeYaniceJson as any;
@@ -19,7 +20,7 @@ describe('YaniceExecutor', () => {
 
         it('should calculate all changed projects correctly', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'lint', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
             const changedProjects: string[] | undefined = yaniceExecutor.phase3Result?.changedProjects;
@@ -29,7 +30,12 @@ describe('YaniceExecutor', () => {
 
         it('should calculate all affected projects correctly when including unsupported commands', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'test', '--rev=HEAD', '--include-filtered'], baseDirectory, yaniceJson1)
+                .executePhase1(
+                    ['output-only', 'test', '--rev=HEAD', '--include-filtered'],
+                    yaniceJsonDirectory,
+                    gitRepoRootPath,
+                    yaniceJson1
+                )
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -45,7 +51,12 @@ describe('YaniceExecutor', () => {
 
         it('should calculate all affected projects correctly when not including unsupported commands', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'test', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .executePhase1(
+                    ['output-only', 'test', '--rev=HEAD', '--outputOnly=true'],
+                    yaniceJsonDirectory,
+                    gitRepoRootPath,
+                    yaniceJson1
+                )
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -61,7 +72,12 @@ describe('YaniceExecutor', () => {
 
         it('should calculate affected projects correctly before filtering', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'd-depends-on-a', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .executePhase1(
+                    ['output-only', 'd-depends-on-a', '--rev=HEAD', '--outputOnly=true'],
+                    yaniceJsonDirectory,
+                    gitRepoRootPath,
+                    yaniceJson1
+                )
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -77,7 +93,7 @@ describe('YaniceExecutor', () => {
 
         it('should set affectedProjects to all projects when --all parameter is given', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'lint', '--all', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'lint', '--all', '--outputOnly=true'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -93,7 +109,7 @@ describe('YaniceExecutor', () => {
 
         it('should filter unsupported commands when --all and outputOnly=false even when includeCommandSupportedOnly=true', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'lint', '--all', '--outputOnly=false'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'lint', '--all', '--outputOnly=false'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -109,7 +125,7 @@ describe('YaniceExecutor', () => {
 
         it('should set affectedProjects to all projects that support the given scope when --all parameter is given', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'lint', '--all', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'lint', '--all', '--outputOnly=true'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -125,7 +141,12 @@ describe('YaniceExecutor', () => {
 
         it('should filter out projects according to parameters', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'test', '--rev=HEAD', '--outputOnly=true'], baseDirectory, yaniceJson1)
+                .executePhase1(
+                    ['output-only', 'test', '--rev=HEAD', '--outputOnly=true'],
+                    yaniceJsonDirectory,
+                    gitRepoRootPath,
+                    yaniceJson1
+                )
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/B/some-B-file', 'path/to/dir/E/some-E-file'])
                 .executePhase3();
 
@@ -149,7 +170,7 @@ describe('YaniceExecutor', () => {
 
         it('should detect directly changed projects correctly', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'lint', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/A/some-A-file', 'path/to/dir/D/some-D-file'])
                 .executePhase3();
 
@@ -171,7 +192,7 @@ describe('YaniceExecutor', () => {
 
         it('should calculate affected projects for a simple scope properly when just one project changed', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'lint', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'lint', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/D/some-D-file'])
                 .executePhase3();
 
@@ -187,7 +208,7 @@ describe('YaniceExecutor', () => {
 
         it('should calculate affected projects for a scope with some dependencies properly when just one project changed', () => {
             yaniceExecutor
-                .executePhase1(['output-only', 'test', '--rev=HEAD'], baseDirectory, yaniceJson1)
+                .executePhase1(['output-only', 'test', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson1)
                 .skipPhase2ForTests(['path/to/dir/D/some-D-file'])
                 .executePhase3();
 
@@ -207,7 +228,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project A for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-1', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['A/some.file'])
                     .executePhase3();
 
@@ -223,7 +244,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project B for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-1', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['B/some.file'])
                     .executePhase3();
 
@@ -239,7 +260,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project C for scope-1 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-1', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-1', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['C/some.file'])
                     .executePhase3();
 
@@ -257,7 +278,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project A for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['A/some.file'])
                     .executePhase3();
 
@@ -273,7 +294,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project B for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['B/some.file'])
                     .executePhase3();
 
@@ -289,7 +310,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project C for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['C/some.file'])
                     .executePhase3();
 
@@ -305,7 +326,7 @@ describe('YaniceExecutor', () => {
             it('should handle changes in project D for scope-2 correctly', () => {
                 const yaniceExecutor4 = new YaniceExecutor();
                 yaniceExecutor4
-                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], baseDirectory, yaniceJson4)
+                    .executePhase1(['output-only', 'scope-2', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, yaniceJson4)
                     .skipPhase2ForTests(['D/some.file'])
                     .executePhase3();
 
@@ -326,7 +347,7 @@ describe('YaniceExecutor', () => {
             it('should test all projects in topologically ordering', () => {
                 const yaniceExecutorReadme = new YaniceExecutor();
                 yaniceExecutorReadme
-                    .executePhase1(['output-only', 'test', '--rev=HEAD'], baseDirectory, readmeYaniceJson)
+                    .executePhase1(['output-only', 'test', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, readmeYaniceJson)
                     .skipPhase2ForTests(['yanice.json'])
                     .executePhase3();
 
@@ -348,7 +369,7 @@ describe('YaniceExecutor', () => {
             it('should test project-A and lib-1 if lib-1 has changed', () => {
                 const yaniceExecutorReadme = new YaniceExecutor();
                 yaniceExecutorReadme
-                    .executePhase1(['output-only', 'test', '--rev=HEAD'], baseDirectory, readmeYaniceJson)
+                    .executePhase1(['output-only', 'test', '--rev=HEAD'], yaniceJsonDirectory, gitRepoRootPath, readmeYaniceJson)
                     .skipPhase2ForTests(['libs/lib-1/some.file'])
                     .executePhase3();
 

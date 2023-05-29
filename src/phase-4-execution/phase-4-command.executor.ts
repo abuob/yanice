@@ -16,7 +16,7 @@ export class Phase4CommandExecutor extends AbstractPhase4Executor {
 
     public executeCommands(yaniceRunArgs: YaniceCliArgsRun): void {
         const yaniceConfig = this.phase3Result.phase2Result.phase1Result.yaniceConfig;
-        const baseDirectory = this.phase3Result.phase2Result.phase1Result.baseDirectory;
+        const baseDirectory = this.phase3Result.phase2Result.phase1Result.yaniceJsonDirectoryPath;
         const affectedProjects = this.phase3Result.affectedProjects;
         const scope: string | null = yaniceRunArgs.defaultArgs.scope;
         const parallelExecutionCommands: ParallelExecutionCommand[] = yaniceConfig.projects

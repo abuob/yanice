@@ -1,27 +1,34 @@
-import { statSync } from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { execSync } from 'node:child_process';
 
 export class FindFileUtil {
-    public static findFileInParentDirsFromInitialDir(fileName: string, initialDir: string): string | null {
-        return FindFileUtil.findFileInParentDirsRecursively(initialDir, fileName);
-    }
-
-    private static findFileInParentDirsRecursively(currentDir: string, fileName: string): string | null {
-        if (FindFileUtil.isFilePathValid(`${currentDir}/${fileName}`)) {
+    public static findFileInParentDirsRecursively(currentDir: string, fileName: string): string | null {
+        const filePathForCurrentDir: string = path.join(currentDir, fileName);
+        if (FindFileUtil.isFilePathValid(filePathForCurrentDir)) {
             // We found the file!
-            return `${currentDir}/${fileName}`;
+            return filePathForCurrentDir;
         }
-        if (currentDir === '/' || path.dirname(currentDir) === currentDir) {
+        const parentDir: string = path.dirname(currentDir);
+        if (parentDir === currentDir) {
             // We cannot go further up
             return null;
         }
         // Go up recursively
-        return FindFileUtil.findFileInParentDirsRecursively(path.dirname(currentDir), fileName);
+        return FindFileUtil.findFileInParentDirsRecursively(parentDir, fileName);
+    }
+
+    public static getGitRoot(yaniceJsonDirPath: string): string | null {
+        try {
+            return execSync('git rev-parse --show-toplevel', { cwd: yaniceJsonDirPath }).toString().trim();
+        } catch (e) {
+            return null;
+        }
     }
 
     private static isFilePathValid(filePath: string): boolean {
         try {
-            return statSync(filePath).isFile();
+            return fs.statSync(filePath).isFile();
         } catch (e) {
             return false;
         }

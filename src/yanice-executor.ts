@@ -14,8 +14,13 @@ export class YaniceExecutor {
     public phase2Result: Phase2Result | null = null;
     public phase3Result: Phase3Result | null = null;
 
-    public executePhase1(args: string[], baseDirectory: string, yaniceJson: YaniceJsonType): YaniceExecutor {
-        this.phase1Result = Phase1Executor.execute(args, baseDirectory, yaniceJson);
+    public executePhase1(
+        args: string[],
+        yaniceJsonDirectoryPath: string,
+        gitRepoRootPath: string,
+        yaniceJson: YaniceJsonType
+    ): YaniceExecutor {
+        this.phase1Result = Phase1Executor.execute(args, yaniceJsonDirectoryPath, gitRepoRootPath, yaniceJson);
         return this;
     }
 
