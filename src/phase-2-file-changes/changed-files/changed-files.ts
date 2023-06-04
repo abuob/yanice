@@ -1,4 +1,5 @@
 const execSync = require('child_process').execSync;
+const path = require('path');
 
 export class ChangedFiles {
     public static filesChangedBetweenTwoCommitHashes(sha1: string, sha2: string): string[] {
@@ -25,6 +26,15 @@ export class ChangedFiles {
             .split('\n')
             .map((line: string) => line.trim())
             .filter((line: string) => line.length > 0)[0];
+    }
+
+    public static gitFilePathRelativeToYaniceJson(gitRepoRootPath: string, yaniceJsonDirPath: string, gitFilePath: string): string | null {
+        const absoluteFilePath: string = path.join(gitRepoRootPath, gitFilePath);
+        const filePathRelativeToYaniceJons = path.relative(yaniceJsonDirPath, absoluteFilePath);
+        if (filePathRelativeToYaniceJons.startsWith('..')) {
+            return null;
+        }
+        return filePathRelativeToYaniceJons.replace(/\\/g, '/');
     }
 
     private static getGitDiffNameOnlyOutputAsArrayOfFiles(gitDiffCommand: string): string[] {

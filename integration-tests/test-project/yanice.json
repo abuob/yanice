@@ -4,7 +4,7 @@
     "projects": [
         {
             "projectName": "A",
-            "pathGlob": "integration-tests/test-project/project-A/**/*",
+            "pathGlob": "project-A/**/*",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "npm run test-log -- project-A flat-all-projects-have-commands"
@@ -20,7 +20,7 @@
         },
         {
             "projectName": "B",
-            "pathGlob": "integration-tests/test-project/project-B/**/*",
+            "pathGlob": "project-B/**/*",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "npm run test-log -- project-B flat-all-projects-have-commands"
@@ -33,7 +33,7 @@
         },
         {
             "projectName": "C",
-            "pathGlob": "integration-tests/test-project/project-C/**/*",
+            "pathGlob": "project-C/**/*",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "npm run test-log -- project-C flat-all-projects-have-commands"

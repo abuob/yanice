@@ -62,4 +62,35 @@ describe('ChangedFiles', () => {
             execSync(`git branch -d ${temporaryBranchName}`);
         });
     });
+
+    describe('gitFilePathRelativeToYaniceJson', () => {
+        it('should return the original git-file-paths when yanice.json is in the repository-root', () => {
+            expect(
+                ChangedFiles.gitFilePathRelativeToYaniceJson('git/repo/root', 'git/repo/root', 'yanice/dir/some/path/file.json')
+            ).to.equal('yanice/dir/some/path/file.json');
+            expect(ChangedFiles.gitFilePathRelativeToYaniceJson('git/repo/root', 'git/repo/root', 'yanice.json')).to.equal('yanice.json');
+        });
+
+        it('should convert relative-file-paths to the repo-root to paths relative to yanice.json when yanice.json is not in root', () => {
+            expect(
+                ChangedFiles.gitFilePathRelativeToYaniceJson(
+                    'git/repo/root/',
+                    'git/repo/root/yanice-dir/',
+                    'yanice-dir/some/path/file.json'
+                )
+            ).to.equal('some/path/file.json');
+            expect(
+                ChangedFiles.gitFilePathRelativeToYaniceJson('git/repo/root', 'git/repo/root/yanice-dir', 'yanice-dir/some/path/')
+            ).to.equal('some/path');
+            expect(
+                ChangedFiles.gitFilePathRelativeToYaniceJson('git/repo/root', 'git/repo/root/yanice-dir', 'yanice-dir/some/path')
+            ).to.equal('some/path');
+        });
+
+        it('should return null if the file is not in a subdirectory of the directory with the yanice.json file', () => {
+            expect(
+                ChangedFiles.gitFilePathRelativeToYaniceJson('git/repo/root/', 'git/repo/root/yanice-dir/', 'some-path-somewhere.json')
+            ).to.equal(null);
+        });
+    });
 });

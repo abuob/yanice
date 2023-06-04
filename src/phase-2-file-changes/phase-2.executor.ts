@@ -1,9 +1,10 @@
 import { PhaseExecutor } from '../util/phase-executor';
-import { ChangedFiles } from './changed-files';
+import { ChangedFiles } from './changed-files/changed-files';
 import { Phase1Result } from '../phase-1-config/phase1.result.type';
 import { Phase2Result } from './phase-2.result.type';
 
 export class Phase2Executor extends PhaseExecutor {
+    public changedFilesRelativeToRepoRoot: string[] = [];
     public changedFiles: string[] = [];
 
     constructor(private readonly phase1Result: Phase1Result) {
@@ -11,7 +12,10 @@ export class Phase2Executor extends PhaseExecutor {
     }
 
     public static execute(phase1Result: Phase1Result): Phase2Result {
-        return new Phase2Executor(phase1Result).calculateChangedFiles().createPhaseResult();
+        return new Phase2Executor(phase1Result)
+            .getChangedFilesRelativeToGitRoot()
+            .getChangesFilesRelativeToYaniceJsonDirectory()
+            .createPhaseResult();
     }
 
     private createPhaseResult(): Phase2Result {
@@ -21,7 +25,7 @@ export class Phase2Executor extends PhaseExecutor {
         };
     }
 
-    private calculateChangedFiles(): Phase2Executor {
+    private getChangedFilesRelativeToGitRoot(): Phase2Executor {
         if (!this.phase1Result) {
             return this;
         }
@@ -29,8 +33,28 @@ export class Phase2Executor extends PhaseExecutor {
         const includeUncommitted: boolean = this.phase1Result.yaniceCliArgs.defaultArgs.includeUncommitted;
         if (diffTarget) {
             const commitSHA: string = ChangedFiles.gitCommandWithRevisionShaAsOutput(`git rev-parse ${diffTarget}`);
-            this.changedFiles = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, includeUncommitted);
+            this.changedFilesRelativeToRepoRoot = ChangedFiles.filesChangedBetweenHeadAndGivenCommit(commitSHA, includeUncommitted);
         }
+        return this;
+    }
+
+    private getChangesFilesRelativeToYaniceJsonDirectory(): Phase2Executor {
+        if (!this.phase1Result) {
+            return this;
+        }
+        const yaniceJsonDirectoryPath: string = this.phase1Result.yaniceJsonDirectoryPath;
+        const gitRepoRootPath: string = this.phase1Result.gitRepoRootPath;
+        this.changedFiles = this.changedFilesRelativeToRepoRoot
+            .map((changedFileRelativeToRepoRoot: string): string | null => {
+                return ChangedFiles.gitFilePathRelativeToYaniceJson(
+                    gitRepoRootPath,
+                    yaniceJsonDirectoryPath,
+                    changedFileRelativeToRepoRoot
+                );
+            })
+            .filter((filePathOrNull: string | null): filePathOrNull is string => {
+                return !!filePathOrNull;
+            });
         return this;
     }
 }
