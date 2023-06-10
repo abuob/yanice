@@ -7,6 +7,13 @@
         "outputFolder": "./.yanice-graph-output",
         "port": 7777
     },
+    "plugins": {
+        "custom": {
+            "dummy-plugin": {
+                "scriptLocation": "./dummy-plugin.js"
+            }
+        }
+    },
     "projects": [
         {
             "projectName": "project-A",

@@ -98,6 +98,11 @@ describe('YaniceCliArgsParser', () => {
         it('should handle input for plugin', () => {
             const expected: YaniceCliArgs = {
                 type: 'plugin',
+                selectedPlugin: {
+                    type: 'custom',
+                    pluginName: 'dummy-plugin',
+                    cliArgs: ['plugin:dummy-plugin', 'some-scope', '--branch=origin/main', '--exclude-uncommitted']
+                },
                 defaultArgs: {
                     scope: 'some-scope',
                     diffTarget: 'origin/main',
@@ -105,9 +110,9 @@ describe('YaniceCliArgsParser', () => {
                     includeUncommitted: false
                 }
             };
-            expect(YaniceCliArgsParser.parseArgs(['plugin', 'some-scope', '--branch=origin/main', '--exclude-uncommitted'])).to.deep.equal(
-                expected
-            );
+            expect(
+                YaniceCliArgsParser.parseArgs(['plugin:dummy-plugin', 'some-scope', '--branch=origin/main', '--exclude-uncommitted'])
+            ).to.deep.equal(expected);
         });
     });
 });

@@ -1,5 +1,6 @@
 import { IntegrationTestUtil } from './test-utils/integration-test.util';
 import { expect } from 'chai';
+import path from 'path';
 
 describe('yanice', () => {
     beforeEach(() => {
@@ -10,7 +11,8 @@ describe('yanice', () => {
         IntegrationTestUtil.resetChanges();
     });
 
-    describe('--all --output-only', () => {
+    // TODO: Adapt describe-names
+    describe('output-only', () => {
         it('should be able to read its config file and print out all project files for a given scope', () => {
             const output: string = IntegrationTestUtil.executeYaniceWithArgs(
                 'output-only flat-all-projects-have-commands --all --rev=HEAD'
@@ -26,9 +28,7 @@ describe('yanice', () => {
             expect(printedProjects).to.have.length(1);
             expect(printedProjects).to.have.same.members(['A']);
         });
-    });
 
-    describe('--output-only', () => {
         it('should print the changed project and all its dependents', () => {
             IntegrationTestUtil.touchProject('project-B');
             const output: string = IntegrationTestUtil.executeYaniceWithArgs('output-only a-depends-on-b --rev=HEAD');
@@ -37,10 +37,8 @@ describe('yanice', () => {
             expect(printedProjects).to.have.same.members(['A', 'B']);
             IntegrationTestUtil.resetChanges();
         });
-    });
 
-    describe('--responsibles', () => {
-        it('should print the listed responsibles for the changed project and all its dependents', () => {
+        it('should print the listed responsibles for the changed project and all its dependents with the --responsibles parameter', () => {
             IntegrationTestUtil.touchProject('project-B');
             const output: string = IntegrationTestUtil.executeYaniceWithArgs('output-only a-depends-on-b --responsibles --rev=HEAD');
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(output);
@@ -50,7 +48,7 @@ describe('yanice', () => {
         });
     });
 
-    describe('execute', () => {
+    describe('run', () => {
         it('should execute all commands', () => {
             const output: string = IntegrationTestUtil.executeYaniceWithArgs('run flat-all-projects-have-commands --all --rev=HEAD');
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(output);
@@ -90,6 +88,15 @@ describe('yanice', () => {
             expect(entryForC).to.have.length(0);
 
             IntegrationTestUtil.resetChanges();
+        });
+    });
+
+    describe('plugin', () => {
+        it('it can start a plugin', () => {
+            const output: string = IntegrationTestUtil.executeYaniceWithArgs('plugin:dummy-plugin a-depends-on-b --rev=HEAD');
+            const outputLines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
+            expect(outputLines).to.have.length(2);
+            expect(outputLines).to.have.same.members(['[DUMMY-PLUGIN] triggered', path.join(__dirname, 'test-project')]);
         });
     });
 });

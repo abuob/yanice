@@ -1,6 +1,6 @@
 import { PhaseExecutor } from '../util/phase-executor';
 import { ChangedFiles } from './changed-files/changed-files';
-import { Phase1Result } from '../phase-1-config/phase1.result.type';
+import { Phase1Result } from '../phase-1-config/phase-1.result.type';
 import { Phase2Result } from './phase-2.result.type';
 
 export class Phase2Executor extends PhaseExecutor {

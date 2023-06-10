@@ -1,4 +1,5 @@
 import { commandOutputOptionsType } from '../config/config.interface';
+import { YanicePluginArgs } from './plugin.type';
 
 export type YaniceCliArgs = YaniceCliArgsOutputOnly | YaniceCliArgsPlugin | YaniceCliArgsRun | YaniceCliArgsVisualize;
 
@@ -25,6 +26,7 @@ export interface YaniceCliArgsVisualize {
 
 export interface YaniceCliArgsPlugin {
     type: 'plugin';
+    selectedPlugin: YanicePluginArgs;
     defaultArgs: YaniceCliDefaultArgs;
 }
 

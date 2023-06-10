@@ -8,6 +8,35 @@
         "options": {
             "$ref": "#options"
         },
+        "plugins": {
+            "type": "object",
+            "properties": {
+                "officiallySupported": {
+                    "type": "object",
+                    "properties": {
+                        "import-boundaries": {
+                            "type": "object",
+                            "properties": {}
+                        }
+                    }
+                },
+                "custom": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                            "type": "object",
+                            "properties": {
+                                "scriptLocation": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": true,
+                            "required": ["scriptLocation"]
+                        }
+                    }
+                }
+            }
+        },
         "projects": {
             "type": "array",
             "items": {

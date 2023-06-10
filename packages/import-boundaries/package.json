@@ -1,8 +1,8 @@
 {
-    "name": "@yanice/assert-project-boundaries",
+    "name": "@yanice/import-boundaries",
     "version": "0.0.1",
     "private": true,
-    "description": "Assert yanice project boundaries",
+    "description": "Plugin for Yanice: Assert import boundaries between projects",
     "engines": {
         "node": ">=14"
     },
@@ -14,7 +14,9 @@
     "files": [
         "dist/**/*"
     ],
-    "scripts": {},
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json"
+    },
     "keywords": [
         "monorepo",
         "change detection"

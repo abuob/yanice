@@ -1,6 +1,13 @@
 {
     "$schema": "../../schema.json",
     "schemaVersion": 2,
+    "plugins": {
+        "custom": {
+            "dummy-plugin": {
+                "scriptLocation": "./dummy-plugin.js"
+            }
+        }
+    },
     "projects": [
         {
             "projectName": "A",

@@ -5,6 +5,7 @@ import {
     YaniceConfig,
     YaniceConfigOptions,
     YaniceJsonType,
+    YanicePluginOptions,
     YaniceProject
 } from './config.interface';
 import { YaniceCliArgs } from '../args-parser/cli-args.interface';
@@ -24,6 +25,7 @@ export class ConfigParser {
         return {
             options: ConfigParser.getConfigOptions(yaniceJson, yaniceCliArgs),
             projects: ConfigParser.getProjects(yaniceJson),
+            plugins: ConfigParser.getPluginOptions(yaniceJson),
             dependencies: {
                 ...ConfigParser.getDefaultDependencies(yaniceJson, yaniceCliArgs.defaultArgs.scope),
                 ...ConfigParser.getExtendedDependencies(yaniceJson, yaniceCliArgs.defaultArgs.scope),
@@ -77,6 +79,15 @@ export class ConfigParser {
                 commands
             };
         });
+    }
+
+    private static getPluginOptions(yaniceJson: YaniceJsonType): YanicePluginOptions {
+        return {
+            custom: yaniceJson.plugins?.custom ?? {},
+            officiallySupported: {
+                'import-boundaries': yaniceJson.plugins?.officiallySupported?.['import-boundaries'] ?? null
+            }
+        };
     }
 
     private static getConfigOptions(yaniceJson: YaniceJsonType, yaniceCliArgs: YaniceCliArgs): YaniceConfigOptions {

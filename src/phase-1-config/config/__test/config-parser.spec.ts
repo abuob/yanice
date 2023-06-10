@@ -144,6 +144,17 @@ describe('ConfigParser', () => {
                 cwd: './'
             });
         });
+
+        it('should properly read plugin options', () => {
+            const actualConfigForBuild = ConfigParser.getYaniceConfig(
+                yaniceJson3 as any,
+                createYaniceCliArgsWithScope(yaniceCliArgs, 'build-some')
+            );
+            const expected = {
+                scriptLocation: './dummy-plugin.js'
+            };
+            expect(actualConfigForBuild.plugins.custom['dummy-plugin']).to.deep.equal(expected);
+        });
     });
 
     describe('getDepGraphFromConfig', () => {

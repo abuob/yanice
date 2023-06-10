@@ -6,6 +6,10 @@ import { KarmaProgressSuccessFilter } from './output-filters/karma-progress-succ
 import { NpmErrorFilter } from './output-filters/npm-error-filter';
 
 export class LogUtil {
+    public static log(message: string): void {
+        log(message);
+    }
+
     public static printCommandSuccess(executionCommand: ParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
         const durationMessage: string = LogUtil.createDurationInfoInBrackets(commandExecutionResult);
         log(`  \x1B[1;32m ✔ ${executionCommand.command}\x1B[0m ${durationMessage}`);

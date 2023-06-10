@@ -2,7 +2,7 @@ import { PhaseExecutor } from '../util/phase-executor';
 import { ConfigVerifier } from './config/config-verifier';
 import { ConfigParser } from './config/config-parser';
 import { YaniceConfig, YaniceJsonType } from './config/config.interface';
-import { Phase1Result } from './phase1.result.type';
+import { Phase1Result } from './phase-1.result.type';
 import { DirectedGraph, DirectedGraphUtil } from './directed-graph/directed-graph';
 import { YaniceCliArgs } from './args-parser/cli-args.interface';
 import { YaniceCliArgsParser } from './args-parser/cli-args-parser';

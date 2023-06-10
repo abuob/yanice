@@ -11,14 +11,17 @@ import { commandOutputOptionsType } from '../config/config.interface';
 export class YaniceCliArgsParser {
     public static parseArgs(args: string[]): YaniceCliArgs | null {
         const firstParameter: string | undefined = args[0];
-        switch (firstParameter) {
-            case 'run':
+        if (!firstParameter) {
+            return null;
+        }
+        switch (true) {
+            case /^run$/.test(firstParameter):
                 return YaniceCliArgsParser.handleRunArgs(args);
-            case 'output-only':
+            case /^output-only$/.test(firstParameter):
                 return YaniceCliArgsParser.handleOutputOnlyArgs(args);
-            case 'visualize':
+            case /^visualize$/.test(firstParameter):
                 return YaniceCliArgsParser.handleVisualizeArgs(args);
-            case 'plugin':
+            case /^plugin:[a-zA-Z][0-9a-zA-Z-]*$/.test(firstParameter):
                 return YaniceCliArgsParser.handlePluginArgs(args);
             default:
                 return null;
@@ -72,8 +75,25 @@ export class YaniceCliArgsParser {
 
     private static handlePluginArgs(args: string[]): YaniceCliArgsPlugin {
         const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
+        const pluginName: string | undefined = args[0]?.split(':')?.[1];
+        switch (pluginName) {
+            case 'import-boundaries': {
+                return {
+                    type: 'plugin',
+                    selectedPlugin: {
+                        type: 'import-boundaries'
+                    },
+                    defaultArgs
+                };
+            }
+        }
         return {
             type: 'plugin',
+            selectedPlugin: {
+                type: 'custom',
+                cliArgs: args,
+                pluginName: pluginName ?? '' // TODO: Handle error
+            },
             defaultArgs
         };
     }

@@ -1,0 +1,5 @@
+{
+    "extends": ["@tsconfig/strictest/tsconfig", "./tsconfig.json"],
+    "files": ["index.ts"],
+    "exclude": ["!+(index.ts|src/**)"]
+}

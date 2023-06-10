@@ -2,6 +2,7 @@
     "extends": "@tsconfig/node14/tsconfig.json",
     "compilerOptions": {
         "resolveJsonModule": true,
+        "declaration": true,
         "outDir": "./dist"
     },
     "exclude": ["dist/**"]

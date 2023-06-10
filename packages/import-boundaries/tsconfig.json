@@ -1,0 +1,11 @@
+{
+    "extends": "@tsconfig/node14/tsconfig.json",
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "outDir": "./dist",
+        "paths": {
+            "yanice": ["../../dist/index.d.ts"]
+        }
+    },
+    "exclude": ["dist/**", ""]
+}

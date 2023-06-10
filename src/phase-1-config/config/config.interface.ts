@@ -1,4 +1,6 @@
 import { commandOutputFilterType } from '../../util/output-filter';
+import { YanicePluginImportBoundariesOptionsInterface } from './plugin-config/import-boundaries.plugin.type';
+import { YaniceCustomPluginOptions } from './plugin-config/custom.plugin.type';
 
 export type commandOutputOptionsType = 'append-at-end-on-error' | 'append-at-end' | 'ignore';
 
@@ -15,6 +17,12 @@ interface YaniceOptionalOptions {
 export interface YaniceJsonType {
     options?: YaniceOptionalOptions;
     schemaVersion: number;
+    plugins?: {
+        officiallySupported: {
+            'import-boundaries'?: YanicePluginImportBoundariesOptionsInterface;
+        };
+        custom: Record<string, YaniceCustomPluginOptions<unknown>>;
+    };
     projects: {
         projectName: string;
         pathRegExp?: string;
@@ -62,8 +70,18 @@ export interface YaniceConfigOptions {
     port: number;
 }
 
+export interface YaniceOfficiallySupportedPluginOptions {
+    'import-boundaries': YanicePluginImportBoundariesOptionsInterface | null;
+}
+
+export interface YanicePluginOptions {
+    officiallySupported: YaniceOfficiallySupportedPluginOptions;
+    custom: Record<string, YaniceCustomPluginOptions<unknown>>;
+}
+
 export interface YaniceConfig {
     options: YaniceConfigOptions;
     projects: YaniceProject[];
+    plugins: YanicePluginOptions;
     dependencies: Record<string, string[] | undefined>;
 }
