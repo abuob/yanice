@@ -1,3 +1,10 @@
-import { ImportBoundariesPlugin } from './src/import-boundaries.plugin';
+import { ImportBoundariesExecutor } from './src/import-boundaries.executor';
+import { YanicePlugin, Phase3Result } from 'yanice';
 
-export default ImportBoundariesPlugin;
+const importBoundariesPlugin: YanicePlugin = {
+    execute: (phase3Results: Phase3Result) => {
+        ImportBoundariesExecutor.execute(phase3Results);
+    }
+};
+
+export default importBoundariesPlugin;

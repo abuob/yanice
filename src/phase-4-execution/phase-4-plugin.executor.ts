@@ -2,9 +2,9 @@ import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
 import { AbstractPhase4Executor } from './phase-4.executor';
 import { YaniceCliArgsPlugin } from '../phase-1-config/args-parser/cli-args.interface';
 import { YanicePluginArgs } from '../phase-1-config/args-parser/plugin.type';
-import { YanicePlugin } from './phase-4.plugin.executor.interface';
 import { YaniceCustomPluginOptions } from '../phase-1-config/config/plugin-config/custom.plugin.type';
 import path from 'path';
+import { YanicePlugin } from './plugin-api/plugin-api.type';
 
 export class Phase4PluginExecutor extends AbstractPhase4Executor {
     constructor(phase3Result: Phase3Result) {
