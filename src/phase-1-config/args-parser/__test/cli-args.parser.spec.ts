@@ -1,6 +1,7 @@
-import { YaniceCliArgsParser } from '../cli-args-parser';
 import { expect } from 'chai';
+
 import { YaniceCliArgs } from '../cli-args.interface';
+import { YaniceCliArgsParser } from '../cli-args-parser';
 
 describe('YaniceCliArgsParser', () => {
     describe('bad input', () => {});

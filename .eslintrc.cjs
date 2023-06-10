@@ -4,8 +4,8 @@ const defaultTsRules = {
     '@typescript-eslint/consistent-type-assertions': [
         'error',
         {
-            assertionStyle: 'never',
-        },
+            assertionStyle: 'never'
+        }
     ],
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
     '@typescript-eslint/dot-notation': 'off',
@@ -15,9 +15,9 @@ const defaultTsRules = {
         {
             accessibility: 'explicit',
             overrides: {
-                constructors: 'no-public',
-            },
-        },
+                constructors: 'no-public'
+            }
+        }
     ],
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/member-ordering': [
@@ -29,16 +29,16 @@ const defaultTsRules = {
                 'public-static-method',
                 'public-instance-method',
                 'private-static-method',
-                'private-instance-method',
-            ],
-        },
+                'private-instance-method'
+            ]
+        }
     ],
     '@typescript-eslint/naming-convention': [
         'error',
         {
             selector: 'class',
-            format: ['PascalCase'],
-        },
+            format: ['PascalCase']
+        }
     ],
     '@typescript-eslint/no-empty-interface': 'error',
     '@typescript-eslint/no-explicit-any': 'off',
@@ -50,8 +50,8 @@ const defaultTsRules = {
         {
             builtinGlobals: false,
             hoist: 'functions',
-            allow: ['resolve', 'reject', 'done', 'cb'],
-        },
+            allow: ['resolve', 'reject', 'done', 'cb']
+        }
     ],
     '@typescript-eslint/no-unused-expressions': 'error',
     '@typescript-eslint/no-unused-vars': [
@@ -60,7 +60,7 @@ const defaultTsRules = {
             vars: 'all',
             args: 'all',
             argsIgnorePattern: '^_'
-        },
+        }
     ],
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/prefer-function-type': 'error',
@@ -78,8 +78,8 @@ const defaultTsRules = {
             parameter: true,
             propertyDeclaration: true,
             variableDeclaration: false,
-            variableDeclarationIgnoreFunction: true,
-        },
+            variableDeclarationIgnoreFunction: true
+        }
     ],
     '@typescript-eslint/unified-signatures': 'error',
     'arrow-body-style': 'off',
@@ -119,12 +119,12 @@ const defaultTsRules = {
         'error',
         {
             name: 'fdescribe',
-            message: 'Do not commit fdescribe. Use describe instead.',
+            message: 'Do not commit fdescribe. Use describe instead.'
         },
         {
             name: 'fit',
-            message: 'Do not commit fit. Use it instead.',
-        },
+            message: 'Do not commit fit. Use it instead.'
+        }
     ],
     'no-restricted-imports': 'off',
     'no-return-await': 'error',
@@ -154,38 +154,38 @@ const defaultTsRules = {
         'error',
         'always',
         {
-            exceptions: ['**'],
-        },
+            exceptions: ['**']
+        }
     ],
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error'
 };
 
 const defaultSetup = {
     parser: '@typescript-eslint/parser',
     env: {
         jest: true,
-        node: true,
+        node: true
     },
     extends: [],
-    plugins: [
-        '@typescript-eslint/eslint-plugin'
-    ],
+    plugins: ['@typescript-eslint/eslint-plugin', 'simple-import-sort']
 };
 
 module.exports = {
     extends: [],
-    parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint'],
+    parser: defaultSetup.parser,
+    plugins: defaultSetup.plugins,
     root: true,
     parserOptions: {
-        project: ['./tsconfig.eslint.json', './packages/*/tsconfig.json'],
+        project: ['./tsconfig.eslint.json', './packages/*/tsconfig.json']
     },
     overrides: [
         {
             files: [`**/*!(.spec).ts`],
             ...defaultSetup,
             rules: {
-                ...defaultTsRules,
-            },
+                ...defaultTsRules
+            }
         },
         {
             files: [`**/*.spec.ts`],
@@ -194,7 +194,7 @@ module.exports = {
                 ...defaultTsRules,
                 '@typescript-eslint/consistent-type-assertions': 'off',
                 '@typescript-eslint/no-non-null-assertion': 'off'
-            },
-        },
+            }
+        }
     ]
 };

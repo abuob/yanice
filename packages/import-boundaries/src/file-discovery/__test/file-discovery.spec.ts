@@ -1,6 +1,7 @@
-import { FileDiscovery } from '../file-discovery';
-import path from 'path';
 import { expect } from 'chai';
+import path from 'path';
+
+import { FileDiscovery } from '../file-discovery';
 import { DirectoryNode } from '../file-discovery.type';
 
 describe('FileDiscovery', () => {

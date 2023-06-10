@@ -1,9 +1,10 @@
 import { expect } from 'chai';
-import { YaniceExecutor } from '../yanice-executor';
+
+import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
 import validYaniceJson1 from '../__fixtures/valid-1.yanice.json';
 import validYaniceJson4 from '../__fixtures/valid-4.yanice.json';
-import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
 import { YaniceJsonType } from '../phase-1-config/config/config.interface';
+import { YaniceExecutor } from '../yanice-executor';
 
 describe('YaniceExecutor', () => {
     let yaniceExecutor: YaniceExecutor;

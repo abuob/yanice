@@ -1,12 +1,12 @@
+import { commandOutputOptionsType } from '../config/config.interface';
 import {
+    YaniceCliArgs,
     YaniceCliArgsOutputOnly,
     YaniceCliArgsPlugin,
     YaniceCliArgsRun,
-    YaniceCliArgs,
     YaniceCliArgsVisualize,
     YaniceCliDefaultArgs
 } from './cli-args.interface';
-import { commandOutputOptionsType } from '../config/config.interface';
 
 export class YaniceCliArgsParser {
     public static parseArgs(args: string[]): YaniceCliArgs | null {

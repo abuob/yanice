@@ -1,7 +1,7 @@
-import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
-import { AbstractPhase4Executor } from './phase-4.executor';
-import { log } from '../util/log';
 import { YaniceCliArgsOutputOnly } from '../phase-1-config/args-parser/cli-args.interface';
+import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
+import { log } from '../util/log';
+import { AbstractPhase4Executor } from './phase-4.executor';
 
 export class Phase4OutputOnlyExecutor extends AbstractPhase4Executor {
     private responsibles: string[] = [];

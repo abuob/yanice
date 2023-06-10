@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const args = process.argv.slice(2);
 const INIT_CWD = process.env.INIT_CWD; // Will be set by npm; script is not supposed to be called directly

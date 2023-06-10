@@ -1,5 +1,5 @@
-const execSync = require('child_process').execSync;
-const path = require('path');
+import { execSync } from 'node:child_process';
+import path from 'node:path';
 
 export class ChangedFiles {
     public static filesChangedBetweenTwoCommitHashes(sha1: string, sha2: string): string[] {
@@ -21,11 +21,16 @@ export class ChangedFiles {
     }
 
     public static gitCommandWithRevisionShaAsOutput(gitCommand: string): string {
-        return execSync(gitCommand)
-            .toString()
+        const output = execSync(gitCommand).toString();
+        const nonEmptyLines: string[] = output
             .split('\n')
             .map((line: string) => line.trim())
-            .filter((line: string) => line.length > 0)[0];
+            .filter((line: string) => line.length > 0);
+        const revisionSha: string | undefined = nonEmptyLines[0];
+        if (!revisionSha) {
+            throw new Error(`Unable to determine commitId: Unexpected output for "${gitCommand}", received:\n${output}`);
+        }
+        return revisionSha;
     }
 
     public static gitFilePathRelativeToYaniceJson(gitRepoRootPath: string, yaniceJsonDirPath: string, gitFilePath: string): string | null {

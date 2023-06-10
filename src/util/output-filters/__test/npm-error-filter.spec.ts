@@ -1,5 +1,6 @@
-import { NpmErrorFilter } from '../npm-error-filter';
 import { expect } from 'chai';
+
+import { NpmErrorFilter } from '../npm-error-filter';
 
 describe('NpmErrorFilter', () => {
     it('should only return true if a given output line contains npm error info', () => {

@@ -1,6 +1,7 @@
-import { IntegrationTestUtil } from './test-utils/integration-test.util';
 import { expect } from 'chai';
 import path from 'path';
+
+import { IntegrationTestUtil } from './test-utils/integration-test.util';
 
 describe('yanice', () => {
     beforeEach(() => {

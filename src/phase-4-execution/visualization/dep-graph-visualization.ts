@@ -1,15 +1,16 @@
+import fs from 'node:fs';
+import http from 'node:http';
+import path from 'node:path';
+
 import { IncomingMessage, ServerResponse } from 'http';
+
+import { YaniceCliArgsVisualize } from '../../phase-1-config/args-parser/cli-args.interface';
 import { YaniceConfig } from '../../phase-1-config/config/config.interface';
 import { DirectedGraph } from '../../phase-1-config/directed-graph/directed-graph';
 import { FindFileUtil } from '../../util/find-file';
 import { log } from '../../util/log';
 import { GraphDagreRenderer } from './graph-dagre-renderer';
 import { GraphDotRenderer } from './graph-dot-renderer';
-import { YaniceCliArgsVisualize } from '../../phase-1-config/args-parser/cli-args.interface';
-
-const fs = require('fs');
-const path = require('path');
-const http = require('http');
 
 export class DepGraphVisualization {
     public static createVisualizationHtml(

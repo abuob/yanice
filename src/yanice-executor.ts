@@ -1,14 +1,14 @@
 import { YaniceJsonType } from './phase-1-config/config/config.interface';
-import { Phase1Result } from './phase-1-config/phase-1.result.type';
 import { Phase1Executor } from './phase-1-config/phase-1.executor';
-import { Phase2Result } from './phase-2-file-changes/phase-2.result.type';
+import { Phase1Result } from './phase-1-config/phase-1.result.type';
 import { Phase2Executor } from './phase-2-file-changes/phase-2.executor';
+import { Phase2Result } from './phase-2-file-changes/phase-2.result.type';
 import { Phase3Executor } from './phase-3-project-changes/phase-3.executor';
 import { Phase3Result } from './phase-3-project-changes/phase-3.result.type';
-import { Phase4VisualizerExecutor } from './phase-4-execution/phase-4-visualizer.executor';
-import { Phase4OutputOnlyExecutor } from './phase-4-execution/phase-4-output-only.executor';
 import { Phase4CommandExecutor } from './phase-4-execution/phase-4-command.executor';
+import { Phase4OutputOnlyExecutor } from './phase-4-execution/phase-4-output-only.executor';
 import { Phase4PluginExecutor } from './phase-4-execution/phase-4-plugin.executor';
+import { Phase4VisualizerExecutor } from './phase-4-execution/phase-4-visualizer.executor';
 
 export class YaniceExecutor {
     public phase1Result: Phase1Result | null = null;

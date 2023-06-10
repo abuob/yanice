@@ -1,10 +1,10 @@
-import { PhaseExecutor } from '../util/phase-executor';
-import { Phase3Result } from './phase-3.result.type';
-import { Phase2Result } from '../phase-2-file-changes/phase-2.result.type';
-import { ChangedProjects } from './changed-projects';
-import { DirectedGraph, DirectedGraphUtil } from '../phase-1-config/directed-graph/directed-graph';
-import { ConfigParser } from '../phase-1-config/config/config-parser';
 import { YaniceConfig } from '../phase-1-config/config/config.interface';
+import { ConfigParser } from '../phase-1-config/config/config-parser';
+import { DirectedGraph, DirectedGraphUtil } from '../phase-1-config/directed-graph/directed-graph';
+import { Phase2Result } from '../phase-2-file-changes/phase-2.result.type';
+import { PhaseExecutor } from '../util/phase-executor';
+import { ChangedProjects } from './changed-projects';
+import { Phase3Result } from './phase-3.result.type';
 
 export class Phase3Executor extends PhaseExecutor {
     private changedProjects: string[] = [];

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { KarmaProgressSuccessFilter } from '../karma-progress-success-filter';
 
 describe('KarmaProgressSuccessFilter', () => {

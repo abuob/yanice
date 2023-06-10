@@ -1,7 +1,8 @@
 import { expect } from 'chai';
-import { NpmErrorFilter } from '../output-filters/npm-error-filter';
-import { KarmaProgressSuccessFilter } from '../output-filters/karma-progress-success-filter';
+
 import { LogUtil } from '../log-util';
+import { KarmaProgressSuccessFilter } from '../output-filters/karma-progress-success-filter';
+import { NpmErrorFilter } from '../output-filters/npm-error-filter';
 
 describe('LogUtil', () => {
     describe('isOutputLineOkayToPrint', () => {

@@ -1,6 +1,8 @@
-import { ChangedFiles } from './changed-files';
+import { execSync } from 'node:child_process';
+
 import { expect } from 'chai';
-const execSync = require('child_process').execSync;
+
+import { ChangedFiles } from './changed-files';
 
 describe('ChangedFiles', () => {
     describe('filesChangedBetweenTwoCommitHashes', () => {

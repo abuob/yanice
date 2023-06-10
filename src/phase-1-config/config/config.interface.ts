@@ -1,6 +1,6 @@
 import { commandOutputFilterType } from '../../util/output-filter';
-import { YanicePluginImportBoundariesOptionsInterface } from './plugin-config/import-boundaries.plugin.type';
 import { YaniceCustomPluginOptions } from './plugin-config/custom.plugin.type';
+import { YanicePluginImportBoundariesOptionsInterface } from './plugin-config/import-boundaries.plugin.type';
 
 export type commandOutputOptionsType = 'append-at-end-on-error' | 'append-at-end' | 'ignore';
 

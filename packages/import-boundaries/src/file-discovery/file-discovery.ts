@@ -1,5 +1,6 @@
 import fsPromises from 'fs/promises';
 import path from 'path';
+
 import { DirectoryContentNode, DirectoryNode, FileNode } from './file-discovery.type';
 
 export class FileDiscovery {

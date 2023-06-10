@@ -1,9 +1,9 @@
-import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
-import { AbstractPhase4Executor } from './phase-4.executor';
-import { execucteInParallelLimited, ICommandExecutionResult, ParallelExecutionCommand } from '../util/execute-in-parallel-limited';
-import { YaniceCommand, YaniceProject } from '../phase-1-config/config/config.interface';
-import { LogUtil } from '../util/log-util';
 import { YaniceCliArgsRun } from '../phase-1-config/args-parser/cli-args.interface';
+import { YaniceCommand, YaniceProject } from '../phase-1-config/config/config.interface';
+import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
+import { execucteInParallelLimited, ICommandExecutionResult, ParallelExecutionCommand } from '../util/execute-in-parallel-limited';
+import { LogUtil } from '../util/log-util';
+import { AbstractPhase4Executor } from './phase-4.executor';
 
 export class Phase4CommandExecutor extends AbstractPhase4Executor {
     constructor(phase3Result: Phase3Result) {

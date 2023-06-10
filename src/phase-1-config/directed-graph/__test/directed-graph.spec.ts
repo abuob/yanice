@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { DirectedGraphUtil } from '../directed-graph';
 
 const graph0 = DirectedGraphUtil.directedGraphBuilder.build();

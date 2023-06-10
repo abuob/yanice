@@ -17,8 +17,8 @@
     ],
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
-        "format": "prettier --write --loglevel warn \"**/*.+(ts|json|html|yml|js)\"",
-        "format:check": "prettier --check --loglevel warn \"**/*.+(ts|json|html|yml|js)\"",
+        "format": "prettier --write --loglevel warn \"**/*.+(ts|json|html|yml|js|cjs)\"",
+        "format:check": "prettier --check --loglevel warn \"**/*.+(ts|json|html|yml|js|cjs)\"",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "test": "mocha -r ts-node/register \"+(src|packages)/**/*.spec.ts\"",
@@ -44,23 +44,23 @@
     "dependencies": {
         "ajv": "^8.12.0",
         "async": "^3.2.4",
-        "minimatch": "^8.0.3"
+        "minimatch": "^9.0.1"
     },
     "devDependencies": {
         "@tsconfig/node14": "^1.0.3",
         "@tsconfig/strictest": "^2.0.1",
         "@types/async": "^3.2.18",
         "@types/chai": "^4.3.4",
-        "@types/minimatch": "^5.1.2",
         "@types/mocha": "^10.0.1",
         "@types/node": "^18.15.11",
-        "@typescript-eslint/eslint-plugin": "^5.57.1",
-        "@typescript-eslint/parser": "^5.57.1",
+        "@typescript-eslint/eslint-plugin": "^5.59.9",
+        "@typescript-eslint/parser": "^5.59.9",
         "chai": "^4.3.7",
-        "eslint": "^8.38.0",
+        "eslint": "^8.42.0",
+        "eslint-plugin-simple-import-sort": "^10.0.0",
         "mocha": "^10.2.0",
-        "prettier": "^2.8.7",
+        "prettier": "^2.8.8",
         "ts-node": "^10.9.1",
-        "typescript": "^5.0.4"
+        "typescript": "5.1.3"
     }
 }

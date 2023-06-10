@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+
 import schemaJson from '../../../schema.json';
 import { log } from '../../util/log';
 import { YaniceJsonType } from './config.interface';

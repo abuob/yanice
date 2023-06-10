@@ -1,8 +1,7 @@
-import { ExecException } from 'child_process';
+import { exec, ExecException } from 'node:child_process';
+import path from 'node:path';
 
-const async = require('async');
-const exec = require('child_process').exec;
-const path = require('path');
+import async from 'async';
 
 export interface ICommandExecutionResult {
     stdout: string;

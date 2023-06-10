@@ -1,4 +1,5 @@
-import { DirectedGraphUtil, DirectedGraph } from '../directed-graph/directed-graph';
+import { YaniceCliArgs } from '../args-parser/cli-args.interface';
+import { DirectedGraph, DirectedGraphUtil } from '../directed-graph/directed-graph';
 import {
     commandOutputOptionsType,
     YaniceCommandPerScope,
@@ -8,7 +9,6 @@ import {
     YanicePluginOptions,
     YaniceProject
 } from './config.interface';
-import { YaniceCliArgs } from '../args-parser/cli-args.interface';
 
 export class ConfigParser {
     public static readonly DEFAULT_CONFIG_OPTIONS: YaniceConfigOptions = {

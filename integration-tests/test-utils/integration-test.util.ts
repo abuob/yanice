@@ -1,6 +1,7 @@
-import { execSync } from 'child_process';
-import path from 'path';
-import fs from 'fs';
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { expect } from 'chai';
 
 interface TestLogEntry {

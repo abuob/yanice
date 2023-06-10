@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+import path from 'node:path';
+
 import { FindFileUtil } from './src/util/find-file';
 import { log } from './src/util/log';
 import { YaniceExecutor } from './src/yanice-executor';
-import * as path from 'node:path';
 
 const yaniceJsonPath = FindFileUtil.findFileInParentDirsRecursively(process.cwd(), 'yanice.json');
 if (!yaniceJsonPath) {

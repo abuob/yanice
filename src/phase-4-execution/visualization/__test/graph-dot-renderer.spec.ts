@@ -1,6 +1,7 @@
 import { expect } from 'chai';
-import { GraphDotRenderer } from '../graph-dot-renderer';
+
 import { DirectedGraphUtil } from '../../../phase-1-config/directed-graph/directed-graph';
+import { GraphDotRenderer } from '../graph-dot-renderer';
 
 describe('GraphDotRenderer', () => {
     it('should render a graph without any edges to DOT', () => {

@@ -1,5 +1,6 @@
-import { ExtractImportStatementsJavascript } from '../extract-import-statements.javascript';
 import { expect } from 'chai';
+
+import { ExtractImportStatementsJavascript } from '../extract-import-statements.javascript';
 
 describe('ExtractImportStatementsJavascript', () => {
     describe('extractImportStatements', () => {

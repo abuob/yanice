@@ -1,6 +1,6 @@
-import { YaniceProject } from '../phase-1-config/config/config.interface';
+import { minimatch } from 'minimatch';
 
-const minimatch = require('minimatch');
+import { YaniceProject } from '../phase-1-config/config/config.interface';
 
 export class ChangedProjects {
     public static getChangedProjectsRaw(yaniceProjects: YaniceProject[], changedFilePaths: string[]): string[] {

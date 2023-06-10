@@ -1,7 +1,7 @@
+import { YaniceCliArgsVisualize } from '../phase-1-config/args-parser/cli-args.interface';
 import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
 import { AbstractPhase4Executor } from './phase-4.executor';
 import { DepGraphVisualization } from './visualization/dep-graph-visualization';
-import { YaniceCliArgsVisualize } from '../phase-1-config/args-parser/cli-args.interface';
 
 export class Phase4VisualizerExecutor extends AbstractPhase4Executor {
     constructor(phase3Result: Phase3Result) {

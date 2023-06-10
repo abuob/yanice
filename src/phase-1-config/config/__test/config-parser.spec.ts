@@ -1,9 +1,10 @@
+import { expect } from 'chai';
+
 import yaniceJson2 from '../../../__fixtures/valid-2.yanice.json';
 import yaniceJson3 from '../../../__fixtures/valid-3.yanice.json';
+import { YaniceCliArgs, YaniceCliArgsRun } from '../../args-parser/cli-args.interface';
+import { DirectedGraph, DirectedGraphUtil } from '../../directed-graph/directed-graph';
 import { ConfigParser } from '../config-parser';
-import { expect } from 'chai';
-import { DirectedGraphUtil, DirectedGraph } from '../../directed-graph/directed-graph';
-import { YaniceCliArgsRun, YaniceCliArgs } from '../../args-parser/cli-args.interface';
 
 describe('ConfigParser', () => {
     const yaniceCliArgs: YaniceCliArgs = {
