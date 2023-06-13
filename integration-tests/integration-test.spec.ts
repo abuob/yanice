@@ -13,7 +13,6 @@ describe('yanice', () => {
         IntegrationTestUtil.resetChanges();
     });
 
-    // TODO: Adapt describe-names
     describe('output-only', () => {
         it('should be able to read its config file and print out all project files for a given scope', () => {
             const output: string = IntegrationTestUtil.executeYaniceWithArgs(
@@ -104,7 +103,7 @@ describe('yanice', () => {
         });
         describe('officially supported', () => {
             describe('import-boundaries', () => {
-                it('should be able to print the import-map provided by the importResolver', () => {
+                it('should be able to print the normalized import-map provided by the importResolver', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
                     );
@@ -114,7 +113,7 @@ describe('yanice', () => {
                     expect(lines[1]).to.equal('project-B/empty.txt');
                 });
 
-                it('should be able to print the import-map provided by the importResolver', () => {
+                it('should be able to print the project-map', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports'
                     );
