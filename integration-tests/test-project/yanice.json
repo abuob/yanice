@@ -6,6 +6,11 @@
             "dummy-plugin": {
                 "scriptLocation": "./dummy-plugin.js"
             }
+        },
+        "officiallySupported": {
+            "import-boundaries": {
+                "importResolvers": ["./dummy-resolver.js"]
+            }
         }
     },
     "projects": [

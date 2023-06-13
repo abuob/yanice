@@ -16,7 +16,15 @@
                     "properties": {
                         "import-boundaries": {
                             "type": "object",
-                            "properties": {}
+                            "properties": {
+                                "importResolvers": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": true
+                            }
                         }
                     }
                 },

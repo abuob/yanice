@@ -7,6 +7,7 @@ import {
     YaniceCliArgsVisualize,
     YaniceCliDefaultArgs
 } from './cli-args.interface';
+import { YaniceImportBoundariesModeType } from './plugin.type';
 
 export class YaniceCliArgsParser {
     public static parseArgs(args: string[]): YaniceCliArgs | null {
@@ -50,8 +51,8 @@ export class YaniceCliArgsParser {
 
     private static handleOutputOnlyArgs(args: string[]): YaniceCliArgsOutputOnly {
         const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
-        const isResponsiblesMode: boolean = args.some((arg) => /^--responsibles$/.test(arg));
-        const includeFiltered: boolean = args.some((arg) => /^--include-filtered$/.test(arg));
+        const isResponsiblesMode: boolean = YaniceCliArgsParser.hasArgument(args, /^--responsibles$/);
+        const includeFiltered: boolean = YaniceCliArgsParser.hasArgument(args, /^--include-filtered$/);
         return {
             type: 'output-only',
             isResponsiblesMode,
@@ -62,9 +63,9 @@ export class YaniceCliArgsParser {
 
     private static handleVisualizeArgs(args: string[]): YaniceCliArgsVisualize {
         const defaultArgs: YaniceCliDefaultArgs = YaniceCliArgsParser.handleDefaultArgs(args);
-        const isSomeArgRendererVizJs: boolean = args.some((arg: string) => /^--renderer=vizjs$/.test(arg));
+        const isSomeArgRendererVizJs: boolean = YaniceCliArgsParser.hasArgument(args, /^--renderer=vizjs$/);
         const renderer: 'dagrejs' | 'vizjs' = isSomeArgRendererVizJs ? 'vizjs' : 'dagrejs';
-        const saveVisualization: boolean = args.some((arg: string) => /^--save-visualization$/.test(arg));
+        const saveVisualization: boolean = YaniceCliArgsParser.hasArgument(args, /^--save-visualization$/);
         return {
             type: 'visualize',
             defaultArgs,
@@ -81,7 +82,8 @@ export class YaniceCliArgsParser {
                 return {
                     type: 'plugin',
                     selectedPlugin: {
-                        type: 'import-boundaries'
+                        type: 'import-boundaries',
+                        mode: YaniceCliArgsParser.getImportBoundariesModeArgument(args)
                     },
                     defaultArgs
                 };
@@ -125,5 +127,21 @@ export class YaniceCliArgsParser {
                 return 'ignore';
         }
         return null;
+    }
+
+    private static getImportBoundariesModeArgument(args: string[]): YaniceImportBoundariesModeType {
+        const hasPrintFileImportArg: boolean = YaniceCliArgsParser.hasArgument(args, /^--print-file-imports$/);
+        if (hasPrintFileImportArg) {
+            return 'print-file-imports';
+        }
+        const hasPrintProjectImportArg: boolean = YaniceCliArgsParser.hasArgument(args, /^--print-project-imports$/);
+        if (hasPrintProjectImportArg) {
+            return 'print-project-imports';
+        }
+        return 'assert';
+    }
+
+    private static hasArgument(args: string[], argRegExp: RegExp): boolean {
+        return args.some((arg: string): boolean => argRegExp.test(arg));
     }
 }

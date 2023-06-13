@@ -8,7 +8,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [14.x, 16.x, 18.x]
+                node-version: [16.x, 18.x]
 
         steps:
             - uses: actions/checkout@v3
@@ -18,13 +18,18 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: ${{ matrix.node-version }}
-            - name: format, lint, build & test
+            - name: npm ci
+              run: npm ci
+            - name: format & linting
               run: |
-                  npm ci
                   npm run format:check
                   npm run lint
-                  npm test
-                  npm run build
-                  npm run integration-tests
-              env:
-                  CI: true
+            - name: test
+              run: npm test
+            - name: build yanice
+              run: npm run build
+            - name: build packages
+              run: npm run build
+              working-directory: packages/import-boundaries
+            - name: integration-tests
+              run: npm run integration-tests

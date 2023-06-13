@@ -7,9 +7,6 @@
         "node": ">=14"
     },
     "main": "dist/index.js",
-    "bin": {
-        "a": "dist/bin.js"
-    },
     "types": "dist/index.d.ts",
     "files": [
         "dist/**/*"

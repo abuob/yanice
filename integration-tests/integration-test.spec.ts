@@ -1,5 +1,6 @@
+import path from 'node:path';
+
 import { expect } from 'chai';
-import path from 'path';
 
 import { IntegrationTestUtil } from './test-utils/integration-test.util';
 
@@ -93,11 +94,36 @@ describe('yanice', () => {
     });
 
     describe('plugin', () => {
-        it('it can start a plugin', () => {
-            const output: string = IntegrationTestUtil.executeYaniceWithArgs('plugin:dummy-plugin a-depends-on-b --rev=HEAD');
-            const outputLines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
-            expect(outputLines).to.have.length(2);
-            expect(outputLines).to.have.same.members(['[DUMMY-PLUGIN] triggered', path.join(__dirname, 'test-project')]);
+        describe('custom', () => {
+            it('it can start a plugin', () => {
+                const output: string = IntegrationTestUtil.executeYaniceWithArgs('plugin:dummy-plugin a-depends-on-b --rev=HEAD');
+                const outputLines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
+                expect(outputLines).to.have.length(2);
+                expect(outputLines).to.have.same.members(['[DUMMY-PLUGIN] triggered', path.join(__dirname, 'test-project')]);
+            });
+        });
+        describe('officially supported', () => {
+            describe('import-boundaries', () => {
+                it('should be able to print the import-map provided by the importResolver', () => {
+                    const output: string = IntegrationTestUtil.executeYaniceWithArgs(
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
+                    );
+                    const lines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
+                    expect(lines).to.have.length(2);
+                    expect(lines[0]).to.equal('project-A/empty.txt:');
+                    expect(lines[1]).to.equal('project-B/empty.txt');
+                });
+
+                it('should be able to print the import-map provided by the importResolver', () => {
+                    const output: string = IntegrationTestUtil.executeYaniceWithArgs(
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports'
+                    );
+                    const lines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
+                    expect(lines).to.have.length(2);
+                    expect(lines[0]).to.equal(`A:`);
+                    expect(lines[1]).to.equal('B');
+                });
+            });
         });
     });
 });

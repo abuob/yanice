@@ -8,4 +8,4 @@ const importBoundariesPlugin: YanicePlugin = {
     }
 };
 
-export default importBoundariesPlugin;
+module.exports = importBoundariesPlugin;

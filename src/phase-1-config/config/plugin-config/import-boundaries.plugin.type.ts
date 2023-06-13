@@ -1,3 +1,3 @@
 export interface YanicePluginImportBoundariesOptionsInterface {
-    importStatementResolver?: string;
+    importResolvers: string[];
 }
