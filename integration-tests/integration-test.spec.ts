@@ -117,10 +117,18 @@ describe('yanice', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports'
                     );
-                    const lines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
-                    expect(lines).to.have.length(2);
-                    expect(lines[0]).to.equal(`A:`);
-                    expect(lines[1]).to.equal('B');
+                    const outputObject = JSON.parse(output.trim());
+                    const expected = {
+                        A: {
+                            'project-A/empty.txt': {
+                                resolvedImports: {
+                                    B: ['project-B/empty.txt']
+                                },
+                                unknownImports: []
+                            }
+                        }
+                    };
+                    expect(outputObject).to.deep.equal(expected);
                 });
             });
         });

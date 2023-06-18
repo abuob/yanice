@@ -1,7 +1,6 @@
 import path from 'node:path';
 
 import {
-    ChangedProjects,
     ImportBoundariesYanicePluginArgs,
     LogUtil,
     Phase3Result,
@@ -12,10 +11,13 @@ import {
 } from 'yanice';
 
 import { YaniceImportBoundariesImportResolver } from './api/import-resolver.interface';
+import { ProjectImportMap } from './api/project-import-map.interface';
+import { ProjectImportMapperUtil } from './project-import-mapper/project-import-mapper.util';
 
 export class ImportBoundariesExecutor {
     public static execute(phase3Result: Phase3Result): void {
         const yaniceConfig: YaniceConfig = phase3Result.phase2Result.phase1Result.yaniceConfig;
+        const yaniceProjects: YaniceProject[] = yaniceConfig.projects;
         const yaniceJsonDirectoryPath: string = phase3Result.phase2Result.phase1Result.yaniceJsonDirectoryPath;
         const yaniceArgs: YaniceCliArgs = phase3Result.phase2Result.phase1Result.yaniceCliArgs;
         const importBoundariesPluginConfig: YanicePluginImportBoundariesOptionsInterface | null =
@@ -47,12 +49,9 @@ export class ImportBoundariesExecutor {
             ImportBoundariesExecutor.printImportMap(normalizedFileImportMap);
             process.exit(0);
         }
-        const projectImportMap: Record<string, string[]> = ImportBoundariesExecutor.getProjectImportMapFromFileImportMap(
-            yaniceConfig,
-            normalizedFileImportMap
-        );
+        const projectImportMap: ProjectImportMap = ProjectImportMapperUtil.createProjectImportMap(yaniceProjects, normalizedFileImportMap);
         if (importBoundariesArgs.mode === 'print-project-imports') {
-            ImportBoundariesExecutor.printImportMap(projectImportMap);
+            ImportBoundariesExecutor.printProjectImportMap(projectImportMap);
             process.exit(0);
         }
     }
@@ -83,31 +82,6 @@ export class ImportBoundariesExecutor {
         return path.relative(yaniceJsonDirectoryPath, absoluteFilePath);
     }
 
-    private static getProjectImportMapFromFileImportMap(
-        yaniceConfig: YaniceConfig,
-        normalizedFileImportMap: Record<string, string[]>
-    ): Record<string, string[]> {
-        const projects: YaniceProject[] = yaniceConfig.projects;
-        const projectImportMap: Record<string, string[]> = {};
-        Object.keys(normalizedFileImportMap).forEach((importingFile: string) => {
-            const importedFiles: string[] = normalizedFileImportMap[importingFile] ?? [];
-
-            const importingProjects: string[] = ChangedProjects.getChangedProjectsRaw(projects, [importingFile]);
-            const importedProjects: string[] = ChangedProjects.getChangedProjectsRaw(projects, importedFiles);
-
-            importingProjects.forEach((importingProject: string) => {
-                if (!projectImportMap[importingProject]) {
-                    projectImportMap[importingProject] = importedProjects;
-                } else {
-                    projectImportMap[importingProject] = ImportBoundariesExecutor.removeDuplicates(
-                        projectImportMap[importingProject]?.concat(importedProjects) ?? []
-                    );
-                }
-            });
-        });
-        return projectImportMap;
-    }
-
     private static printImportMap(importMap: Record<string, string[]>): void {
         Object.keys(importMap).forEach((key: string): void => {
             LogUtil.log(`${key}:`);
@@ -115,6 +89,10 @@ export class ImportBoundariesExecutor {
                 LogUtil.log(`    ${value}`);
             });
         });
+    }
+
+    private static printProjectImportMap(projectImportMap: ProjectImportMap): void {
+        LogUtil.log(JSON.stringify(projectImportMap, null, 4));
     }
 
     private static getImportResolver(scriptLocation: string, yaniceJsonDirectoryPath: string): YaniceImportBoundariesImportResolver {
