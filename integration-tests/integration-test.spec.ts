@@ -2,6 +2,8 @@ import path from 'node:path';
 
 import { expect } from 'chai';
 
+import { fixtureFileImportMap } from './fixtures/fixture.file-import-map';
+import { fixtureProjectImportByFilesMap } from './fixtures/fixture.project-import-by-files-map';
 import { IntegrationTestUtil } from './test-utils/integration-test.util';
 
 describe('yanice', () => {
@@ -108,22 +110,7 @@ describe('yanice', () => {
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
                     );
                     const outputObject = JSON.parse(output.trim());
-                    const expected = [
-                        {
-                            absoluteFilePath: IntegrationTestUtil.mapProjectNameToAbsoluteFileName('project-A'),
-                            createdBy: 'dummy-resolver',
-                            resolvedImports: [
-                                {
-                                    parsedImportStatement: 'import stuff from "somewhere"',
-                                    resolvedAbsoluteFilePath: IntegrationTestUtil.mapProjectNameToAbsoluteFileName('project-B')
-                                }
-                            ],
-                            resolvedPackageImports: [],
-                            skippedImports: [],
-                            unknownImports: []
-                        }
-                    ];
-                    expect(outputObject).to.deep.equal(expected);
+                    expect(outputObject).to.deep.equal(fixtureFileImportMap);
                 });
 
                 it('should be able to print the project-map', () => {
@@ -131,24 +118,7 @@ describe('yanice', () => {
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports'
                     );
                     const outputObject = JSON.parse(output.trim());
-                    const expected = {
-                        A: [
-                            {
-                                createdByResolver: 'dummy-resolver',
-                                filePath: 'project-A/empty.txt',
-                                resolvedImports: [
-                                    {
-                                        filePath: 'project-B/empty.txt',
-                                        projects: ['B']
-                                    }
-                                ],
-                                resolvedPackageImports: [],
-                                skippedImports: [],
-                                unknownImports: []
-                            }
-                        ]
-                    };
-                    expect(outputObject).to.deep.equal(expected);
+                    expect(outputObject).to.deep.equal(fixtureProjectImportByFilesMap);
                 });
             });
         });

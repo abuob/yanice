@@ -21,10 +21,10 @@ describe('ResolveImportStatements', () => {
                     fromClause: '../../../api/import-resolver.interface'
                 }
             ];
-            const actual = await ResolveImportStatements.resolveImportStatements(__dirname, parsedImportStatements);
+            const actual = await ResolveImportStatements.resolveImportStatements(__filename, parsedImportStatements);
             const expected = {
-                absoluteFilePath: __dirname,
-                createdBy: 'es6-import-resolver',
+                createdBy: 'import-resolver-es6',
+                absoluteFilePath: __filename,
                 resolvedImports: [
                     {
                         parsedImportStatement: {

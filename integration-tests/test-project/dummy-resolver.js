@@ -22,13 +22,20 @@ const dummyResolver = {
         if (absoluteFilePath !== projectAPath) {
             return Promise.resolve(null);
         }
+        /**
+         * @type {import("../../packages/import-boundaries/src/api/import-resolver.interface.ts").FileImportMap}
+         */
         const result = {
             absoluteFilePath: absolutePath('project-A/empty.txt'),
             unknownImports: [],
             resolvedImports: [
                 {
                     resolvedAbsoluteFilePath: absolutePath('project-B/empty.txt'),
-                    parsedImportStatement: 'import stuff from "somewhere"'
+                    parsedImportStatement: {
+                        type: 'relative',
+                        raw: 'import stuff from "somewhere"',
+                        fromClause: 'somewhere'
+                    }
                 }
             ],
             resolvedPackageImports: [],

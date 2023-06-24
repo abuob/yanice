@@ -14,7 +14,7 @@ export class ResolveImportStatements {
         parsedImportStatements: ParsedImportStatement[]
     ): Promise<FileImportMap> {
         const fileImportMap: FileImportMap = {
-            createdBy: 'es6-import-resolver',
+            createdBy: 'import-resolver-es6',
             absoluteFilePath,
             skippedImports: [],
             resolvedImports: [],
@@ -66,15 +66,16 @@ export class ResolveImportStatements {
         absoluteFilePath: string,
         relativeImportStatement: RelativeImportStatement
     ): Promise<string | null> {
+        const directoryPath: string = path.dirname(absoluteFilePath);
         const fromClause: string = relativeImportStatement.fromClause;
-        const pathJoinedWithTsExtension: string = path.join(absoluteFilePath, fromClause, '.ts');
+        const pathJoinedWithTsExtension: string = path.join(directoryPath, `${fromClause}.ts`);
         const isRelativeDirectImport: boolean = await ResolveImportStatements.isFile(pathJoinedWithTsExtension);
         if (isRelativeDirectImport) {
             return pathJoinedWithTsExtension;
         }
 
-        const pathJoined: string = path.join(absoluteFilePath, fromClause);
-        const pathJoinedWithIndexTs: string = path.join(absoluteFilePath, fromClause, 'index.ts');
+        const pathJoined: string = path.join(directoryPath, fromClause);
+        const pathJoinedWithIndexTs: string = path.join(directoryPath, fromClause, 'index.ts');
         const isRelativeIndexTsImport: boolean = await Promise.all([
             ResolveImportStatements.isDirectory(pathJoined),
             ResolveImportStatements.isFile(pathJoinedWithIndexTs)

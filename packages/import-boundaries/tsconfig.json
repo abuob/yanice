@@ -3,6 +3,7 @@
     "compilerOptions": {
         "resolveJsonModule": true,
         "outDir": "./dist",
+        "declaration": true,
         "paths": {
             "yanice": ["../../dist/index.d.ts"]
         }

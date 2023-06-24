@@ -40,7 +40,7 @@ export class IntegrationTestUtil {
     }
 
     public static touchProject(project: allProjectsType): void {
-        const absoluteFilePath: string = IntegrationTestUtil.mapProjectNameToAbsoluteFileName(project);
+        const absoluteFilePath: string = IntegrationTestUtil.mapProjectNameToEmptyTxt(project);
         fs.writeFileSync(absoluteFilePath, 'dummy-change, must be reverted!', { encoding: 'utf-8' });
     }
 
@@ -57,8 +57,12 @@ export class IntegrationTestUtil {
         return testLog[project] ?? [];
     }
 
-    public static mapProjectNameToAbsoluteFileName(project: allProjectsType): string {
-        return path.join(__dirname, '../test-project', project, 'empty.txt');
+    public static getAbsoluteFilePathInTestProject(filePath: string): string {
+        return path.join(__dirname, '../test-project', filePath);
+    }
+
+    public static mapProjectNameToEmptyTxt(project: allProjectsType): string {
+        return IntegrationTestUtil.getAbsoluteFilePathInTestProject(path.join(project, 'empty.txt'));
     }
 
     private static getAllEmptyFilePathsRelativeToRoot(): string[] {
@@ -72,7 +76,7 @@ export class IntegrationTestUtil {
 
     private static getAllEmptyFilePaths(): string[] {
         const allProjects: allProjectsType[] = IntegrationTestUtil.allProjects;
-        return allProjects.map((project: allProjectsType) => IntegrationTestUtil.mapProjectNameToAbsoluteFileName(project));
+        return allProjects.map((project: allProjectsType) => IntegrationTestUtil.mapProjectNameToEmptyTxt(project));
     }
 
     private static getTestLog(): TestLog {

@@ -10,7 +10,8 @@
         "officiallySupported": {
             "import-boundaries": {
                 "importResolvers": {
-                    "**/*.txt": ["./dummy-resolver.js"]
+                    "**/*.txt": ["./dummy-resolver.js"],
+                    "**/*.ts": ["import-resolver-es6"]
                 }
             }
         }
