@@ -9,7 +9,9 @@
         },
         "officiallySupported": {
             "import-boundaries": {
-                "importResolvers": ["./dummy-resolver.js"]
+                "importResolvers": {
+                    "**/*.txt": ["./dummy-resolver.js"]
+                }
             }
         }
     },

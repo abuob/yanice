@@ -36,5 +36,5 @@ export interface FileImportMap {
 
 export interface YaniceImportBoundariesImportResolver {
     name: string;
-    getFileImportMaps: () => FileImportMap[];
+    getFileImportMap: (absoluteFilePath: string, fileContent: string) => Promise<FileImportMap | null>;
 }

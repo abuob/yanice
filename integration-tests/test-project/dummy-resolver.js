@@ -1,5 +1,9 @@
 const path = require('node:path');
 
+/**
+ * @param relativePath
+ * @returns {string}
+ */
 function absolutePath(relativePath) {
     return path.join(__dirname, relativePath);
 }
@@ -11,24 +15,27 @@ const dummyResolver = {
     name: 'dummy-resolver',
 
     /**
-     * @returns {import('../../packages/import-boundaries/src/api/import-resolver.interface.ts').FileImportMap[]}
+     * @returns {Promise<import('../../packages/import-boundaries/src/api/import-resolver.interface.ts').FileImportMap | null>}
      */
-    getFileImportMaps: () => {
-        return [
-            {
-                absoluteFilePath: absolutePath('project-A/empty.txt'),
-                unknownImports: [],
-                resolvedImports: [
-                    {
-                        resolvedAbsoluteFilePath: absolutePath('project-B/empty.txt'),
-                        parsedImportStatement: 'import stuff from "somewhere"'
-                    }
-                ],
-                resolvedPackageImports: [],
-                createdBy: 'dummy-resolver',
-                skippedImports: []
-            }
-        ];
+    getFileImportMap: async (absoluteFilePath, fileContent) => {
+        const projectAPath = absolutePath('project-A/empty.txt');
+        if (absoluteFilePath !== projectAPath) {
+            return Promise.resolve(null);
+        }
+        const result = {
+            absoluteFilePath: absolutePath('project-A/empty.txt'),
+            unknownImports: [],
+            resolvedImports: [
+                {
+                    resolvedAbsoluteFilePath: absolutePath('project-B/empty.txt'),
+                    parsedImportStatement: 'import stuff from "somewhere"'
+                }
+            ],
+            resolvedPackageImports: [],
+            createdBy: 'dummy-resolver',
+            skippedImports: []
+        };
+        return Promise.resolve(result);
     }
 };
 module.exports = dummyResolver;

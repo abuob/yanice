@@ -1,5 +1,3 @@
-import path from 'node:path';
-
 import {
     ImportBoundariesYanicePluginArgs,
     LogUtil,
@@ -10,12 +8,14 @@ import {
     YaniceProject
 } from 'yanice';
 
-import { FileImportMap, YaniceImportBoundariesImportResolver } from './api/import-resolver.interface';
+import { FileImportMap } from './api/import-resolver.interface';
 import { ProjectImportByFilesMap } from './api/project-import-map.interface';
+import { FileDiscovery } from './file-discovery/file-discovery';
+import { ImportResolution } from './import-resolvers/import-resolution';
 import { ProjectImportMapperUtil } from './project-import-mapper/project-import-mapper.util';
 
 export class ImportBoundariesExecutor {
-    public static execute(phase3Result: Phase3Result): void {
+    public static async execute(phase3Result: Phase3Result): Promise<void> {
         const yaniceConfig: YaniceConfig = phase3Result.phase2Result.phase1Result.yaniceConfig;
         const yaniceProjects: YaniceProject[] = yaniceConfig.projects;
         const yaniceJsonDirectoryPath: string = phase3Result.phase2Result.phase1Result.yaniceJsonDirectoryPath;
@@ -24,7 +24,7 @@ export class ImportBoundariesExecutor {
             yaniceConfig.plugins.officiallySupported['import-boundaries'];
 
         if (yaniceArgs.type !== 'plugin' || yaniceArgs.selectedPlugin.type !== 'import-boundaries') {
-            process.exit(1); // TODO: Handle better
+            ImportBoundariesExecutor.exitPlugin(1, 'Incorrect arguments passed to "import-boundaries"-plugin, abort!');
         }
 
         const importBoundariesArgs: ImportBoundariesYanicePluginArgs = yaniceArgs.selectedPlugin;
@@ -33,21 +33,19 @@ export class ImportBoundariesExecutor {
             ImportBoundariesExecutor.exitPlugin(1, 'Plugin "import-boundaries" not configured in yanice.json!');
         }
 
-        const importResolverScriptLocations: string[] = importBoundariesPluginConfig.importResolvers;
-        const importResolvers: YaniceImportBoundariesImportResolver[] = importResolverScriptLocations.map((scriptLocation: string) =>
-            ImportBoundariesExecutor.getImportResolver(scriptLocation, yaniceJsonDirectoryPath)
+        const allFilePaths: string[] = await FileDiscovery.getFilePathsRecursively(
+            yaniceJsonDirectoryPath,
+            importBoundariesPluginConfig.exclusionGlobs ?? []
         );
-        const fileImportMaps: FileImportMap[] = importResolvers.reduce(
-            (prev: FileImportMap[], curr: YaniceImportBoundariesImportResolver): FileImportMap[] => {
-                const fileImportMap: FileImportMap[] = curr.getFileImportMaps();
-                return prev.concat(fileImportMap);
-            },
-            []
+
+        const fileImportMaps: FileImportMap[] = await ImportResolution.getImportMaps(
+            yaniceJsonDirectoryPath,
+            allFilePaths,
+            importBoundariesPluginConfig.importResolvers
         );
 
         if (importBoundariesArgs.mode === 'print-file-imports') {
-            ImportBoundariesExecutor.printOutput(fileImportMaps);
-            process.exit(0);
+            ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(fileImportMaps, null, 4));
         }
         const projectImportByFilesMap: ProjectImportByFilesMap = ProjectImportMapperUtil.createProjectImportByFilesMap(
             fileImportMaps,
@@ -55,17 +53,8 @@ export class ImportBoundariesExecutor {
             yaniceProjects
         );
         if (importBoundariesArgs.mode === 'print-project-imports') {
-            ImportBoundariesExecutor.printOutput(projectImportByFilesMap);
-            process.exit(0);
+            ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(projectImportByFilesMap, null, 4));
         }
-    }
-
-    private static printOutput(object: FileImportMap[] | ProjectImportByFilesMap): void {
-        LogUtil.log(JSON.stringify(object, null, 4));
-    }
-
-    private static getImportResolver(scriptLocation: string, yaniceJsonDirectoryPath: string): YaniceImportBoundariesImportResolver {
-        return require(path.join(yaniceJsonDirectoryPath, scriptLocation));
     }
 
     private static exitPlugin(exitCode: number, message: string | null): never {

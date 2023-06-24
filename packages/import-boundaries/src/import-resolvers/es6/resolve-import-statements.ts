@@ -1,4 +1,4 @@
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import {
@@ -9,7 +9,10 @@ import {
 } from '../../api/import-resolver.interface';
 
 export class ResolveImportStatements {
-    public static resolveImportStatements(absoluteFilePath: string, parsedImportStatements: ParsedImportStatement[]): FileImportMap {
+    public static async resolveImportStatements(
+        absoluteFilePath: string,
+        parsedImportStatements: ParsedImportStatement[]
+    ): Promise<FileImportMap> {
         const fileImportMap: FileImportMap = {
             createdBy: 'es6-import-resolver',
             absoluteFilePath,
@@ -18,6 +21,8 @@ export class ResolveImportStatements {
             resolvedPackageImports: [],
             unknownImports: []
         };
+
+        const relativeImportPromises: Promise<void>[] = [];
         parsedImportStatements.forEach((parsedImportStatement: ParsedImportStatement, index: number): void => {
             if (index > 0 && parsedImportStatements[index - 1]?.type === 'skip') {
                 fileImportMap.skippedImports.push(parsedImportStatement);
@@ -26,47 +31,58 @@ export class ResolveImportStatements {
                 return;
             }
             if (parsedImportStatement.type === 'relative') {
-                const resolvedImportOrNull: string | null = ResolveImportStatements.resolveRelativeImportStatement(
+                const resolveRelativeImportStatementPromise: Promise<void> = ResolveImportStatements.resolveRelativeImportStatement(
                     absoluteFilePath,
                     parsedImportStatement
-                );
-                if (resolvedImportOrNull) {
-                    fileImportMap.resolvedImports.push({
-                        parsedImportStatement,
-                        resolvedAbsoluteFilePath: resolvedImportOrNull
-                    });
-                }
-                fileImportMap.unknownImports.push(parsedImportStatement);
+                ).then((resolvedImportOrNull: string | null): Promise<void> => {
+                    if (resolvedImportOrNull) {
+                        fileImportMap.resolvedImports.push({
+                            parsedImportStatement,
+                            resolvedAbsoluteFilePath: resolvedImportOrNull
+                        });
+                    } else {
+                        fileImportMap.unknownImports.push(parsedImportStatement);
+                    }
+                    return Promise.resolve();
+                });
+                relativeImportPromises.push(resolveRelativeImportStatementPromise);
                 return;
             }
             if (parsedImportStatement.type === 'package-like') {
                 const resolvedPackageImportOrNull: string | null = ResolveImportStatements.resolvePackageLikeImport(parsedImportStatement);
                 if (resolvedPackageImportOrNull) {
                     fileImportMap.resolvedPackageImports.push(resolvedPackageImportOrNull);
+                } else {
+                    fileImportMap.unknownImports.push(parsedImportStatement);
                 }
-                fileImportMap.unknownImports.push(parsedImportStatement);
                 return;
             }
         });
+        await Promise.all(relativeImportPromises);
         return fileImportMap;
     }
 
-    private static resolveRelativeImportStatement(
+    private static async resolveRelativeImportStatement(
         absoluteFilePath: string,
         relativeImportStatement: RelativeImportStatement
-    ): string | null {
+    ): Promise<string | null> {
         const fromClause: string = relativeImportStatement.fromClause;
         const pathJoinedWithTsExtension: string = path.join(absoluteFilePath, fromClause, '.ts');
-        if (fs.existsSync(pathJoinedWithTsExtension) && fs.lstatSync(pathJoinedWithTsExtension).isFile()) {
+        const isRelativeDirectImport: boolean = await ResolveImportStatements.isFile(pathJoinedWithTsExtension);
+        if (isRelativeDirectImport) {
             return pathJoinedWithTsExtension;
         }
 
         const pathJoined: string = path.join(absoluteFilePath, fromClause);
         const pathJoinedWithIndexTs: string = path.join(absoluteFilePath, fromClause, 'index.ts');
-        if (fs.existsSync(pathJoined) && fs.lstatSync(pathJoined).isDirectory()) {
-            if (fs.existsSync(pathJoinedWithIndexTs) && fs.lstatSync(pathJoinedWithIndexTs).isFile()) {
-                return pathJoinedWithIndexTs;
-            }
+        const isRelativeIndexTsImport: boolean = await Promise.all([
+            ResolveImportStatements.isDirectory(pathJoined),
+            ResolveImportStatements.isFile(pathJoinedWithIndexTs)
+        ]).then(([isRelativeDirectoryImport, doesIndexTsFileExist]) => {
+            return isRelativeDirectoryImport && doesIndexTsFileExist;
+        });
+        if (isRelativeIndexTsImport) {
+            return pathJoinedWithIndexTs;
         }
 
         // Attempt to resolve JS with node:
@@ -82,6 +98,24 @@ export class ResolveImportStatements {
             return require.resolve(packageLikeImportStatement.fromClause);
         } catch (e) {
             return null;
+        }
+    }
+
+    private static async isDirectory(absolutePath: string): Promise<boolean> {
+        try {
+            const lstat = await fs.lstat(absolutePath);
+            return lstat.isDirectory();
+        } catch (e) {
+            return false;
+        }
+    }
+
+    private static async isFile(absolutePath: string): Promise<boolean> {
+        try {
+            const lstat = await fs.lstat(absolutePath);
+            return lstat.isFile();
+        } catch (e) {
+            return false;
         }
     }
 }

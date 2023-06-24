@@ -20,7 +20,7 @@ describe('FileDiscovery', () => {
         it('should exclude passed exclusions', async () => {
             const fileDiscoveryCodeFolder: string = path.join(__dirname, '../');
             const allFilesInFileDiscoveryFolder: string[] = await FileDiscovery.getFilePathsRecursively(fileDiscoveryCodeFolder, [
-                '__test'
+                '**/__test/**'
             ]);
             expect(allFilesInFileDiscoveryFolder).to.have.same.members([
                 path.join(fileDiscoveryCodeFolder, '/file-discovery.ts'),

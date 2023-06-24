@@ -18,15 +18,14 @@
                             "type": "object",
                             "properties": {
                                 "importResolvers": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                },
-                                "excluded": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
+                                    "type": "object",
+                                    "patternProperties": {
+                                        "^.+$": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
                                     }
                                 },
                                 "exclusionGlobs": {
@@ -37,7 +36,7 @@
                                 }
                             },
                             "additionalProperties": false,
-                            "required": []
+                            "required": ["importResolvers"]
                         }
                     }
                 },

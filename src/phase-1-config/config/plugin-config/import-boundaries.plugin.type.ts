@@ -1,3 +1,5 @@
 export interface YanicePluginImportBoundariesOptionsInterface {
-    importResolvers: string[];
+    importResolvers: Record<string, string[]>;
+    excluded?: string[];
+    exclusionGlobs?: string[];
 }
