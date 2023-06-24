@@ -107,10 +107,23 @@ describe('yanice', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
                     );
-                    const lines: string[] = IntegrationTestUtil.getNonEmptyLines(output);
-                    expect(lines).to.have.length(2);
-                    expect(lines[0]).to.equal('project-A/empty.txt:');
-                    expect(lines[1]).to.equal('project-B/empty.txt');
+                    const outputObject = JSON.parse(output.trim());
+                    const expected = [
+                        {
+                            absoluteFilePath: IntegrationTestUtil.mapProjectNameToAbsoluteFileName('project-A'),
+                            createdBy: 'dummy-resolver',
+                            resolvedImports: [
+                                {
+                                    parsedImportStatement: 'import stuff from "somewhere"',
+                                    resolvedAbsoluteFilePath: IntegrationTestUtil.mapProjectNameToAbsoluteFileName('project-B')
+                                }
+                            ],
+                            resolvedPackageImports: [],
+                            skippedImports: [],
+                            unknownImports: []
+                        }
+                    ];
+                    expect(outputObject).to.deep.equal(expected);
                 });
 
                 it('should be able to print the project-map', () => {
@@ -119,14 +132,21 @@ describe('yanice', () => {
                     );
                     const outputObject = JSON.parse(output.trim());
                     const expected = {
-                        A: {
-                            'project-A/empty.txt': {
-                                resolvedImports: {
-                                    B: ['project-B/empty.txt']
-                                },
+                        A: [
+                            {
+                                createdByResolver: 'dummy-resolver',
+                                filePath: 'project-A/empty.txt',
+                                resolvedImports: [
+                                    {
+                                        filePath: 'project-B/empty.txt',
+                                        projects: ['B']
+                                    }
+                                ],
+                                resolvedPackageImports: [],
+                                skippedImports: [],
                                 unknownImports: []
                             }
-                        }
+                        ]
                     };
                     expect(outputObject).to.deep.equal(expected);
                 });

@@ -1,53 +1,71 @@
+import path from 'node:path';
+
 import { ChangedProjects, YaniceProject } from 'yanice';
 
-import { FileToProjectImportMap, ProjectImportMap } from '../api/project-import-map.interface';
+import { EnrichedFileImportMap } from '../api/enriched-file-import-map.interface';
+import { FileImportMap } from '../api/import-resolver.interface';
+import { ProjectImportByFilesMap } from '../api/project-import-map.interface';
 
 export class ProjectImportMapperUtil {
     private static fileToProjectsCacheMap: Record<string, string[] | undefined> = {};
 
-    public static createProjectImportMap(
-        yaniceProjects: YaniceProject[],
-        normalizedFileImportMap: Record<string, string[]>
-    ): ProjectImportMap {
-        const projectImportMap: ProjectImportMap = {};
-        Object.keys(normalizedFileImportMap).forEach((filePath: string): void => {
+    public static createProjectImportByFilesMap(
+        fileImportMaps: FileImportMap[],
+        yaniceJsonDirectoryPath: string,
+        yaniceProjects: YaniceProject[]
+    ): ProjectImportByFilesMap {
+        return fileImportMaps.reduce((prev: ProjectImportByFilesMap, curr: FileImportMap): ProjectImportByFilesMap => {
+            const filePath: string = ProjectImportMapperUtil.convertAbsolutePathToYaniceJsonPath(
+                yaniceJsonDirectoryPath,
+                curr.absoluteFilePath
+            );
             const correspondingProjects: string[] = ProjectImportMapperUtil.getProjectNamesByFile(yaniceProjects, filePath);
-            const importedFiles: string[] = normalizedFileImportMap[filePath] ?? [];
+            const enrichedMap: EnrichedFileImportMap = ProjectImportMapperUtil.createEnrichedFileImportMap(
+                curr,
+                yaniceJsonDirectoryPath,
+                yaniceProjects
+            );
             correspondingProjects.forEach((correspondingProject: string): void => {
-                const existingProjectOrUndefined: ProjectImportMap[string] | undefined = projectImportMap[correspondingProject];
-                if (existingProjectOrUndefined) {
-                    existingProjectOrUndefined[filePath] = ProjectImportMapperUtil.getFileToProjectImportMap(yaniceProjects, importedFiles);
+                const existingPropOrUndef: EnrichedFileImportMap[] | undefined = prev[correspondingProject];
+                if (existingPropOrUndef) {
+                    existingPropOrUndef.push(enrichedMap);
                 } else {
-                    projectImportMap[correspondingProject] = {
-                        [filePath]: ProjectImportMapperUtil.getFileToProjectImportMap(yaniceProjects, importedFiles)
-                    };
+                    prev[correspondingProject] = [enrichedMap];
                 }
             });
-        });
-        return projectImportMap;
+            return prev;
+        }, {});
     }
 
-    private static getFileToProjectImportMap(yaniceProjects: YaniceProject[], importedFiles: string[]): FileToProjectImportMap {
-        const resolvedImports: FileToProjectImportMap['resolvedImports'] = {};
-        const unknownImports: string[] = [];
-        importedFiles.forEach((importedFile: string): void => {
-            const correspondingProjectNames: string[] = ProjectImportMapperUtil.getProjectNamesByFile(yaniceProjects, importedFile);
-            if (correspondingProjectNames.length === 0) {
-                unknownImports.push(importedFile);
-            }
-            correspondingProjectNames.forEach((correspondingProjectName: string): void => {
-                const existingArrayOrUndefined: string[] | undefined = resolvedImports[correspondingProjectName];
-                if (existingArrayOrUndefined) {
-                    existingArrayOrUndefined.push(importedFile);
-                } else {
-                    resolvedImports[correspondingProjectName] = [importedFile];
-                }
-            });
-        });
+    private static createEnrichedFileImportMap(
+        fileImportMap: FileImportMap,
+        yaniceJsonDirectoryPath: string,
+        yaniceProjects: YaniceProject[]
+    ): EnrichedFileImportMap {
         return {
-            resolvedImports,
-            unknownImports
+            createdByResolver: fileImportMap.createdBy,
+            filePath: ProjectImportMapperUtil.convertAbsolutePathToYaniceJsonPath(yaniceJsonDirectoryPath, fileImportMap.absoluteFilePath),
+            resolvedImports: fileImportMap.resolvedImports.map(
+                (resolvedImport: FileImportMap['resolvedImports'][number]): EnrichedFileImportMap['resolvedImports'][number] => {
+                    const filePath: string = ProjectImportMapperUtil.convertAbsolutePathToYaniceJsonPath(
+                        yaniceJsonDirectoryPath,
+                        resolvedImport.resolvedAbsoluteFilePath
+                    );
+                    return {
+                        filePath,
+                        projects: ProjectImportMapperUtil.getProjectNamesByFile(yaniceProjects, filePath),
+                        importStatement: resolvedImport.parsedImportStatement.raw
+                    };
+                }
+            ),
+            unknownImports: fileImportMap.unknownImports.map((unknownImport) => unknownImport.raw),
+            skippedImports: fileImportMap.skippedImports.map((skippedImport) => skippedImport.raw),
+            resolvedPackageImports: fileImportMap.resolvedPackageImports
         };
+    }
+
+    private static convertAbsolutePathToYaniceJsonPath(yaniceJsonDir: string, absoluteFilePath: string): string {
+        return path.relative(yaniceJsonDir, absoluteFilePath);
     }
 
     private static getProjectNamesByFile(yaniceProjects: YaniceProject[], filePath: string): string[] {

@@ -16,7 +16,8 @@
         "graph-display-template.html"
     ],
     "scripts": {
-        "build": "tsc -p tsconfig.build.json",
+        "build-for-local": "tsc -p tsconfig.build.json",
+        "build": "node scripts/prebuild.js && node dist/bin.js run build --concurrency=1 --all --output-mode=append-at-end-on-error",
         "format": "prettier --write --loglevel warn \"**/*.+(ts|json|html|yml|js|cjs)\"",
         "format:check": "prettier --check --loglevel warn \"**/*.+(ts|json|html|yml|js|cjs)\"",
         "lint": "eslint .",

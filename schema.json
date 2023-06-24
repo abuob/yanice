@@ -23,8 +23,21 @@
                                         "type": "string"
                                     }
                                 },
-                                "required": true
-                            }
+                                "excluded": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "exclusionGlobs": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": []
                         }
                     }
                 },

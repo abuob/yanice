@@ -4,11 +4,31 @@ function absolutePath(relativePath) {
     return path.join(__dirname, relativePath);
 }
 
+/**
+ * @type {import('../../packages/import-boundaries/src/api/import-resolver.interface.ts').YaniceImportBoundariesImportResolver}
+ */
 const dummyResolver = {
-    getImportMap: () => {
-        return {
-            [absolutePath('project-A/empty.txt')]: [absolutePath('project-B/empty.txt')]
-        };
+    name: 'dummy-resolver',
+
+    /**
+     * @returns {import('../../packages/import-boundaries/src/api/import-resolver.interface.ts').FileImportMap[]}
+     */
+    getFileImportMaps: () => {
+        return [
+            {
+                absoluteFilePath: absolutePath('project-A/empty.txt'),
+                unknownImports: [],
+                resolvedImports: [
+                    {
+                        resolvedAbsoluteFilePath: absolutePath('project-B/empty.txt'),
+                        parsedImportStatement: 'import stuff from "somewhere"'
+                    }
+                ],
+                resolvedPackageImports: [],
+                createdBy: 'dummy-resolver',
+                skippedImports: []
+            }
+        ];
     }
 };
 module.exports = dummyResolver;

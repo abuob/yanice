@@ -1,17 +1,31 @@
 import { expect } from 'chai';
 import { YaniceProject } from 'yanice';
 
-import { ProjectImportMap } from '../../api/project-import-map.interface';
+import { FileImportMap, ParsedImportStatement } from '../../api/import-resolver.interface';
+import { ProjectImportByFilesMap } from '../../api/project-import-map.interface';
 import { ProjectImportMapperUtil } from '../project-import-mapper.util';
 
 describe('ProjectImportMapperUtil', () => {
-    describe('createProjectImportMap', () => {
+    describe('createProjectImportByFilesMap', () => {
         const defaultYaniceProject: YaniceProject = {
             projectName: 'default',
             pathGlob: '**',
             pathRegExp: /.*/,
             responsibles: [],
             commands: {}
+        };
+        const defaultImportmap: FileImportMap = {
+            absoluteFilePath: 'TO-BE-OVERWRITTEN',
+            skippedImports: [],
+            resolvedPackageImports: [],
+            unknownImports: [],
+            resolvedImports: [],
+            createdBy: 'test'
+        };
+        const defaultParsedImportStatement: ParsedImportStatement = {
+            type: 'relative',
+            raw: 'import stuff from "./some/where"',
+            fromClause: './some/where'
         };
         const yaniceProjects: YaniceProject[] = [
             { ...defaultYaniceProject, projectName: 'A', pathGlob: 'proj/A/**' },
@@ -20,56 +34,116 @@ describe('ProjectImportMapperUtil', () => {
         ];
 
         it('should create a project-import-map when all files can be properly matched', () => {
-            const importMap: Record<string, string[]> = {
-                'proj/A/some.file': ['proj/B/some.file', 'proj/C/some.file'],
-                'proj/B/some.file': ['proj/C/some.file']
-            };
-            const actual: ProjectImportMap = ProjectImportMapperUtil.createProjectImportMap(yaniceProjects, importMap);
-            const expected: ProjectImportMap = {
-                A: {
-                    'proj/A/some.file': {
-                        resolvedImports: {
-                            B: ['proj/B/some.file'],
-                            C: ['proj/C/some.file']
+            const fileImportMaps: FileImportMap[] = [
+                {
+                    ...defaultImportmap,
+                    absoluteFilePath: 'root/yanice/dir/proj/A/some.file',
+                    resolvedImports: [
+                        {
+                            parsedImportStatement: defaultParsedImportStatement,
+                            resolvedAbsoluteFilePath: 'root/yanice/dir/proj/B/some.file'
                         },
-                        unknownImports: []
-                    }
+                        {
+                            parsedImportStatement: defaultParsedImportStatement,
+                            resolvedAbsoluteFilePath: 'root/yanice/dir/proj/A/some.file'
+                        }
+                    ]
                 },
-                B: {
-                    'proj/B/some.file': {
-                        resolvedImports: {
-                            C: ['proj/C/some.file']
-                        },
+                {
+                    ...defaultImportmap,
+                    absoluteFilePath: 'root/yanice/dir/proj/B/some.file',
+                    resolvedImports: [
+                        {
+                            parsedImportStatement: defaultParsedImportStatement,
+                            resolvedAbsoluteFilePath: 'root/yanice/dir/proj/C/some.file'
+                        }
+                    ],
+                    resolvedPackageImports: ['some-package'],
+                    unknownImports: [{ type: 'relative', fromClause: 'somewhere', raw: 'import stuff from "somewhere"' }]
+                }
+            ];
+            const actual: ProjectImportByFilesMap = ProjectImportMapperUtil.createProjectImportByFilesMap(
+                fileImportMaps,
+                'root/yanice/dir',
+                yaniceProjects
+            );
+            const expected: ProjectImportByFilesMap = {
+                A: [
+                    {
+                        createdByResolver: 'test',
+                        filePath: 'proj/A/some.file',
+                        resolvedImports: [
+                            {
+                                filePath: 'proj/B/some.file',
+                                importStatement: 'import stuff from "./some/where"',
+                                projects: ['B']
+                            },
+                            {
+                                filePath: 'proj/A/some.file',
+                                importStatement: 'import stuff from "./some/where"',
+                                projects: ['A']
+                            }
+                        ],
+                        resolvedPackageImports: [],
+                        skippedImports: [],
                         unknownImports: []
                     }
-                }
+                ],
+                B: [
+                    {
+                        createdByResolver: 'test',
+                        filePath: 'proj/B/some.file',
+                        resolvedImports: [
+                            {
+                                filePath: 'proj/C/some.file',
+                                importStatement: 'import stuff from "./some/where"',
+                                projects: ['C']
+                            }
+                        ],
+                        resolvedPackageImports: ['some-package'],
+                        skippedImports: [],
+                        unknownImports: ['import stuff from "somewhere"']
+                    }
+                ]
             };
             expect(actual).to.deep.equal(expected);
         });
 
         it('should create a project-import-map when unknown imports are present which cannot be mapped to any project', () => {
-            const importMap: Record<string, string[]> = {
-                'proj/A/some.file': ['proj/B/some.file', 'this-does-not-match-anything'],
-                'proj/B/some.file': ['proj/B/some.file', 'this-does-not-match-anything'] // cycle, does not make much sense, but valid here!
-            };
-            const actual: ProjectImportMap = ProjectImportMapperUtil.createProjectImportMap(yaniceProjects, importMap);
-            const expected: ProjectImportMap = {
-                A: {
-                    'proj/A/some.file': {
-                        resolvedImports: {
-                            B: ['proj/B/some.file']
-                        },
-                        unknownImports: ['this-does-not-match-anything']
-                    }
-                },
-                B: {
-                    'proj/B/some.file': {
-                        resolvedImports: {
-                            B: ['proj/B/some.file']
-                        },
-                        unknownImports: ['this-does-not-match-anything']
-                    }
+            const fileImportMaps: FileImportMap[] = [
+                {
+                    ...defaultImportmap,
+                    absoluteFilePath: 'root/yanice/dir/proj/A/some.file',
+                    resolvedImports: [
+                        {
+                            parsedImportStatement: defaultParsedImportStatement,
+                            resolvedAbsoluteFilePath: 'root/yanice/dir/this-does-not-match-anything'
+                        }
+                    ]
                 }
+            ];
+            const actual: ProjectImportByFilesMap = ProjectImportMapperUtil.createProjectImportByFilesMap(
+                fileImportMaps,
+                'root/yanice/dir',
+                yaniceProjects
+            );
+            const expected: ProjectImportByFilesMap = {
+                A: [
+                    {
+                        createdByResolver: 'test',
+                        filePath: 'proj/A/some.file',
+                        resolvedImports: [
+                            {
+                                filePath: 'this-does-not-match-anything',
+                                importStatement: 'import stuff from "./some/where"',
+                                projects: []
+                            }
+                        ],
+                        resolvedPackageImports: [],
+                        skippedImports: [],
+                        unknownImports: []
+                    }
+                ]
             };
             expect(actual).to.deep.equal(expected);
         });

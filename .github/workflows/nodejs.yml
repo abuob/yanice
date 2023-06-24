@@ -26,10 +26,7 @@ jobs:
                   npm run lint
             - name: test
               run: npm test
-            - name: build yanice
+            - name: build yanice & packages
               run: npm run build
-            - name: build packages
-              run: npm run build
-              working-directory: packages/import-boundaries
             - name: integration-tests
               run: npm run integration-tests

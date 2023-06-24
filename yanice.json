@@ -1,0 +1,32 @@
+{
+    "$schema": "./node_modules/yanice/schema.json",
+    "schemaVersion": 2,
+    "projects": [
+        {
+            "projectName": "yanice",
+            "pathGlob": "!packages/**",
+            "commands": {
+                "build": {
+                    "command": "tsc -p tsconfig.build.json"
+                }
+            }
+        },
+        {
+            "projectName": "import-boundaries",
+            "pathGlob": "packages/import-boundaries/**",
+            "commands": {
+                "build": {
+                    "command": "tsc -p tsconfig.build.json && pwd",
+                    "cwd": "packages/import-boundaries"
+                }
+            }
+        }
+    ],
+    "dependencyScopes": {
+        "build": {
+            "dependencies": {
+                "yanice": ["import-boundaries"]
+            }
+        }
+    }
+}

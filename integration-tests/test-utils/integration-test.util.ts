@@ -57,6 +57,10 @@ export class IntegrationTestUtil {
         return testLog[project] ?? [];
     }
 
+    public static mapProjectNameToAbsoluteFileName(project: allProjectsType): string {
+        return path.join(__dirname, '../test-project', project, 'empty.txt');
+    }
+
     private static getAllEmptyFilePathsRelativeToRoot(): string[] {
         const allProjects: allProjectsType[] = IntegrationTestUtil.allProjects;
         return allProjects.map((project: allProjectsType) => IntegrationTestUtil.mapProjectNameToRelativePathToRoot(project));
@@ -69,10 +73,6 @@ export class IntegrationTestUtil {
     private static getAllEmptyFilePaths(): string[] {
         const allProjects: allProjectsType[] = IntegrationTestUtil.allProjects;
         return allProjects.map((project: allProjectsType) => IntegrationTestUtil.mapProjectNameToAbsoluteFileName(project));
-    }
-
-    private static mapProjectNameToAbsoluteFileName(project: allProjectsType): string {
-        return path.join(__dirname, '../test-project', project, 'empty.txt');
     }
 
     private static getTestLog(): TestLog {
