@@ -1,6 +1,7 @@
 {
     "extends": "@tsconfig/node16/tsconfig.json",
     "compilerOptions": {
+        "sourceMap": true,
         "resolveJsonModule": true,
         "declaration": true,
         "outDir": "./dist"

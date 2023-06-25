@@ -11,7 +11,7 @@
     },
     "types": "dist/index.d.ts",
     "files": [
-        "dist/**/*",
+        "dist/**/!(*.js.map)",
         "schema.json",
         "graph-display-template.html"
     ],
