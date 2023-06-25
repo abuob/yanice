@@ -1,3 +1,5 @@
+import { FileImportMap } from './import-resolver.interface';
+
 export interface EnrichedFileImportMap {
     createdByResolver: string;
     filePath: string;
@@ -6,7 +8,7 @@ export interface EnrichedFileImportMap {
         filePath: string;
         projects: string[];
     }[];
-    resolvedPackageImports: string[];
+    resolvedPackageImports: FileImportMap['resolvedPackageImports'];
     skippedImports: string[];
     unknownImports: string[];
 }

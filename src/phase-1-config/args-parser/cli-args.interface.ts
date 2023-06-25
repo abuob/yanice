@@ -3,6 +3,8 @@ import { YanicePluginArgs } from './plugin.type';
 
 export type YaniceCliArgs = YaniceCliArgsOutputOnly | YaniceCliArgsPlugin | YaniceCliArgsRun | YaniceCliArgsVisualize;
 
+export type YaniceModeType = YaniceCliArgs['type'];
+
 export interface YaniceCliArgsRun {
     type: 'run';
     concurrency: number;

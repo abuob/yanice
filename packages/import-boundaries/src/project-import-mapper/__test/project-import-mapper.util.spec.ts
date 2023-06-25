@@ -59,7 +59,12 @@ describe('ProjectImportMapperUtil', () => {
                             resolvedAbsoluteFilePath: 'root/yanice/dir/proj/C/some.file'
                         }
                     ],
-                    resolvedPackageImports: ['some-package'],
+                    resolvedPackageImports: [
+                        {
+                            package: 'some-package',
+                            resolvedAbsoluteFilePath: 'somewhere'
+                        }
+                    ],
                     unknownImports: [{ type: 'relative', fromClause: 'somewhere', raw: 'import stuff from "somewhere"' }]
                 }
             ];
@@ -101,7 +106,12 @@ describe('ProjectImportMapperUtil', () => {
                                 projects: ['C']
                             }
                         ],
-                        resolvedPackageImports: ['some-package'],
+                        resolvedPackageImports: [
+                            {
+                                package: 'some-package',
+                                resolvedAbsoluteFilePath: 'somewhere'
+                            }
+                        ],
                         skippedImports: [],
                         unknownImports: ['import stuff from "somewhere"']
                     }

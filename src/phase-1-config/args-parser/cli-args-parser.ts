@@ -5,26 +5,42 @@ import {
     YaniceCliArgsPlugin,
     YaniceCliArgsRun,
     YaniceCliArgsVisualize,
-    YaniceCliDefaultArgs
+    YaniceCliDefaultArgs,
+    YaniceModeType
 } from './cli-args.interface';
 import { YaniceImportBoundariesModeType } from './plugin.type';
 
 export class YaniceCliArgsParser {
-    public static parseArgs(args: string[]): YaniceCliArgs | null {
-        const firstParameter: string | undefined = args[0];
+    public static determineYaniceMode(firstParameter: string | null | undefined): YaniceModeType | null {
         if (!firstParameter) {
             return null;
         }
         switch (true) {
             case /^run$/.test(firstParameter):
-                return YaniceCliArgsParser.handleRunArgs(args);
+                return 'run';
             case /^output-only$/.test(firstParameter):
-                return YaniceCliArgsParser.handleOutputOnlyArgs(args);
+                return 'output-only';
             case /^visualize$/.test(firstParameter):
-                return YaniceCliArgsParser.handleVisualizeArgs(args);
+                return 'visualize';
             case /^plugin:[a-zA-Z][0-9a-zA-Z-]*$/.test(firstParameter):
-                return YaniceCliArgsParser.handlePluginArgs(args);
+                return 'plugin';
             default:
+                return null;
+        }
+    }
+
+    public static parseArgs(args: string[]): YaniceCliArgs | null {
+        const yaniceMode: YaniceModeType | null = YaniceCliArgsParser.determineYaniceMode(args[0]);
+        switch (yaniceMode) {
+            case 'run':
+                return YaniceCliArgsParser.handleRunArgs(args);
+            case 'output-only':
+                return YaniceCliArgsParser.handleOutputOnlyArgs(args);
+            case 'visualize':
+                return YaniceCliArgsParser.handleVisualizeArgs(args);
+            case 'plugin':
+                return YaniceCliArgsParser.handlePluginArgs(args);
+            case null:
                 return null;
         }
     }

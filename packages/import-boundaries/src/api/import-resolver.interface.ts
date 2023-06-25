@@ -29,7 +29,10 @@ export interface FileImportMap {
         parsedImportStatement: ParsedImportStatement;
         resolvedAbsoluteFilePath: string;
     }[];
-    resolvedPackageImports: string[];
+    resolvedPackageImports: {
+        package: string;
+        resolvedAbsoluteFilePath: string;
+    }[];
     skippedImports: ParsedImportStatement[];
     unknownImports: ParsedImportStatement[];
 }

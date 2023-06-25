@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { expect } from 'chai';
 
-import { ParsedImportStatement } from '../../../api/import-resolver.interface';
+import { FileImportMap, ParsedImportStatement } from '../../../api/import-resolver.interface';
 import { ResolveImportStatements } from '../resolve-import-statements';
 
 describe('ResolveImportStatements', () => {
@@ -22,7 +22,7 @@ describe('ResolveImportStatements', () => {
                 }
             ];
             const actual = await ResolveImportStatements.resolveImportStatements(__filename, parsedImportStatements);
-            const expected = {
+            const expected: FileImportMap = {
                 createdBy: 'import-resolver-es6',
                 absoluteFilePath: __filename,
                 resolvedImports: [
@@ -43,7 +43,12 @@ describe('ResolveImportStatements', () => {
                         resolvedAbsoluteFilePath: path.join(__dirname, '../../../api/import-resolver.interface.ts')
                     }
                 ],
-                resolvedPackageImports: [require.resolve('chai')],
+                resolvedPackageImports: [
+                    {
+                        package: 'chai',
+                        resolvedAbsoluteFilePath: require.resolve('chai')
+                    }
+                ],
                 skippedImports: [],
                 unknownImports: []
             };

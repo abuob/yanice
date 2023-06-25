@@ -1,5 +1,5 @@
 import { PhaseExecutor } from '../util/phase-executor';
-import { YaniceCliArgs } from './args-parser/cli-args.interface';
+import { YaniceCliArgs, YaniceModeType } from './args-parser/cli-args.interface';
 import { YaniceCliArgsParser } from './args-parser/cli-args-parser';
 import { YaniceConfig, YaniceJsonType } from './config/config.interface';
 import { ConfigParser } from './config/config-parser';
@@ -32,7 +32,7 @@ export class Phase1Executor extends PhaseExecutor {
         this.yaniceJsonDirectoryPath = baseDirectory;
         this.yaniceJson = yaniceJson;
         this.gitRepoRootPath = gitRepoRootPath;
-        return this.validateYaniceJson(yaniceJson).parseCliArgs(args).verifyArgs().parseYaniceJson();
+        return this.validateYaniceJson(yaniceJson).sanityCheckCliArgs(args).parseCliArgs(args).verifyArgs().parseYaniceJson();
     }
 
     private createPhaseResult(): Phase1Result {
@@ -80,6 +80,17 @@ export class Phase1Executor extends PhaseExecutor {
 
     private parseCliArgs(args: string[]): Phase1Executor {
         this.yaniceCliArgs = YaniceCliArgsParser.parseArgs(args);
+        return this;
+    }
+
+    private sanityCheckCliArgs(args: string[]): Phase1Executor {
+        const yaniceMode: YaniceModeType | null = YaniceCliArgsParser.determineYaniceMode(args[0]);
+        if (!yaniceMode) {
+            this.exitYanice(
+                1,
+                `Received "${args[0]}" as first parameter; should be one of these: run, output-only, visualize, plugin:<plugin-identifier>.`
+            );
+        }
         return this;
     }
 

@@ -52,7 +52,10 @@ export class ResolveImportStatements {
             if (parsedImportStatement.type === 'package-like') {
                 const resolvedPackageImportOrNull: string | null = ResolveImportStatements.resolvePackageLikeImport(parsedImportStatement);
                 if (resolvedPackageImportOrNull) {
-                    fileImportMap.resolvedPackageImports.push(resolvedPackageImportOrNull);
+                    fileImportMap.resolvedPackageImports.push({
+                        package: parsedImportStatement.fromClause,
+                        resolvedAbsoluteFilePath: resolvedPackageImportOrNull
+                    });
                 } else {
                     fileImportMap.unknownImports.push(parsedImportStatement);
                 }
