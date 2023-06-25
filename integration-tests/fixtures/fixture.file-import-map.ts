@@ -68,3 +68,7 @@ export const fixtureFileImportMap: FileImportMap[] = [
         unknownImports: []
     }
 ];
+
+export const fixtureFileImportMapWithoutDummyResolver: FileImportMap[] = fixtureFileImportMap.filter(
+    (fileImportMap: FileImportMap) => fileImportMap.createdBy !== 'dummy-resolver'
+);

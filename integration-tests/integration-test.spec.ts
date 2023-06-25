@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { expect } from 'chai';
 
-import { fixtureFileImportMap } from './fixtures/fixture.file-import-map';
+import { fixtureFileImportMap, fixtureFileImportMapWithoutDummyResolver } from './fixtures/fixture.file-import-map';
 import { fixtureProjectImportByFilesMap } from './fixtures/fixture.project-import-by-files-map';
 import { IntegrationTestUtil } from './test-utils/integration-test.util';
 
@@ -107,15 +107,23 @@ describe('yanice', () => {
             describe('import-boundaries', () => {
                 it('should be able to print the file-import-maps', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports --skip-post-resolvers'
                     );
                     const outputObject = JSON.parse(output.trim());
                     expect(outputObject).to.deep.equal(fixtureFileImportMap);
                 });
 
+                it('should be able to print the file-import-maps also when running post-resolvers', () => {
+                    const output: string = IntegrationTestUtil.executeYaniceWithArgs(
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
+                    );
+                    const outputObject = JSON.parse(output.trim());
+                    expect(outputObject).to.deep.equal(fixtureFileImportMapWithoutDummyResolver);
+                });
+
                 it('should be able to print the project-map', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports'
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports --skip-post-resolvers'
                     );
                     const outputObject = JSON.parse(output.trim());
                     expect(outputObject).to.deep.equal(fixtureProjectImportByFilesMap);

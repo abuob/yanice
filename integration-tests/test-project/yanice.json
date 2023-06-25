@@ -12,7 +12,8 @@
                 "importResolvers": {
                     "**/*.txt": ["./dummy-resolver.js"],
                     "**/*.ts": ["import-resolver-es6"]
-                }
+                },
+                "postResolve": ["./post-resolve.js"]
             }
         }
     },

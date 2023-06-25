@@ -33,6 +33,12 @@
                                     "items": {
                                         "type": "string"
                                     }
+                                },
+                                "postResolve": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
                                 }
                             },
                             "additionalProperties": false,

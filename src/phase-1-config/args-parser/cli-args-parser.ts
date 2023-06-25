@@ -83,7 +83,8 @@ export class YaniceCliArgsParser {
                     type: 'plugin',
                     selectedPlugin: {
                         type: 'import-boundaries',
-                        mode: YaniceCliArgsParser.getImportBoundariesModeArgument(args)
+                        mode: YaniceCliArgsParser.getImportBoundariesModeArgument(args),
+                        skipPostResolvers: YaniceCliArgsParser.hasArgument(args, /^--skip-post-resolvers$/)
                     },
                     defaultArgs
                 };

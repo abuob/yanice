@@ -12,6 +12,7 @@ import { FileImportMap } from './api/import-resolver.interface';
 import { ProjectImportByFilesMap } from './api/project-import-map.interface';
 import { FileDiscovery } from './file-discovery/file-discovery';
 import { ImportResolution } from './import-resolvers/import-resolution';
+import { PostResolver } from './post-resolver/post-resolver';
 import { ProjectImportMapperUtil } from './project-import-mapper/project-import-mapper.util';
 
 export class ImportBoundariesExecutor {
@@ -38,10 +39,17 @@ export class ImportBoundariesExecutor {
             importBoundariesPluginConfig.exclusionGlobs ?? []
         );
 
-        const fileImportMaps: FileImportMap[] = await ImportResolution.getImportMaps(
+        const fileImportMapsRaw: FileImportMap[] = await ImportResolution.getImportMaps(
             yaniceJsonDirectoryPath,
             allFilePaths,
             importBoundariesPluginConfig.importResolvers
+        );
+
+        const fileImportMaps: FileImportMap[] = await ImportBoundariesExecutor.postResolveIfNecessary(
+            fileImportMapsRaw,
+            yaniceJsonDirectoryPath,
+            importBoundariesPluginConfig.postResolve ?? [],
+            importBoundariesArgs
         );
 
         if (importBoundariesArgs.mode === 'print-file-imports') {
@@ -55,6 +63,18 @@ export class ImportBoundariesExecutor {
         if (importBoundariesArgs.mode === 'print-project-imports') {
             ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(projectImportByFilesMap, null, 4));
         }
+    }
+
+    private static async postResolveIfNecessary(
+        fileImportMaps: FileImportMap[],
+        yaniceJsonDirectoryPath: string,
+        postResolverLocations: string[],
+        importBoundariesArgs: ImportBoundariesYanicePluginArgs
+    ): Promise<FileImportMap[]> {
+        if (postResolverLocations.length === 0 || importBoundariesArgs.skipPostResolvers) {
+            return Promise.resolve(fileImportMaps);
+        }
+        return PostResolver.postResolveProcessing(fileImportMaps, yaniceJsonDirectoryPath, postResolverLocations);
     }
 
     private static exitPlugin(exitCode: number, message: string | null): never {

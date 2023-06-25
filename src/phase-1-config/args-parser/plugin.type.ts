@@ -11,4 +11,5 @@ export interface CustomYanicePluginArgs {
 export interface ImportBoundariesYanicePluginArgs {
     type: 'import-boundaries';
     mode: YaniceImportBoundariesModeType;
+    skipPostResolvers: boolean;
 }
