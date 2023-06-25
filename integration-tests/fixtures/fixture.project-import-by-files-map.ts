@@ -27,7 +27,7 @@ export const fixtureProjectImportByFilesMap: ProjectImportByFilesMap = {
                 }
             ],
             resolvedPackageImports: [],
-            skippedImports: [],
+            skippedImports: ["import { dummyC } from '../project-C/project-c'"],
             unknownImports: []
         }
     ],

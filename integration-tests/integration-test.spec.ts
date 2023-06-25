@@ -105,7 +105,7 @@ describe('yanice', () => {
         });
         describe('officially supported', () => {
             describe('import-boundaries', () => {
-                it('should be able to print the normalized import-map provided by the importResolver', () => {
+                it('should be able to print the file-import-maps', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
                         'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
                     );

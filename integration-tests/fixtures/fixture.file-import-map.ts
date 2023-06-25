@@ -33,7 +33,13 @@ export const fixtureFileImportMap: FileImportMap[] = [
             }
         ],
         resolvedPackageImports: [],
-        skippedImports: [],
+        skippedImports: [
+            {
+                fromClause: '../project-C/project-c',
+                raw: "import { dummyC } from '../project-C/project-c'",
+                type: 'relative'
+            }
+        ],
         unknownImports: []
     },
     {

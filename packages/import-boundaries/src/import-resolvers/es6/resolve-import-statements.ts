@@ -26,6 +26,7 @@ export class ResolveImportStatements {
         parsedImportStatements.forEach((parsedImportStatement: ParsedImportStatement, index: number): void => {
             if (index > 0 && parsedImportStatements[index - 1]?.type === 'skip') {
                 fileImportMap.skippedImports.push(parsedImportStatement);
+                return;
             }
             if (parsedImportStatement.type === 'skip') {
                 return;
