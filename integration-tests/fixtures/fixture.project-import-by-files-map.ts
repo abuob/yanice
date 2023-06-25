@@ -18,16 +18,29 @@ export const fixtureProjectImportByFilesMap: ProjectImportByFilesMap = {
         },
         {
             createdByResolver: 'import-resolver-es6',
-            filePath: 'project-A/project-a.ts',
+            filePath: 'project-A/project-a-1.ts',
             resolvedImports: [
                 {
                     filePath: 'project-B/project-b.ts',
                     importStatement: "import { dummyB } from '../project-B/project-b'",
                     projects: ['B']
+                },
+                {
+                    filePath: 'project-A/project-a-2.ts',
+                    importStatement: "import { dummyA2 } from './project-a-2'",
+                    projects: ['A']
                 }
             ],
             resolvedPackageImports: [],
             skippedImports: ["import { dummyC } from '../project-C/project-c'"],
+            unknownImports: []
+        },
+        {
+            createdByResolver: 'import-resolver-es6',
+            filePath: 'project-A/project-a-2.ts',
+            resolvedImports: [],
+            resolvedPackageImports: [],
+            skippedImports: [],
             unknownImports: []
         }
     ],

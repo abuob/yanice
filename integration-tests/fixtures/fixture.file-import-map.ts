@@ -20,7 +20,7 @@ export const fixtureFileImportMap: FileImportMap[] = [
         unknownImports: []
     },
     {
-        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a.ts'),
+        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-1.ts'),
         createdBy: 'import-resolver-es6',
         resolvedImports: [
             {
@@ -30,6 +30,14 @@ export const fixtureFileImportMap: FileImportMap[] = [
                     type: 'relative'
                 },
                 resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-B/project-b.ts')
+            },
+            {
+                parsedImportStatement: {
+                    fromClause: './project-a-2',
+                    raw: "import { dummyA2 } from './project-a-2'",
+                    type: 'relative'
+                },
+                resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts')
             }
         ],
         resolvedPackageImports: [],
@@ -40,6 +48,14 @@ export const fixtureFileImportMap: FileImportMap[] = [
                 type: 'relative'
             }
         ],
+        unknownImports: []
+    },
+    {
+        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts'),
+        createdBy: 'import-resolver-es6',
+        resolvedImports: [],
+        resolvedPackageImports: [],
+        skippedImports: [],
         unknownImports: []
     },
     {

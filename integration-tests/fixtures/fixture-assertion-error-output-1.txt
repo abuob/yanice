@@ -1,0 +1,6 @@
+project-A/project-a-1.ts (project: A):
+    Import to project "A" which is not configured in yanice.json:
+        import { dummyA2 } from './project-a-2'
+project-B/project-b.ts (project: B):
+    Import to project "C" which is not configured in yanice.json:
+        import { dummyC } from '../project-C/project-c'

@@ -8,8 +8,11 @@ import {
     YaniceProject
 } from 'yanice';
 
+import { YaniceImportBoundariesAssertionViolation } from './api/assertion.interface';
 import { FileImportMap } from './api/import-resolver.interface';
 import { ProjectImportByFilesMap } from './api/project-import-map.interface';
+import { AssertionLogger } from './assertions/assertion-logger';
+import { ImportBoundariesAssertions } from './assertions/import-boundaries-assertions';
 import { FileDiscovery } from './file-discovery/file-discovery';
 import { ImportResolution } from './import-resolvers/import-resolution';
 import { PostResolver } from './post-resolver/post-resolver';
@@ -63,10 +66,24 @@ export class ImportBoundariesExecutor {
         if (importBoundariesArgs.mode === 'print-project-imports') {
             ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(projectImportByFilesMap, null, 4));
         }
-        const yaniceImportDependencies: YaniceConfig['dependencies'] =
-            ProjectImportMapperUtil.createYaniceDependenciesImportMap(projectImportByFilesMap);
         if (importBoundariesArgs.mode === 'generate') {
+            const yaniceImportDependencies: YaniceConfig['dependencies'] =
+                ProjectImportMapperUtil.createYaniceDependenciesImportMap(projectImportByFilesMap);
             ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(yaniceImportDependencies, null, 4));
+        }
+        if (importBoundariesArgs.mode === 'assert') {
+            const assertionViolations: YaniceImportBoundariesAssertionViolation[] = await ImportBoundariesAssertions.assertImportBoundaries(
+                yaniceJsonDirectoryPath,
+                importBoundariesPluginConfig.assertions ?? [],
+                phase3Result,
+                fileImportMaps,
+                projectImportByFilesMap
+            );
+            if (assertionViolations.length > 0) {
+                AssertionLogger.logAssertionViolations(assertionViolations);
+                ImportBoundariesExecutor.exitPlugin(1, null);
+            }
+            ImportBoundariesExecutor.exitPlugin(0, 'No import boundary violation found!');
         }
     }
 

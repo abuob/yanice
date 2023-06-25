@@ -39,6 +39,12 @@
                                     "items": {
                                         "type": "string"
                                     }
+                                },
+                                "assertions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
                                 }
                             },
                             "additionalProperties": false,

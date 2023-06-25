@@ -13,19 +13,11 @@ export class PostResolver {
             yaniceJsonDirectoryPath,
             postResolversLocations
         );
-        return PostResolver.applyPostResolversRecursively(postResolvers, fileImportMaps);
-    }
-
-    private static async applyPostResolversRecursively(
-        postResolvers: YaniceImportBoundariesPostResolver[],
-        fileImportMaps: FileImportMap[]
-    ): Promise<FileImportMap[]> {
-        const nextResolver: YaniceImportBoundariesPostResolver | undefined = postResolvers[0];
-        if (postResolvers.length === 0 || !nextResolver) {
-            return Promise.resolve(fileImportMaps);
+        let updatedFileImportMaps: FileImportMap[] = fileImportMaps;
+        for (const postResolver of postResolvers) {
+            updatedFileImportMaps = await postResolver.postProcess(updatedFileImportMaps);
         }
-        const newFileImportMaps: FileImportMap[] = await nextResolver.postProcess(fileImportMaps);
-        return PostResolver.applyPostResolversRecursively(postResolvers.slice(1), newFileImportMaps);
+        return updatedFileImportMaps;
     }
 
     private static loadPostResolvers(

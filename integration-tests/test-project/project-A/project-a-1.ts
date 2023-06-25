@@ -1,8 +1,9 @@
 import { dummyB } from '../project-B/project-b';
 // @yanice:import-boundaries ignore-next-statement
 import { dummyC } from '../project-C/project-c';
+import { dummyA2 } from './project-a-2';
 
-export const dummyA: number = dummyB + dummyC;
+export const dummyA1: number = dummyB + dummyC + dummyA2;
 
 // eslint-disable-next-line no-console
-console.log(dummyA);
+console.log(dummyA1);

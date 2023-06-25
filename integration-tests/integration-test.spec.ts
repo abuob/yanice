@@ -15,6 +15,15 @@ describe('yanice', () => {
         IntegrationTestUtil.resetChanges();
     });
 
+    describe('bad input', () => {
+        it('should exit non-zero and print a warning when first parameter is bad', async () => {
+            const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('totally-invalid');
+            expect(commandResult.statusCode).to.equal(1);
+            const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
+            expect(output).to.deep.equal(IntegrationTestUtil.getTextFixtureContent('fixture-bad-input.txt'));
+        });
+    });
+
     describe('output-only', () => {
         it('should be able to read its config file and print out all project files for a given scope', () => {
             const output: string = IntegrationTestUtil.executeYaniceWithArgs(
@@ -140,6 +149,15 @@ describe('yanice', () => {
                         C: []
                     };
                     expect(outputObject).to.deep.equal(expected);
+                });
+
+                it('should be able to print import-boundary-violations', async () => {
+                    const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --assert'
+                    );
+                    const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
+                    expect(commandResult.statusCode).to.equal(1);
+                    expect(output).to.deep.equal(IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-output-1.txt'));
                 });
             });
         });

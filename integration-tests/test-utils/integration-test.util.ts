@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { exec, execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -11,6 +11,11 @@ interface TestLogEntry {
 type allProjectsType = 'project-A' | 'project-B' | 'project-C';
 type TestLog = Partial<Record<allProjectsType, TestLogEntry[]>>;
 
+interface CommandResult {
+    statusCode: number | undefined;
+    stdout: string;
+}
+
 export class IntegrationTestUtil {
     private static readonly allProjects: allProjectsType[] = ['project-A', 'project-B', 'project-C'];
     private static readonly repoRoot: string = path.join(__dirname, '../../');
@@ -20,6 +25,19 @@ export class IntegrationTestUtil {
         const pathToBin: string = path.join(__dirname, '../../dist/bin.js');
         const pathToTestProject: string = path.join(__dirname, '../test-project');
         return execSync(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }).toString();
+    }
+
+    public static async executeYaniceWithArgsAsync(args: string): Promise<CommandResult> {
+        const pathToBin: string = path.join(__dirname, '../../dist/bin.js');
+        const pathToTestProject: string = path.join(__dirname, '../test-project');
+        return new Promise((resolve) => {
+            exec(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }, (error, stdout) => {
+                resolve({
+                    stdout,
+                    statusCode: error?.code
+                });
+            });
+        });
     }
 
     public static getNonEmptyLines(input: string): string[] {
@@ -63,6 +81,16 @@ export class IntegrationTestUtil {
 
     public static mapProjectNameToEmptyTxt(project: allProjectsType): string {
         return IntegrationTestUtil.getAbsoluteFilePathInTestProject(path.join(project, 'empty.txt'));
+    }
+
+    public static normalizeTextOutput(textOutput: string): string {
+        // Keep test CRLF-agnostic
+        return textOutput.replace(/\r\n/g, '\n');
+    }
+
+    public static getTextFixtureContent(fileName: string): string {
+        const fileContent: string = fs.readFileSync(path.join(__dirname, '../fixtures', fileName), { encoding: 'utf-8' });
+        return IntegrationTestUtil.normalizeTextOutput(fileContent);
     }
 
     private static getAllEmptyFilePathsRelativeToRoot(): string[] {
