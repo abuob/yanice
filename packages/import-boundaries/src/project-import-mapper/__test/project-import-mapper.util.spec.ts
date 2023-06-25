@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { YaniceProject } from 'yanice';
 
+import { EnrichedFileImportMap } from '../../api/enriched-file-import-map.interface';
 import { FileImportMap, ParsedImportStatement } from '../../api/import-resolver.interface';
 import { ProjectImportByFilesMap } from '../../api/project-import-map.interface';
 import { ProjectImportMapperUtil } from '../project-import-mapper.util';
@@ -145,6 +146,43 @@ describe('ProjectImportMapperUtil', () => {
                     }
                 ]
             };
+            expect(actual).to.deep.equal(expected);
+        });
+    });
+
+    describe('createYaniceDependenciesImportMap', () => {
+        function createEnrichedFileImportMap(importedProjects: string[][]): EnrichedFileImportMap {
+            return {
+                createdByResolver: 'test',
+                filePath: 'filePath',
+                resolvedImports: importedProjects.map((importedProject: string[]): EnrichedFileImportMap['resolvedImports'][number] => {
+                    return {
+                        importStatement: 'importStatement',
+                        projects: importedProject,
+                        filePath: 'filePath'
+                    };
+                }),
+                unknownImports: [],
+                resolvedPackageImports: [],
+                skippedImports: []
+            };
+        }
+
+        it('should create the dependency-map used in the yanice.json', () => {
+            const projectImportByFilesMap: ProjectImportByFilesMap = {
+                A: [createEnrichedFileImportMap([['A'], ['A', 'B']]), createEnrichedFileImportMap([['B'], ['C']])],
+                B: [createEnrichedFileImportMap([['C', 'B']]), createEnrichedFileImportMap([['B']])],
+                C: [createEnrichedFileImportMap([['D', 'C']])],
+                D: [createEnrichedFileImportMap([])]
+            };
+            const expected: Record<string, string[]> = {
+                A: ['B', 'C'],
+                B: ['C'],
+                C: ['D'],
+                D: []
+            };
+            const actual: Record<string, string[] | undefined> =
+                ProjectImportMapperUtil.createYaniceDependenciesImportMap(projectImportByFilesMap);
             expect(actual).to.deep.equal(expected);
         });
     });

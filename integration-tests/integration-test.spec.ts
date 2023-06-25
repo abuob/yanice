@@ -128,6 +128,19 @@ describe('yanice', () => {
                     const outputObject = JSON.parse(output.trim());
                     expect(outputObject).to.deep.equal(fixtureProjectImportByFilesMap);
                 });
+
+                it('should be able to print the import-dependency-map for the yanice.json', () => {
+                    const output: string = IntegrationTestUtil.executeYaniceWithArgs(
+                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --generate --skip-post-resolvers'
+                    );
+                    const outputObject = JSON.parse(output.trim());
+                    const expected: Record<string, string[]> = {
+                        A: ['B'],
+                        B: ['C'],
+                        C: []
+                    };
+                    expect(outputObject).to.deep.equal(expected);
+                });
             });
         });
     });

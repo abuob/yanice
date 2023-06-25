@@ -48,7 +48,7 @@ export class ImportBoundariesExecutor {
         const fileImportMaps: FileImportMap[] = await ImportBoundariesExecutor.postResolveIfNecessary(
             fileImportMapsRaw,
             yaniceJsonDirectoryPath,
-            importBoundariesPluginConfig.postResolve ?? [],
+            importBoundariesPluginConfig.postResolve,
             importBoundariesArgs
         );
 
@@ -63,15 +63,20 @@ export class ImportBoundariesExecutor {
         if (importBoundariesArgs.mode === 'print-project-imports') {
             ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(projectImportByFilesMap, null, 4));
         }
+        const yaniceImportDependencies: YaniceConfig['dependencies'] =
+            ProjectImportMapperUtil.createYaniceDependenciesImportMap(projectImportByFilesMap);
+        if (importBoundariesArgs.mode === 'generate') {
+            ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(yaniceImportDependencies, null, 4));
+        }
     }
 
     private static async postResolveIfNecessary(
         fileImportMaps: FileImportMap[],
         yaniceJsonDirectoryPath: string,
-        postResolverLocations: string[],
+        postResolverLocations: string[] | undefined,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
     ): Promise<FileImportMap[]> {
-        if (postResolverLocations.length === 0 || importBoundariesArgs.skipPostResolvers) {
+        if (!postResolverLocations || postResolverLocations.length === 0 || importBoundariesArgs.skipPostResolvers) {
             return Promise.resolve(fileImportMaps);
         }
         return PostResolver.postResolveProcessing(fileImportMaps, yaniceJsonDirectoryPath, postResolverLocations);

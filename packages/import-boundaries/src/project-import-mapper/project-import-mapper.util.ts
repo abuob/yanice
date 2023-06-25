@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { ChangedProjects, YaniceProject } from 'yanice';
+import { ChangedProjects, YaniceConfig, YaniceProject } from 'yanice';
 
 import { EnrichedFileImportMap } from '../api/enriched-file-import-map.interface';
 import { FileImportMap } from '../api/import-resolver.interface';
@@ -35,6 +35,21 @@ export class ProjectImportMapperUtil {
             });
             return prev;
         }, {});
+    }
+
+    public static createYaniceDependenciesImportMap(projectImportByFilesMap: ProjectImportByFilesMap): YaniceConfig['dependencies'] {
+        return Object.keys(projectImportByFilesMap)
+            .sort()
+            .reduce((prev: YaniceConfig['dependencies'], curr: string): YaniceConfig['dependencies'] => {
+                const enrichedFileImportMaps: EnrichedFileImportMap[] = projectImportByFilesMap[curr] ?? [];
+                const importedProjectsWithDuplicates: string[] = enrichedFileImportMaps
+                    .flatMap((enrichedFileImportMap: EnrichedFileImportMap) => enrichedFileImportMap.resolvedImports)
+                    .flatMap((resolvedImport: EnrichedFileImportMap['resolvedImports'][number]): string[] => resolvedImport.projects);
+                prev[curr] = Array.from(new Set(importedProjectsWithDuplicates))
+                    .filter((projectName: string) => projectName !== curr)
+                    .sort();
+                return prev;
+            }, {});
     }
 
     private static createEnrichedFileImportMap(

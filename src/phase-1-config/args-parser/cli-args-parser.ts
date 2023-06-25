@@ -131,13 +131,14 @@ export class YaniceCliArgsParser {
     }
 
     private static getImportBoundariesModeArgument(args: string[]): YaniceImportBoundariesModeType {
-        const hasPrintFileImportArg: boolean = YaniceCliArgsParser.hasArgument(args, /^--print-file-imports$/);
-        if (hasPrintFileImportArg) {
+        if (YaniceCliArgsParser.hasArgument(args, /^--print-file-imports$/)) {
             return 'print-file-imports';
         }
-        const hasPrintProjectImportArg: boolean = YaniceCliArgsParser.hasArgument(args, /^--print-project-imports$/);
-        if (hasPrintProjectImportArg) {
+        if (YaniceCliArgsParser.hasArgument(args, /^--print-project-imports$/)) {
             return 'print-project-imports';
+        }
+        if (YaniceCliArgsParser.hasArgument(args, /^--generate$/)) {
+            return 'generate';
         }
         return 'assert';
     }
