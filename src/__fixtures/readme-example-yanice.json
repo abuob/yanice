@@ -5,6 +5,24 @@
         "outputFilters": [],
         "commandOutput": "ignore"
     },
+    "plugins": {
+        "custom": {
+            "dummy-plugin": {
+                "scriptLocation": "./some-plugin.js"
+            }
+        },
+        "officiallySupported": {
+            "import-boundaries": {
+                "importResolvers": {
+                    "**/*.txt": ["./custom-resolver.js"],
+                    "**/*.ts": ["import-resolver-es6"]
+                },
+                "exclusionGlobs": ["**/dist/**"],
+                "postResolve": ["./custom-post-resolve.js"],
+                "assertions": ["only-allow-actual-imports-in-config", "only-allow-configured-imports", "./some-custom-assertion.js"]
+            }
+        }
+    },
     "projects": [
         {
             "projectName": "project-A",

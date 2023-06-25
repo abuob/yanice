@@ -116,7 +116,7 @@ describe('yanice', () => {
             describe('import-boundaries', () => {
                 it('should be able to print the file-import-maps', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports --skip-post-resolvers'
+                        'plugin:import-boundaries a-depends-on-b --print-file-imports --skip-post-resolvers'
                     );
                     const outputObject = JSON.parse(output.trim());
                     expect(outputObject).to.deep.equal(fixtureFileImportMap);
@@ -124,7 +124,7 @@ describe('yanice', () => {
 
                 it('should be able to print the file-import-maps also when running post-resolvers', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-file-imports'
+                        'plugin:import-boundaries a-depends-on-b --print-file-imports'
                     );
                     const outputObject = JSON.parse(output.trim());
                     expect(outputObject).to.deep.equal(fixtureFileImportMapWithoutDummyResolver);
@@ -132,7 +132,7 @@ describe('yanice', () => {
 
                 it('should be able to print the project-map', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --print-project-imports --skip-post-resolvers'
+                        'plugin:import-boundaries a-depends-on-b --print-project-imports --skip-post-resolvers'
                     );
                     const outputObject = JSON.parse(output.trim());
                     expect(outputObject).to.deep.equal(fixtureProjectImportByFilesMap);
@@ -140,7 +140,7 @@ describe('yanice', () => {
 
                 it('should be able to print the import-dependency-map for the yanice.json', () => {
                     const output: string = IntegrationTestUtil.executeYaniceWithArgs(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --generate --skip-post-resolvers'
+                        'plugin:import-boundaries a-depends-on-b --generate --skip-post-resolvers'
                     );
                     const outputObject = JSON.parse(output.trim());
                     const expected: Record<string, string[]> = {
@@ -153,7 +153,7 @@ describe('yanice', () => {
 
                 it('should be able to print import-boundary-violations', async () => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
-                        'plugin:import-boundaries a-depends-on-b --rev=HEAD --assert'
+                        'plugin:import-boundaries a-depends-on-b --assert'
                     );
                     const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
                     expect(commandResult.statusCode).to.equal(1);

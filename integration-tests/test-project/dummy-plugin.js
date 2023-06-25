@@ -1,3 +1,6 @@
+/**
+ * @type {import('yanice').YanicePlugin}
+ */
 const dummyPlugin = {
     execute: (phase3Result) => {
         console.log('[DUMMY-PLUGIN] triggered');

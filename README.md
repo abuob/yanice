@@ -1,8 +1,11 @@
 # Yanice
 
-Yanice (_yet another incremental command executor_) takes care of change detection and incremental builds/command execution within a git-based monorepository.
-It lets you define various dependency graphs for different "scopes" (e.g. build, test, lint...) to model the dependencies between your projects,
-detects changes between the current working tree and e.g. another commit, and lets you execute commands depending on those changes and the dependency graphs you defined.
+Yanice (_yet another incremental command executor_) takes care of change detection and incremental builds/command
+execution within a git-based monorepository.
+It lets you define various dependency graphs for different "scopes" (e.g. build, test, lint...) to model the
+dependencies between your projects,
+detects changes between the current working tree and e.g. another commit, and lets you execute commands depending on
+those changes and the dependency graphs you defined.
 
 For example, a repository with two projects and two libraries might be modeled as follows:
 
@@ -10,22 +13,34 @@ For example, a repository with two projects and two libraries might be modeled a
   <img alt="yanice-visualization-example" src="https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png">
 </p>
 
-### Assumptions & Caveats:
-* The dependencies between the projects inside the repository can be modeled as a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG)
-* This DAG is known and is described in a `yanice.json`-file
-* Yanice will _not_ read any file inside the repository (except its configuration - the aforementioned `yanice.json`)
-* Yanice will therefore _not_ automatically detect dependencies via, for example, detecting imports. Enabling this via optional plugins is on the roadmap though (see below)
-* Yanice works best for small- to medium-sized repositories (<50 projects), the dependencies between the projects have to be defined manually, 
-which _can_ get cumbersome with increasing size
-* Due to the design philosophy of not reading/touching any files inside the repository, 
-yanice can technically be used for any kind of repository, no matter the technology/languages used (node/git must be available)
-* In its current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a given git-ref (commitSHA, HEAD, branch...). 
-Metadata about last command executions are _not_ stored or considered in any other way. To achieve incremental builds for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare to that
+## Assumptions & Caveats:
 
+-   The dependencies between the projects inside the repository can be modeled as
+    a [directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG)
+-   This DAG is known and is described in a `yanice.json`-file
+-   Yanice will _not_ read any file inside the repository (except its configuration - the aforementioned `yanice.json`)
+-   Yanice will therefore _not_ automatically detect dependencies via, for example, detecting imports. Enabling this via plugins is possible though, see below
+-   Yanice works best for small- to medium-sized repositories, the dependencies between the projects have
+    to be defined and maintained in a single configuration-file, which _can_ get cumbersome with increasing size
+-   Due to the design philosophy of not reading/touching any files inside the repository, yanice can technically be used for any kind of repository, no matter the technology/languages used (node/git must be
+    available)
+-   In its current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a
+    given git-ref (commitSHA, HEAD, branch...). Metadata about last command executions are _not_ stored or considered in any other way. To achieve incremental builds
+    for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare
+    to that
 
-## Example
-### Configuration
-The complete version of the `yanice.json` used for this example can be found here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json)
+## Installation
+
+Install e.g. via npm as follows:
+
+```
+npm install --save-dev yanice
+```
+
+## Configuration
+
+The complete version of the `yanice.json` used for this example can be found
+here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json)
 
 The example corresponds to the graph in the picture above. `project-A` for example is defined as follows:
 
@@ -49,12 +64,16 @@ The example corresponds to the graph in the picture above. `project-A` for examp
   "responsibles": ["Bob", "Bill"]
 }
 ```
-Every file in the repository that matches the given `pathGlob` (you can also use `pathRegExp` if preferred, or both) will be part of the project.
-Note that this allows you to match any file or even no file at all: If you neither define the pathGlob nor the pathRegExp,
+
+Every file in the repository that matches the given `pathGlob` (you can also use `pathRegExp` if preferred, or both)
+will be part of the project.
+Note that this allows you to match any file or even no file at all: If you neither define the pathGlob nor the
+pathRegExp,
 all files in the repository will match. Projects such as "all-js-files" or "ci-relevant-files" can easily be modeled.
 
-A Command will be executed in the given `cwd`. A command corresponds to a scope (here: build, test, lint), for which a dependency graph is defined in the `yanice.json`. E.g. for test, the dependencies
-are modeled as such: 
+A Command will be executed in the given `cwd`. A command corresponds to a scope (here: build, test, lint), for which a
+dependency graph is defined in the `yanice.json`. E.g. for test, the dependencies
+are modeled as such:
 
 ```
 "test": {
@@ -70,46 +89,79 @@ are modeled as such:
 }
 ```
 
-A scope can extend another scope, but currently, only one level of extension is allowed. 
-If a scope is extended, all dependencies are the same as of the extended scope - except for those that are overridden (in the given example, `project-A` and `lib-1` have overridden dependencies inherited from `build`).
+A scope can extend another scope, but currently, only one level of extension is allowed.
+If a scope is extended, all dependencies are the same as of the extended scope - except for those that are overridden (
+in the given example, `project-A` and `lib-1` have overridden dependencies inherited from `build`).
 
-A scope can have `defaultDependencies`; projects which are not listed will have these as dependencies. This is intended for scopes that
-have an inherently 'flat' dependency tree; e.g. linting: Each project might depend on some global linting configuration but nothing else.
+A scope can have `defaultDependencies`; projects which are not listed will have these as dependencies. This is intended
+for scopes that
+have an inherently 'flat' dependency tree; e.g. linting: Each project might depend on some global linting configuration
+but nothing else.
 Not intended to be used in combination with `extends`.
 
-### Commands
-In general, commands have the following base structure: `yanice <scope> --(rev|branch|commit)=<git-rev>`
+## Commands
 
-Per default, yanice will execute all commands of the selected scope along the dependency graph in topological order. The following options exist:
+In general, commands have the following base
+structure: `yanice (run|output-only|visualize|plugin:<plugin-name>) <scope> --(rev|branch|commit)=<git-rev>`.
 
-| Parameter  | Default | Effect |
-| :------------------------------------ |----------| ------------- |
-| `--rev=<git-revision>`, `--branch=<git-branch>`, `--commit=<commitSHA>` | | git-revision with which the current working tree (w/o uncommitted changes, see below) will be compared. `--rev=<..>` accepts anything that `git rev-parse` can turn into a commit-SHA. Under the hood, yanice uses `git diff --name-only` in combination with `git merge-base --octopus` to determine the changed files. Therefore, yanice needs to know the corresponding refs/git-history, this is especially relevant with regards to shallow-clone.  |
-| `--output-only`, `outputOnly=false/true` | `false` | Will not execute the commands, only outputs which projects have changed/commands would be executed on.  |
-| `--all` |  | Ignore all change detection and just assume every project has changed.|
-| `--concurrency=n` | `1` | Will execute `n` commands in parallel |
-| `--responsibles` | | Will print all responsibles of all projects that are affected by changes as per given scope. This might be useful for determining who should e.g. review a pull request |
-| `--include-uncommitted`, `--includeUncommitted=true/false` | `true` | Whether to include uncommitted changes. Per default, uncommitted changes are considered, otherwise `HEAD` will be used for comparison|
-| `--includeCommandSupportedOnly=true/false` | `true` | Works only in combination with `--output-only`. Per default, projects for which a command is not specified will not be part of the output even if they are dependents of a changed project (e.g. a project that imports something from a changed library but does not have any tests and therefore no test-command)|
-| `--visualize` | | Will create a visualization of the graph, e.g. as in the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png)|
-| `--save-visualization` | | Same as `--visualize`, but will save the generated html in `.yanice-output` (see options)|
-| `--renderer=dagre/vizjs` | `dagre` | Only works in combination with `--visualize`. Will choose the renderer, available are [dagre](https://github.com/dagrejs/dagre) and [vizjs](https://github.com/mdaines/viz.js). |
+See further below for examples.
 
+### First parameter
 
+Yanice consists internally of phases: Load configuration, parse the arguments, calculate the dependency tree, determine
+changed files using git,
+calculating changed projects, and so on. These steps are always the same, except for the last one, which determines
+what to do with all the results from the previous steps. This is determined by the first argument:
 
-With the [configuration from above](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json), we could run the following commands:
-* `yanice test --visualize --rev=HEAD`: Will create a visualization of the graph like in the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png).
-* `yanice lint --branch=master --concurrency=3`: Run all lint-commands of all projects that have changed compared to the master branch,
-include uncommitted changes (default), run 3 commands in parallel (default: 1).
-* `yanice lint --branch=master --outputOnly=true`: Same as above, but instead of running the commands, the projects
-on which lint-commands would be executed are printed to the console. 
-* `yanice test --branch=master --responsibles`: Print all responsibles. Note that we have to provide a scope (here: test)
-in order to create the dependency graph. 
-Yanice will collect all responsibles of the projects that are either directly changed or affected by changes, and log them to the console.
-Note that the project does not need to have a command for the used scope; its responsibles are still included.
+| First parameter        | Effect                                                                                                                                                                                                         |
+| :--------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run`                  | Runs the commands                                                                                                                                                                                              |
+| `output-only`          | Same as `run`, but instead of running the commands, print related information.                                                                                                                                 |
+| `visualize`            | Starts a small server which serves a visualization of the graph and all the changes; see e.g. [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png). |
+| `plugin:<plugin-name>` | Invokes a plugin with all available data. There are some officially provided plugins, however, you an also provide the location of a custom script that yanice will invoke. See below for details.             |
+
+### Second parameter
+
+The second parameter selects a `scope` as defined in the `yanice.json`, see above.
+
+### Additional parameters
+
+The order of the remaining parameters generally does not matter (except when overwriting each other):
+
+| Parameter                                                               | Works only for | Default  | Effect                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| :---------------------------------------------------------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--rev=<git-revision>`, `--branch=<git-branch>`, `--commit=<commitSHA>` |                |          | git-revision with which the current working tree (w/o uncommitted changes, see below) will be compared. `--rev=<..>` accepts anything that `git rev-parse` can turn into a commit-SHA. Under the hood, yanice uses `git diff --name-only` in combination with `git merge-base --octopus` to determine the changed files. Therefore, yanice needs to know the corresponding refs/git-history, this is especially relevant with regards to shallow-clone. |
+| `--all`                                                                 |                |          | Ignore all change detection and just assume every project has changed.                                                                                                                                                                                                                                                                                                                                                                                  |
+| `--concurrency=n`                                                       | `run`          | `1`      | Will execute `n` commands in parallel                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `--output-mode=ignore\|append-at-end\|append-at-end-on-error`           | `run`          | `ignore` | Determines what to do with `stdout` when running commands. Note that this overwrites configuration in the `yanice.json`.                                                                                                                                                                                                                                                                                                                                |
+| `--responsibles`                                                        | `output-only`  |          | Will print all responsibles of all projects that are affected by changes as per given scope. This might be useful for determining who should e.g. review a pull request                                                                                                                                                                                                                                                                                 |
+| `--exclude-uncommitted`                                                 |                |          | Per default, uncommitted changes are considered. With this parameter, `HEAD` will be used for comparison, the index will be ignored.                                                                                                                                                                                                                                                                                                                    |
+| `--include-filtered`                                                    | `output-only`  |          | Per default, projects for which a command is not specified will not be part of the output even if they are dependents of a changed project (e.g. a project that imports something from a changed library but does not have any tests and therefore no test-command)                                                                                                                                                                                     |
+| `--save-visualization`                                                  | `visualize`    |          | Instead of serving the visualization, it will save the generated html in `.yanice-output` (see options)                                                                                                                                                                                                                                                                                                                                                 |
+| `--renderer=dagre/vizjs`                                                | `visualize`    | `dagre`  | Will choose the renderer, available are [dagre](https://github.com/dagrejs/dagre) and [vizjs](https://github.com/mdaines/viz.js).                                                                                                                                                                                                                                                                                                                       |
+
+With
+the [configuration from above](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json),
+we could run the following commands:
+
+-   `yanice visualize test --rev=HEAD`: Will create a visualization of the graph like in
+    the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png).
+-   `yanice run lint --branch=master --concurrency=3`: Run all lint-commands of all projects that have changed compared to
+    the master branch,
+    include uncommitted changes (default), run 3 commands in parallel (default: 1).
+-   `yanice output-only lint --branch=master`: Same as above, but instead of running the commands, the projects
+    on which lint-commands would be executed are printed to the console.
+-   `yanice output-only test --branch=master --responsibles`: Print all responsibles. Note that we have to provide a
+    scope (here: test)
+    in order to create the dependency graph.
+    Yanice will collect all responsibles of the projects that are either directly changed or affected by changes, and log
+    them to the console.
+    Note that the project does not need to have a command for the used scope; its responsibles are still included.
 
 ### Options
-Options are defined in the yanice.json and can be defined as global defaults and on a per-scope-basis.
+
+Options are defined in the `yanice.json` and can be defined as global defaults and on a per-scope-basis.
+
 <table>
     <tr>
         <th>Options</th>
@@ -143,8 +195,42 @@ Options are defined in the yanice.json and can be defined as global defaults and
     </tr>
 </table>
 
+## Plugins
+
+As a design choice, yanice itself will never read any file in the repository except for the `yanice.json`.
+Therefore, tasks like automatically creating dependency-trees based on imports or asserting that declared dependencies
+are not violated
+is not possible from within yanice. However, plugins which are invoked by yanice do not have this limitation.
+
+The general idea is that when yanice is run with `yanice plugin:some-plugin ...`, yanice will run its usual steps,
+but in the end invoke the selected plugin and forward all data that has so far been calculated into the plugin.
+
+### Officially supported plugins
+
+| Name              | npm-package                 | Purpose                                                                                                                                                                                                                                                                               |
+| :---------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| import-boundaries | `@yanice/import-boundaries` | Helps to bridge the gap between the dependencies declared in the `yanice.json` and the _actual_ dependencies as per imports. Currently supports import-detection for javascript/typescript, but allows for custom import-resolvers which take a file and map it to the found imports. |
+
+### Custom plugins
+
+Custom plugins are javascript-files which yanice can require. See [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json) for configuration, [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/dummy-plugin.js) for a custom plugin example.
+
+### Dependencies
+
+Yanice tries to work with as little dependencies as possible, currently relying only on the following transitive dependencies:
+
+| Name      | npm-package                                     | Purpose                                                                                |
+| :-------- | ----------------------------------------------- | -------------------------------------------------------------------------------------- |
+| ajv       | [link](https://www.npmjs.com/package/ajv)       | Used for JSON-schema validation of the `yanice.json`.                                  |
+| async     | [link](https://www.npmjs.com/package/async)     | Used to queue and parallelize commands when using `run`. On the roadmap to be removed. |
+| minimatch | [link](https://www.npmjs.com/package/minimatch) | Used for glob-expression matching.                                                     |
+
 ### Roadmap:
-* Currently, maintenance/setup of the `yanice.json` can get cumbersome by an increasing/changing amount of projects inside the repository. Optional plugins that are able to detect project-dependencies
-by parsing import-statements and enforce boundaries could alleviate that.
-* Built-in incremental change-detection: Currently, if you run the same yanice-command twice (e.g. test), yanice will execute all commands again, even if there are no changes
-compared to the previous run. Store metadata about the last execution so that yanice will not run obviously redundant commands.
+
+-   For command-queuing and parallelization, we currently use the `async`-library as mentioned above. We could do without.
+-   Currently, maintenance/setup of the `yanice.json` can get cumbersome by an increasing/changing amount of projects
+    inside the repository.
+-   Built-in incremental change-detection: Currently, if you run the same yanice-command twice (e.g. test), yanice will
+    execute all commands again, even if there are no changes
+    compared to the previous run. Store metadata about the last execution so that yanice will not run obviously redundant
+    commands.
