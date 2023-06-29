@@ -66,7 +66,7 @@ export const fixtureProjectImportByFilesMap: ProjectImportByFilesMap = {
             filePath: 'project-C/project-c.ts',
             resolvedImports: [],
             resolvedPackageImports: [],
-            skippedImports: [],
+            skippedImports: ["import { dummyB } from '../project-B/project-b'"],
             unknownImports: []
         }
     ]

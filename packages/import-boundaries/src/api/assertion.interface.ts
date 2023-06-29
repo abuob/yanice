@@ -4,8 +4,10 @@ import { FileImportMap } from './import-resolver.interface';
 import { ProjectImportByFilesMap } from './project-import-map.interface';
 
 export type YaniceImportBoundariesAssertionViolation =
+    | AssertionViolationAmountOfSkippedImportsNotConfigured
     | AssertionViolationConfiguredImportUnused
     | AssertionViolationImportNotConfigured
+    | AssertionViolationTooManySkippedImports
     | AssertionViolationUnknownImport;
 
 export interface AssertionViolationUnknownImport {
@@ -28,6 +30,15 @@ export interface AssertionViolationConfiguredImportUnused {
     type: 'configured-import-unused';
     withinProject: string;
     unusedProject: string;
+}
+
+export interface AssertionViolationTooManySkippedImports {
+    type: 'too-many-skipped-imports';
+    maxAmount: number;
+    actualAmount: number;
+}
+export interface AssertionViolationAmountOfSkippedImportsNotConfigured {
+    type: 'amount-of-skipped-imports-not-configured';
 }
 
 export interface YaniceImportBoundariesAssertion {

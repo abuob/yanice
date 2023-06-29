@@ -54,6 +54,7 @@ Currently supported:
 
 -   `only-allow-actual-imports-in-config`
 -   `only-allow-configured-imports`
+-   `max-skipped-imports`
 
 ## Commands
 

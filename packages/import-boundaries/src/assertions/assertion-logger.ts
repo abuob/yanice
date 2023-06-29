@@ -7,24 +7,37 @@ export class AssertionLogger {
         violations.forEach((violation: YaniceImportBoundariesAssertionViolation) => AssertionLogger.logAssertionViolation(violation));
     }
 
-    private static logAssertionViolation(violation: YaniceImportBoundariesAssertionViolation): void {
+    private static logAssertionViolation(violation: YaniceImportBoundariesAssertionViolation): null {
+        // the "return null" makes the compiler handle us all different violation.types here
         switch (violation.type) {
             case 'unknown-import':
-                AssertionLogger.logInFile(violation.filePath, violation.withinProject);
-                LogUtil.log(`    Unknown import: ${violation.importStatement}`);
-                return;
+                LogUtil.log(`${violation.filePath}:`);
+                LogUtil.log(`    In project:        ${violation.withinProject}`);
+                LogUtil.log(`    Unknown import:    ${violation.importStatement}\n`);
+                return null;
             case 'import-not-configured':
-                AssertionLogger.logInFile(violation.filePath, violation.withinProject);
-                LogUtil.log(`    Import to project "${violation.actualProject}" which is not configured in yanice.json:`);
-                LogUtil.log(`        ${violation.importStatement}`);
-                return;
+                const allowedImports: string =
+                    violation.allowedProjects.length === 0 ? '(none)' : `[${violation.allowedProjects.join(', ')}]`;
+                LogUtil.log(`${violation.filePath}:`);
+                LogUtil.log(`    In project:        ${violation.withinProject}`);
+                LogUtil.log(`    Import statement:  ${violation.importStatement}`);
+                LogUtil.log(`    Allowed Imports:   ${allowedImports}`);
+                LogUtil.log(`    Actual import:     ${violation.actualProject}\n`);
+                return null;
             case 'configured-import-unused':
-                LogUtil.log(`For project "${violation.withinProject}":`);
-                LogUtil.log(`    Imports to "${violation.unusedProject}" are allowed and configured but do not exist`);
-                return;
+                LogUtil.log(`${violation.withinProject}:`);
+                LogUtil.log(`    Imports to "${violation.unusedProject}" are allowed and configured but do not exist\n`);
+                return null;
+            case 'too-many-skipped-imports':
+                LogUtil.log(`Too many skipped imports:`);
+                LogUtil.log(`    Found ${violation.actualAmount} skipped imports, maximum allowed amount is ${violation.maxAmount}\n`);
+                return null;
+            case 'amount-of-skipped-imports-not-configured':
+                LogUtil.log(`Maximum amount of skipped imports not configured:`);
+                LogUtil.log(
+                    `    The "max-skipped-imports"-assertion is enabled in the yanice.json, but "assertionOptions.maximumSkippedImports" is not configured\n`
+                );
+                return null;
         }
-    }
-    private static logInFile(filePath: string, project: string): void {
-        LogUtil.log(`${filePath} (project: ${project}):`);
     }
 }

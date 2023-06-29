@@ -45,6 +45,14 @@
                                     "items": {
                                         "type": "string"
                                     }
+                                },
+                                "assertionOptions": {
+                                    "type": "object",
+                                    "properties": {
+                                        "maximumSkippedImports": {
+                                            "type": "number"
+                                        }
+                                    }
                                 }
                             },
                             "additionalProperties": false,

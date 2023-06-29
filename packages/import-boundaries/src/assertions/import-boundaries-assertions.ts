@@ -5,6 +5,7 @@ import { Phase3Result } from 'yanice';
 import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
 import { FileImportMap } from '../api/import-resolver.interface';
 import { ProjectImportByFilesMap } from '../api/project-import-map.interface';
+import { maxSkippedImports } from './max-skipped-imports';
 import { onlyAllowActualImportsInConfigAssertion } from './only-allow-actual-imports-in-config.assertion';
 import { onlyAllowConfiguredImportsAssertion } from './only-allow-configured-imports.assertion';
 
@@ -42,6 +43,8 @@ export class ImportBoundariesAssertions {
                 return onlyAllowActualImportsInConfigAssertion;
             case 'only-allow-configured-imports':
                 return onlyAllowConfiguredImportsAssertion;
+            case 'max-skipped-imports':
+                return maxSkippedImports;
             default: {
                 return require(path.join(yaniceJsonDirectoryPath, resolverNameOrLocation));
             }

@@ -1,6 +1,15 @@
-project-A/project-a-1.ts (project: A):
-    Import to project "A" which is not configured in yanice.json:
-        import { dummyA2 } from './project-a-2'
-project-B/project-b.ts (project: B):
-    Import to project "C" which is not configured in yanice.json:
-        import { dummyC } from '../project-C/project-c'
+project-A/project-a-1.ts:
+    In project:        A
+    Import statement:  import { dummyA2 } from './project-a-2'
+    Allowed Imports:   [B]
+    Actual import:     A
+
+project-B/project-b.ts:
+    In project:        B
+    Import statement:  import { dummyC } from '../project-C/project-c'
+    Allowed Imports:   (none)
+    Actual import:     C
+
+Too many skipped imports:
+    Found 2 skipped imports, maximum allowed amount is 0
+

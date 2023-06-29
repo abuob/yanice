@@ -15,7 +15,10 @@
                 },
                 "exclusionGlobs": ["**/dist/**"],
                 "postResolve": ["./post-resolve.js"],
-                "assertions": ["only-allow-actual-imports-in-config", "only-allow-configured-imports"]
+                "assertions": ["only-allow-actual-imports-in-config", "only-allow-configured-imports", "max-skipped-imports"],
+                "assertionOptions": {
+                    "maximumSkippedImports": 0
+                }
             }
         }
     },

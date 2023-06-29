@@ -80,7 +80,13 @@ export const fixtureFileImportMap: FileImportMap[] = [
         createdBy: 'import-resolver-es6',
         resolvedImports: [],
         resolvedPackageImports: [],
-        skippedImports: [],
+        skippedImports: [
+            {
+                fromClause: '../project-B/project-b',
+                raw: "import { dummyB } from '../project-B/project-b'",
+                type: 'relative'
+            }
+        ],
         unknownImports: []
     }
 ];
