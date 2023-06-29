@@ -46,8 +46,8 @@ export class GraphDagreRenderer {
                         : [],
                     isAffected: affectedProjects.includes(node.name),
                     command: projectOrUndefined ? projectOrUndefined.commands[scope] || null : null,
-                    pathGlob: projectOrUndefined ? projectOrUndefined.pathGlob : '**',
-                    pathRegExp: projectOrUndefined ? projectOrUndefined.pathRegExp.toString() : '.*'
+                    pathGlob: projectOrUndefined?.pathGlob ?? '**',
+                    pathRegExp: projectOrUndefined?.pathRegExp?.toString() ?? '.*'
                 };
             })
             .reduce(

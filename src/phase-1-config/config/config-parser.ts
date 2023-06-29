@@ -73,8 +73,8 @@ export class ConfigParser {
             });
             return {
                 projectName: project.projectName,
-                pathGlob: project.pathGlob ? project.pathGlob : '**',
-                pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : /.*/,
+                pathGlob: project.pathGlob ?? null,
+                pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : null,
                 responsibles: project.responsibles ? project.responsibles : [],
                 commands
             };

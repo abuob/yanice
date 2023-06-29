@@ -3,6 +3,7 @@ export * from './src/phase-1-config/args-parser/plugin.type';
 export * from './src/phase-1-config/config/config.interface';
 export * from './src/phase-1-config/config/plugin-config/custom.plugin.type';
 export * from './src/phase-1-config/config/plugin-config/import-boundaries.plugin.type';
+export * from './src/phase-1-config/directed-graph/directed-graph';
 export * from './src/phase-3-project-changes/changed-projects';
 export * from './src/phase-3-project-changes/glob-tester';
 export * from './src/phase-3-project-changes/phase-3.result.type';

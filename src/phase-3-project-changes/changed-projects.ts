@@ -11,6 +11,9 @@ export class ChangedProjects {
     }
 
     public static isFilePathPartOfProject(yaniceProject: YaniceProject, filePath: string): boolean {
-        return yaniceProject.pathRegExp.test(filePath) && GlobTester.isGlobMatching(filePath, yaniceProject.pathGlob);
+        return (
+            (!yaniceProject.pathRegExp || yaniceProject.pathRegExp.test(filePath)) &&
+            (!yaniceProject.pathGlob || GlobTester.isGlobMatching(filePath, yaniceProject.pathGlob))
+        );
     }
 }

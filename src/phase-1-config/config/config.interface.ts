@@ -48,8 +48,8 @@ export interface YaniceJsonType {
 
 export interface YaniceProject {
     projectName: string;
-    pathRegExp: RegExp;
-    pathGlob: string;
+    pathRegExp: RegExp | null;
+    pathGlob: string | null;
     commands: YaniceCommandPerScope;
     responsibles: string[];
 }
