@@ -7,4 +7,8 @@ export class GlobTester {
     public static isGlobMatching(input: string, glob: string): boolean {
         return minimatch(input, glob, { dot: true });
     }
+
+    public static filterByPattern(inputs: string[], glob: string): string[] {
+        return inputs.filter(minimatch.filter(glob, { dot: true }));
+    }
 }
