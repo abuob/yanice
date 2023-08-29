@@ -1,10 +1,13 @@
-import fs from 'node:fs/promises';
 import path from 'node:path';
+import util from 'node:util';
 
+import gracefulFs from 'graceful-fs';
 import { GlobTester } from 'yanice';
 
 import { FileImportMap, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
 import { importResolverEs6 } from './es6/import-resolver.es6';
+
+const fsReadFile = util.promisify(gracefulFs.readFile);
 
 export class ImportResolution {
     public static async getImportMaps(
@@ -51,7 +54,7 @@ export class ImportResolution {
         absoluteFilePath: string,
         resolvers: YaniceImportBoundariesImportResolver[]
     ): Promise<FileImportMap[]> {
-        const fileContent: string = await fs.readFile(absoluteFilePath, { encoding: 'utf-8' });
+        const fileContent: string = await fsReadFile(absoluteFilePath, { encoding: 'utf-8' });
         const fileImportMapPromises: Promise<FileImportMap | null>[] = resolvers.map(
             (resolver: YaniceImportBoundariesImportResolver): Promise<FileImportMap | null> => {
                 return resolver.getFileImportMap(absoluteFilePath, fileContent);

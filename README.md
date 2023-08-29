@@ -219,11 +219,12 @@ Custom plugins are javascript-files which yanice can require. See [here](https:/
 
 Yanice tries to work with as little dependencies as possible, currently relying only on the following transitive dependencies:
 
-| Name      | npm-package                                     | Purpose                                                                                |
-| :-------- | ----------------------------------------------- | -------------------------------------------------------------------------------------- |
-| ajv       | [link](https://www.npmjs.com/package/ajv)       | Used for JSON-schema validation of the `yanice.json`.                                  |
-| async     | [link](https://www.npmjs.com/package/async)     | Used to queue and parallelize commands when using `run`. On the roadmap to be removed. |
-| minimatch | [link](https://www.npmjs.com/package/minimatch) | Used for glob-expression matching.                                                     |
+| Name        | npm-package                                       | Purpose                                                                                |
+| :---------- | ------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| ajv         | [link](https://www.npmjs.com/package/ajv)         | Used for JSON-schema validation of the `yanice.json`.                                  |
+| async       | [link](https://www.npmjs.com/package/async)       | Used to queue and parallelize commands when using `run`. On the roadmap to be removed. |
+| minimatch   | [link](https://www.npmjs.com/package/minimatch)   | Used for glob-expression matching.                                                     |
+| graceful-fs | [link](https://www.npmjs.com/package/graceful-fs) | Used to read files (avoid EMFILE-errors, especially on windows)                        |
 
 ### Roadmap:
 
