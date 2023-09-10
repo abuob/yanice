@@ -41,59 +41,38 @@ export class Phase4CommandExecutor extends AbstractPhase4Executor {
             affectedProjects.includes(project.projectName)
         );
 
-        const promiseQueue: PromiseQueueEntry[] = projectsWithCommandsToExecute.reduce(
+        const promiseQueueEntries: PromiseQueueEntry[] = projectsWithCommandsToExecute.reduce(
             (prev: PromiseQueueEntry[], currentProject: YaniceProject): PromiseQueueEntry[] => {
                 const yaniceCommand: YaniceCommand | undefined = currentProject.commands[scope];
                 if (!yaniceCommand) {
                     return prev;
                 }
-                const promiseQueueEntries: PromiseQueueEntry[] = yaniceCommand.commands.map(
+                const promiseQueueEntriesForProject: PromiseQueueEntry[] = yaniceCommand.commands.map(
                     (command: string, commandIndex: number): PromiseQueueEntry => {
                         const absoluteCwd: string = path.resolve(baseDirectory, yaniceCommand.cwd);
-                        const promiseCreator: PromiseCreator = this.createPromiseCreatorForCommand(
-                            command,
-                            absoluteCwd,
-                            async () => {},
-                            async (commandExecutionResult: CommandExecutionResult): Promise<void> => {
-                                if (commandExecutionResult.exitCode === 0) {
-                                    LogUtil.printCommandSuccess(command, yaniceCommand.cwd, commandExecutionResult);
-                                } else {
-                                    LogUtil.printCommandFailure(command, yaniceCommand.cwd, commandExecutionResult);
-                                }
-                            }
-                        );
-                        const waitingFor: string[] = DirectedGraphUtil.getDescendantsAndSelfForSingleNode(
+                        const promiseCreator: PromiseCreator = this.createPromiseCreatorForCommand(command, absoluteCwd, yaniceCommand.cwd);
+                        const waitingFor: string[] = Phase4CommandExecutor.getWaitingForDependencies(
                             depGraph,
-                            currentProject.projectName
-                        ).reduce((acc: string[], currentProjectName: string): string[] => {
-                            if (currentProjectName === currentProject.projectName || !affectedProjects.includes(currentProjectName)) {
-                                return acc;
-                            }
-                            const correspondingProject: YaniceProject | undefined = yaniceConfig.projects.find((project) => {
-                                return project.projectName === currentProjectName;
-                            });
-                            const correspondingProjectCommands = correspondingProject?.commands[scope]?.commands;
-                            if (!correspondingProject || !correspondingProjectCommands) {
-                                return acc;
-                            }
-                            const mappedNames: string[] = correspondingProjectCommands.map((_, index: number) => {
-                                return this.mapProjectNameAndCommandIndexToIdentifier(correspondingProject.projectName, index);
-                            });
-                            return acc.concat(mappedNames);
-                        }, []);
+                            affectedProjects,
+                            currentProject.projectName,
+                            yaniceConfig.projects,
+                            scope
+                        );
                         return {
-                            name: this.mapProjectNameAndCommandIndexToIdentifier(currentProject.projectName, commandIndex),
+                            name: Phase4CommandExecutor.mapProjectNameAndCommandIndexToIdentifier(currentProject.projectName, commandIndex),
                             promiseCreator,
                             waitingFor
                         };
                     }
                 );
-                return prev.concat(promiseQueueEntries);
+                return prev.concat(promiseQueueEntriesForProject);
             },
             []
         );
 
-        PromiseQueue.startQueue(promiseQueue, yaniceRunArgs.concurrency).then((): void => {
+        const promiseQueue: PromiseQueue = PromiseQueue.createQueue(promiseQueueEntries, yaniceRunArgs.concurrency);
+
+        promiseQueue.startQueue().then((): void => {
             LogUtil.printOutputFormattedAfterAllCommandsCompleted(yaniceConfig, this.commandExecutionResults);
             if (this.commandExecutionResults.some((result: CommandExecutionResult): boolean => result.exitCode !== 0)) {
                 this.exitYanice(1, null);
@@ -101,33 +80,70 @@ export class Phase4CommandExecutor extends AbstractPhase4Executor {
         });
     }
 
-    private mapProjectNameAndCommandIndexToIdentifier(projectName: string, index: number): string {
+    private static getWaitingForDependencies(
+        depGraph: DirectedGraph,
+        affectedProjects: string[],
+        currentYaniceProjectName: string,
+        yaniceProjects: YaniceProject[],
+        scope: string
+    ): string[] {
+        return DirectedGraphUtil.getDescendantsAndSelfForSingleNode(depGraph, currentYaniceProjectName).reduce(
+            (acc: string[], currentProjectName: string): string[] => {
+                if (currentProjectName === currentYaniceProjectName || !affectedProjects.includes(currentProjectName)) {
+                    return acc;
+                }
+                const correspondingProject: YaniceProject | undefined = yaniceProjects.find((project: YaniceProject): boolean => {
+                    return project.projectName === currentProjectName;
+                });
+                const correspondingProjectCommands: string[] | undefined = correspondingProject?.commands[scope]?.commands;
+                if (!correspondingProject || !correspondingProjectCommands) {
+                    return acc;
+                }
+                const mappedNames: string[] = correspondingProjectCommands.map((_: string, index: number) => {
+                    return Phase4CommandExecutor.mapProjectNameAndCommandIndexToIdentifier(correspondingProject.projectName, index);
+                });
+                return acc.concat(mappedNames);
+            },
+            []
+        );
+    }
+
+    private static mapProjectNameAndCommandIndexToIdentifier(projectName: string, index: number): string {
         return `${projectName}--${index}`;
     }
 
-    private createPromiseCreatorForCommand(
-        command: string,
-        cwd: string,
-        initTaskCallback: () => Promise<void>,
-        afterTaskCallback: (commandExecutionResult: CommandExecutionResult) => Promise<void>
-    ): PromiseCreator {
-        return (): Promise<void> => {
+    private createPromiseCreatorForCommand(command: string, absoluteCwd: string, relativeCwdToBaseDir: string): PromiseCreator {
+        const afterTaskCallback: (
+            commandExecutionResult: CommandExecutionResult,
+            getRemainingQueueSize: () => number
+        ) => Promise<void> = async (commandExecutionResult: CommandExecutionResult, getRemainingQueueSize: () => number): Promise<void> => {
+            if (commandExecutionResult.exitCode === 0) {
+                LogUtil.printCommandSuccess(command, relativeCwdToBaseDir, commandExecutionResult, getRemainingQueueSize());
+            } else {
+                LogUtil.printCommandFailure(command, relativeCwdToBaseDir, commandExecutionResult, getRemainingQueueSize());
+            }
+        };
+
+        return (getRemainingQueueSize: () => number): Promise<void> => {
             return new Promise(async (resolve): Promise<void> => {
                 const startTime: number = Date.now();
-                await initTaskCallback();
-                exec(command, { cwd, encoding: 'utf-8' }, (err: ExecException | null, stdout: string, stderr: string): void => {
-                    const endTime: number = Date.now();
-                    const commandExecutionResult: CommandExecutionResult = {
-                        stdout,
-                        stderr,
-                        exitCode: err ? (err.code ? err.code : 1) : 0,
-                        executionDurationInMs: endTime - startTime
-                    };
-                    this.commandExecutionResults.push(commandExecutionResult);
-                    afterTaskCallback(commandExecutionResult).then(() => {
-                        resolve();
-                    });
-                });
+                exec(
+                    command,
+                    { cwd: absoluteCwd, encoding: 'utf-8' },
+                    (err: ExecException | null, stdout: string, stderr: string): void => {
+                        const endTime: number = Date.now();
+                        const commandExecutionResult: CommandExecutionResult = {
+                            stdout,
+                            stderr,
+                            exitCode: err ? (err.code ? err.code : 1) : 0,
+                            executionDurationInMs: endTime - startTime
+                        };
+                        this.commandExecutionResults.push(commandExecutionResult);
+                        afterTaskCallback(commandExecutionResult, getRemainingQueueSize).then(() => {
+                            resolve();
+                        });
+                    }
+                );
             });
         };
     }

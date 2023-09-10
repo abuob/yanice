@@ -54,8 +54,8 @@ export class ImportResolution {
             },
             []
         );
-
-        await PromiseQueue.startSimpleQueue(promiseCreators, maxConcurrency);
+        const promiseQueue: PromiseQueue = PromiseQueue.createSimpleQueue(promiseCreators, maxConcurrency);
+        await promiseQueue.startQueue();
         return allFileImportMaps;
     }
 

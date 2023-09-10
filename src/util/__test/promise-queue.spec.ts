@@ -20,7 +20,8 @@ describe('PromiseQueue', (): void => {
             { name: 'c', waitingFor: [], promiseCreator },
             { name: 'd', waitingFor: [], promiseCreator }
         ];
-        const results = await PromiseQueue.startQueue(queue, 1);
+        const promiseQueue = PromiseQueue.createQueue(queue, 1);
+        const results = await promiseQueue.startQueue();
         const resultA = getResultWithName(results, 'a');
         const resultB = getResultWithName(results, 'b');
         const resultC = getResultWithName(results, 'c');
@@ -37,7 +38,8 @@ describe('PromiseQueue', (): void => {
             { name: 'c', waitingFor: ['a'], promiseCreator },
             { name: 'd', waitingFor: ['b'], promiseCreator }
         ];
-        const results = await PromiseQueue.startQueue(queue, 1);
+        const promiseQueue = PromiseQueue.createQueue(queue, 1);
+        const results = await promiseQueue.startQueue();
         const resultA = getResultWithName(results, 'a');
         const resultB = getResultWithName(results, 'b');
         const resultC = getResultWithName(results, 'c');
@@ -60,7 +62,8 @@ describe('PromiseQueue', (): void => {
             { name: 'c', waitingFor: [], promiseCreator },
             { name: 'd', waitingFor: [], promiseCreator }
         ];
-        const results = await PromiseQueue.startQueue(queue, 2);
+        const promiseQueue = PromiseQueue.createQueue(queue, 2);
+        const results = await promiseQueue.startQueue();
         const resultA = getResultWithName(results, 'a');
         const resultB = getResultWithName(results, 'b');
         const resultC = getResultWithName(results, 'c');

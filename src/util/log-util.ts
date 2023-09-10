@@ -10,16 +10,24 @@ export class LogUtil {
         log(message);
     }
 
-    public static printCommandSuccess(command: string, relativeCwd: string, commandExecutionResult: CommandExecutionResult): void {
-        const durationMessage: string = LogUtil.createDurationInfoInBrackets(commandExecutionResult);
-        const cwdInfoIfNotRoot: string = relativeCwd !== './' ? ` (cwd: ${relativeCwd})` : '';
-        log(`  \x1B[1;32m ✔ ${command}\x1B[0m ${durationMessage}${cwdInfoIfNotRoot} `);
+    public static printCommandSuccess(
+        command: string,
+        relativeCwd: string,
+        commandExecutionResult: CommandExecutionResult,
+        queueSize: number
+    ): void {
+        const commandInfo: string = LogUtil.getCommandInfoString(commandExecutionResult.executionDurationInMs, relativeCwd, queueSize);
+        log(`  \x1B[1;32m ✔ ${command}\x1B[0m ${commandInfo}`);
     }
 
-    public static printCommandFailure(command: string, relativeCwd: string, commandExecutionResult: CommandExecutionResult): void {
-        const durationMessage: string = ` ${LogUtil.createDurationInfoInBrackets(commandExecutionResult)}`;
-        const cwdInfoIfNotRoot: string = relativeCwd !== './' ? ` (cwd: ${relativeCwd})` : '';
-        log(`  \x1B[1;31m ✘ ${command}\x1B[0m ${durationMessage}${cwdInfoIfNotRoot}`);
+    public static printCommandFailure(
+        command: string,
+        relativeCwd: string,
+        commandExecutionResult: CommandExecutionResult,
+        queueSize: number
+    ): void {
+        const commandInfo: string = LogUtil.getCommandInfoString(commandExecutionResult.executionDurationInMs, relativeCwd, queueSize);
+        log(`  \x1B[1;31m ✘ ${command}\x1B[0m ${commandInfo}`);
     }
 
     public static printOutputFormattedAfterAllCommandsCompleted(
@@ -54,18 +62,34 @@ export class LogUtil {
         return appliedFilters.reduce((prev: boolean, curr): boolean => prev && curr.filterOutputLine(outputLine), true);
     }
 
-    private static createDurationInfoInBrackets(commandExecutionResult: CommandExecutionResult): string {
-        const durationInSeconds: number = commandExecutionResult.executionDurationInMs / 1000;
+    public static getCommandInfoString(executionDurationInMs: number, relativeCwd: string, queueSize: number): string {
+        const durationInfo: string = LogUtil.getCommandDurationString(executionDurationInMs);
+        const relativeCwdInfo: string | null = LogUtil.getCwdInfo(relativeCwd);
+        if (relativeCwdInfo) {
+            return `(${durationInfo}s, cwd: ${relativeCwdInfo}, queue: ${queueSize})`;
+        }
+        return `(${durationInfo}s, queue: ${queueSize})`;
+    }
+
+    private static getCwdInfo(relativeCwd: string): string | null {
+        if (relativeCwd !== './') {
+            return relativeCwd;
+        }
+        return null;
+    }
+
+    private static getCommandDurationString(executionDurationInMs: number): string {
+        const durationInSeconds: number = executionDurationInMs / 1000;
         if (durationInSeconds < 1) {
-            return `(${durationInSeconds.toFixed(3)}s)`;
+            return durationInSeconds.toFixed(3);
         }
         if (durationInSeconds < 10) {
-            return `(${durationInSeconds.toFixed(2)}s)`;
+            return durationInSeconds.toFixed(2);
         }
         if (durationInSeconds < 100) {
-            return `(${durationInSeconds.toFixed(1)}s)`;
+            return durationInSeconds.toFixed(1);
         }
-        return `(${Math.round(durationInSeconds)}s)`;
+        return Math.round(durationInSeconds).toString();
     }
 
     private static printOutputChunkFilteredUnlessIgnored(chunk: string, appliedFilters: OutputFilter[], ignoreFlag: boolean): void {

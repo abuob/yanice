@@ -1,4 +1,4 @@
-export type PromiseCreator = () => Promise<void>;
+export type PromiseCreator = (getRemainingQueueSize: () => number) => Promise<void>;
 
 export interface PromiseQueueEntry {
     name: string;
@@ -24,27 +24,7 @@ export class PromiseQueue {
 
     constructor(private maxConcurrency: number, private internalQueue: InternalPromiseQueueEntry[]) {}
 
-    public static async startQueue(
-        promiseQueueEntries: PromiseQueueEntry[],
-        concurrency: number
-    ): Promise<PromiseQueueEntryExecutionResult[]> {
-        const internalQueue: InternalPromiseQueueEntry[] = promiseQueueEntries.map(
-            (entry: PromiseQueueEntry): InternalPromiseQueueEntry => {
-                return {
-                    entry,
-                    isInExecutionOrExecuted: false,
-                    result: null
-                };
-            }
-        );
-        const promiseQueue: PromiseQueue = new PromiseQueue(concurrency, internalQueue);
-        return promiseQueue.populateQueueEntriesRecursively();
-    }
-
-    public static async startSimpleQueue(
-        promiseCreators: PromiseCreator[],
-        concurrency: number
-    ): Promise<PromiseQueueEntryExecutionResult[]> {
+    public static createSimpleQueue(promiseCreators: PromiseCreator[], concurrency: number): PromiseQueue {
         const internalQueue: InternalPromiseQueueEntry[] = promiseCreators.map(
             (promiseCreator: PromiseCreator, index: number): InternalPromiseQueueEntry => {
                 return {
@@ -58,21 +38,24 @@ export class PromiseQueue {
                 };
             }
         );
-        const promiseQueue: PromiseQueue = new PromiseQueue(concurrency, internalQueue);
-        return promiseQueue.populateQueueEntriesRecursively();
+        return new PromiseQueue(concurrency, internalQueue);
     }
 
-    private static async executePromise(promiseQueueEntry: PromiseQueueEntry): Promise<PromiseQueueEntryExecutionResult> {
-        const startTime: number = Date.now();
-        return promiseQueueEntry.promiseCreator().then((): PromiseQueueEntryExecutionResult => {
-            const stopTime: number = Date.now();
-            return {
-                name: promiseQueueEntry.name,
-                startTime,
-                stopTime,
-                durationInMilliSeconds: stopTime - startTime
-            };
-        });
+    public static createQueue(promiseQueueEntries: PromiseQueueEntry[], concurrency: number): PromiseQueue {
+        const internalQueue: InternalPromiseQueueEntry[] = promiseQueueEntries.map(
+            (entry: PromiseQueueEntry): InternalPromiseQueueEntry => {
+                return {
+                    entry,
+                    isInExecutionOrExecuted: false,
+                    result: null
+                };
+            }
+        );
+        return new PromiseQueue(concurrency, internalQueue);
+    }
+
+    public async startQueue(): Promise<PromiseQueueEntryExecutionResult[]> {
+        return this.populateQueueEntriesRecursively();
     }
 
     private static getReadyEntries(internalQueue: InternalPromiseQueueEntry[]): InternalPromiseQueueEntry[] {
@@ -91,6 +74,30 @@ export class PromiseQueue {
             );
             return isEveryWaitingForConditionSatisfied;
         });
+    }
+
+    private getRemainingQueueSize(): number {
+        const internalQueueEntriesYetToBeExecuted: InternalPromiseQueueEntry[] = this.internalQueue.filter(
+            (internalQueueEntry: InternalPromiseQueueEntry): boolean => {
+                return !internalQueueEntry.isInExecutionOrExecuted;
+            }
+        );
+        return internalQueueEntriesYetToBeExecuted.length;
+    }
+
+    private async executePromise(promiseQueueEntry: PromiseQueueEntry): Promise<PromiseQueueEntryExecutionResult> {
+        const startTime: number = Date.now();
+        return promiseQueueEntry
+            .promiseCreator((): number => this.getRemainingQueueSize())
+            .then((): PromiseQueueEntryExecutionResult => {
+                const stopTime: number = Date.now();
+                return {
+                    name: promiseQueueEntry.name,
+                    startTime,
+                    stopTime,
+                    durationInMilliSeconds: stopTime - startTime
+                };
+            });
     }
 
     private async populateQueueEntriesRecursively(): Promise<PromiseQueueEntryExecutionResult[]> {
@@ -117,15 +124,15 @@ export class PromiseQueue {
         promisesToExecute.forEach((internalQueueEntry: InternalPromiseQueueEntry) => {
             internalQueueEntry.isInExecutionOrExecuted = true;
             this.currentExecutionAmount++;
-            const executionPromise: Promise<PromiseQueueEntryExecutionResult[]> = PromiseQueue.executePromise(
-                internalQueueEntry.entry
-            ).then(async (result: PromiseQueueEntryExecutionResult): Promise<PromiseQueueEntryExecutionResult[]> => {
-                this.currentExecutionAmount--;
-                internalQueueEntry.result = result;
-                return this.populateQueueEntriesRecursively().then((results): PromiseQueueEntryExecutionResult[] => {
-                    return [result, ...results];
-                });
-            });
+            const executionPromise: Promise<PromiseQueueEntryExecutionResult[]> = this.executePromise(internalQueueEntry.entry).then(
+                async (result: PromiseQueueEntryExecutionResult): Promise<PromiseQueueEntryExecutionResult[]> => {
+                    this.currentExecutionAmount--;
+                    internalQueueEntry.result = result;
+                    return this.populateQueueEntriesRecursively().then((results): PromiseQueueEntryExecutionResult[] => {
+                        return [result, ...results];
+                    });
+                }
+            );
             promisesInExecution.push(executionPromise);
         });
         return Promise.all(promisesInExecution).then(
