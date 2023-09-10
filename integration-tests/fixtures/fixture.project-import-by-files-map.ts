@@ -18,6 +18,14 @@ export const fixtureProjectImportByFilesMap: ProjectImportByFilesMap = {
         },
         {
             createdByResolver: 'import-resolver-es6',
+            filePath: 'project-A/project-a-2.ts',
+            resolvedImports: [],
+            resolvedPackageImports: [],
+            skippedImports: [],
+            unknownImports: []
+        },
+        {
+            createdByResolver: 'import-resolver-es6',
             filePath: 'project-A/project-a-1.ts',
             resolvedImports: [
                 {
@@ -33,14 +41,6 @@ export const fixtureProjectImportByFilesMap: ProjectImportByFilesMap = {
             ],
             resolvedPackageImports: [],
             skippedImports: ["import { dummyC } from '../project-C/project-c'"],
-            unknownImports: []
-        },
-        {
-            createdByResolver: 'import-resolver-es6',
-            filePath: 'project-A/project-a-2.ts',
-            resolvedImports: [],
-            resolvedPackageImports: [],
-            skippedImports: [],
             unknownImports: []
         }
     ],

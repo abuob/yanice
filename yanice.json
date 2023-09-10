@@ -26,7 +26,7 @@
             "pathGlob": "packages/import-boundaries/**",
             "commands": {
                 "build": {
-                    "command": "tsc -p tsconfig.build.json && pwd",
+                    "command": "tsc -p tsconfig.build.json",
                     "cwd": "packages/import-boundaries"
                 }
             }

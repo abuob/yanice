@@ -20,6 +20,28 @@ export const fixtureFileImportMap: FileImportMap[] = [
         unknownImports: []
     },
     {
+        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts'),
+        createdBy: 'import-resolver-es6',
+        resolvedImports: [],
+        resolvedPackageImports: [],
+        skippedImports: [],
+        unknownImports: []
+    },
+    {
+        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-C/project-c.ts'),
+        createdBy: 'import-resolver-es6',
+        resolvedImports: [],
+        resolvedPackageImports: [],
+        skippedImports: [
+            {
+                fromClause: '../project-B/project-b',
+                raw: "import { dummyB } from '../project-B/project-b'",
+                type: 'relative'
+            }
+        ],
+        unknownImports: []
+    },
+    {
         absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-1.ts'),
         createdBy: 'import-resolver-es6',
         resolvedImports: [
@@ -51,14 +73,6 @@ export const fixtureFileImportMap: FileImportMap[] = [
         unknownImports: []
     },
     {
-        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts'),
-        createdBy: 'import-resolver-es6',
-        resolvedImports: [],
-        resolvedPackageImports: [],
-        skippedImports: [],
-        unknownImports: []
-    },
-    {
         absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-B/project-b.ts'),
         createdBy: 'import-resolver-es6',
         resolvedImports: [
@@ -73,20 +87,6 @@ export const fixtureFileImportMap: FileImportMap[] = [
         ],
         resolvedPackageImports: [],
         skippedImports: [],
-        unknownImports: []
-    },
-    {
-        absoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-C/project-c.ts'),
-        createdBy: 'import-resolver-es6',
-        resolvedImports: [],
-        resolvedPackageImports: [],
-        skippedImports: [
-            {
-                fromClause: '../project-B/project-b',
-                raw: "import { dummyB } from '../project-B/project-b'",
-                type: 'relative'
-            }
-        ],
         unknownImports: []
     }
 ];

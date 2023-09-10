@@ -1,5 +1,5 @@
 import { YaniceConfig } from '../phase-1-config/config/config.interface';
-import { ICommandExecutionResult, ParallelExecutionCommand } from './execute-in-parallel-limited';
+import { CommandExecutionResult } from '../phase-4-execution/phase-4-command.executor';
 import { log } from './log';
 import { commandOutputFilterType, OutputFilter } from './output-filter';
 import { KarmaProgressSuccessFilter } from './output-filters/karma-progress-success-filter';
@@ -10,20 +10,21 @@ export class LogUtil {
         log(message);
     }
 
-    public static printCommandSuccess(executionCommand: ParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
+    public static printCommandSuccess(command: string, relativeCwd: string, commandExecutionResult: CommandExecutionResult): void {
         const durationMessage: string = LogUtil.createDurationInfoInBrackets(commandExecutionResult);
-        log(`  \x1B[1;32m ✔ ${executionCommand.command}\x1B[0m ${durationMessage}`);
+        const cwdInfoIfNotRoot: string = relativeCwd !== './' ? ` (cwd: ${relativeCwd})` : '';
+        log(`  \x1B[1;32m ✔ ${command}\x1B[0m ${durationMessage}${cwdInfoIfNotRoot} `);
     }
 
-    public static printCommandFailure(executionCommand: ParallelExecutionCommand, commandExecutionResult: ICommandExecutionResult): void {
+    public static printCommandFailure(command: string, relativeCwd: string, commandExecutionResult: CommandExecutionResult): void {
         const durationMessage: string = ` ${LogUtil.createDurationInfoInBrackets(commandExecutionResult)}`;
-        const cwdInfoIfNotRoot: string = executionCommand.cwd !== './' ? ` (cwd: ${executionCommand.cwd})` : '';
-        log(`  \x1B[1;31m ✘ ${executionCommand.command}\x1B[0m${cwdInfoIfNotRoot}${durationMessage}`);
+        const cwdInfoIfNotRoot: string = relativeCwd !== './' ? ` (cwd: ${relativeCwd})` : '';
+        log(`  \x1B[1;31m ✘ ${command}\x1B[0m ${durationMessage}${cwdInfoIfNotRoot}`);
     }
 
     public static printOutputFormattedAfterAllCommandsCompleted(
         yaniceConfig: YaniceConfig,
-        commandExecutionResults: ICommandExecutionResult[]
+        commandExecutionResults: CommandExecutionResult[]
     ): void {
         const allSelectedFilters = LogUtil.getAllSelectedOutputFilters(yaniceConfig.options.outputFilters);
         const ignoreStdout: boolean = yaniceConfig.options.outputFilters.includes('ignoreStdout');
@@ -53,9 +54,18 @@ export class LogUtil {
         return appliedFilters.reduce((prev: boolean, curr): boolean => prev && curr.filterOutputLine(outputLine), true);
     }
 
-    private static createDurationInfoInBrackets(commandExecutionResult: ICommandExecutionResult): string {
-        const durationInSeconds: number = Math.floor(commandExecutionResult.executionDurationInMs / 1000);
-        return `(${durationInSeconds}s)`;
+    private static createDurationInfoInBrackets(commandExecutionResult: CommandExecutionResult): string {
+        const durationInSeconds: number = commandExecutionResult.executionDurationInMs / 1000;
+        if (durationInSeconds < 1) {
+            return `(${durationInSeconds.toFixed(3)}s)`;
+        }
+        if (durationInSeconds < 10) {
+            return `(${durationInSeconds.toFixed(2)}s)`;
+        }
+        if (durationInSeconds < 100) {
+            return `(${durationInSeconds.toFixed(1)}s)`;
+        }
+        return `(${Math.round(durationInSeconds)}s)`;
     }
 
     private static printOutputChunkFilteredUnlessIgnored(chunk: string, appliedFilters: OutputFilter[], ignoreFlag: boolean): void {

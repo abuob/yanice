@@ -1,6 +1,7 @@
+import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { FileReader, GlobTester } from 'yanice';
+import { GlobTester, PromiseCreator, PromiseQueue } from 'yanice';
 
 import { FileImportMap, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
 import { importResolverEs6 } from './es6/import-resolver.es6';
@@ -25,32 +26,44 @@ export class ImportResolution {
             },
             {}
         );
+        return ImportResolution.getAllFileImportMapPromisesStaggered(absolutePaths, pathGlobs, loadedResolvers, 100);
+    }
 
-        const allFileImportMapPromises: Promise<FileImportMap[]>[] = [];
+    private static async getAllFileImportMapPromisesStaggered(
+        absolutePaths: string[],
+        pathGlobs: string[],
+        loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined>,
+        maxConcurrency: number
+    ): Promise<FileImportMap[]> {
+        const allFileImportMaps: FileImportMap[] = [];
+        const promiseCreators: PromiseCreator[] = absolutePaths.reduce(
+            (prev: PromiseCreator[], absoluteFilePath: string): PromiseCreator[] => {
+                const promiseCreatorsForGivenFile: PromiseCreator[] = pathGlobs
+                    .filter((pathGlob: string) => GlobTester.isGlobMatching(absoluteFilePath, pathGlob))
+                    .map((pathGlob: string): PromiseCreator => {
+                        const resolvers: YaniceImportBoundariesImportResolver[] = loadedResolvers[pathGlob] ?? [];
+                        return async (): Promise<void> => {
+                            const fileImportMap: FileImportMap[] = await ImportResolution.getFileImportMapPromises(
+                                absoluteFilePath,
+                                resolvers
+                            );
+                            allFileImportMaps.push(...fileImportMap);
+                        };
+                    });
+                return prev.concat(promiseCreatorsForGivenFile);
+            },
+            []
+        );
 
-        absolutePaths.forEach((absoluteFilePath: string): void => {
-            pathGlobs.forEach((pathGlob: string): void => {
-                if (!GlobTester.isGlobMatching(absoluteFilePath, pathGlob)) {
-                    return;
-                }
-                const resolvers: YaniceImportBoundariesImportResolver[] = loadedResolvers[pathGlob] ?? [];
-                const fileImportMapPromisesPerGlob: Promise<FileImportMap[]> = ImportResolution.getFileImportMapPromises(
-                    absoluteFilePath,
-                    resolvers
-                );
-                allFileImportMapPromises.push(fileImportMapPromisesPerGlob);
-            });
-        });
-        return Promise.all(allFileImportMapPromises).then((allFileImportMaps: FileImportMap[][]): FileImportMap[] => {
-            return allFileImportMaps.flat();
-        });
+        await PromiseQueue.startSimpleQueue(promiseCreators, maxConcurrency);
+        return allFileImportMaps;
     }
 
     private static async getFileImportMapPromises(
         absoluteFilePath: string,
         resolvers: YaniceImportBoundariesImportResolver[]
     ): Promise<FileImportMap[]> {
-        const fileContent: string = await FileReader.readFile(absoluteFilePath);
+        const fileContent: string = await fs.readFile(absoluteFilePath, { encoding: 'utf-8' });
         const fileImportMapPromises: Promise<FileImportMap | null>[] = resolvers.map(
             (resolver: YaniceImportBoundariesImportResolver): Promise<FileImportMap | null> => {
                 return resolver.getFileImportMap(absoluteFilePath, fileContent);

@@ -45,16 +45,14 @@ export class Phase3Executor extends PhaseExecutor {
         if (!this.phase2Result) {
             return this;
         }
-        if (this.changedProjects) {
-            const depGraph: DirectedGraph = this.phase2Result.phase1Result.depGraph;
-            const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
-            const includeAllProjects: boolean = this.phase2Result.phase1Result.yaniceCliArgs.defaultArgs.includeAllProjects;
-            if (!includeAllProjects) {
-                const affected: string[] = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(depGraph, this.changedProjects);
-                this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySortedReverse(depGraph, affected);
-            } else {
-                this.affectedProjectsUnfiltered = yaniceConfig.projects.map((project) => project.projectName);
-            }
+        const depGraph: DirectedGraph = this.phase2Result.phase1Result.depGraph;
+        const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
+        const includeAllProjects: boolean = this.phase2Result.phase1Result.yaniceCliArgs.defaultArgs.includeAllProjects;
+        if (!includeAllProjects) {
+            const affected: string[] = DirectedGraphUtil.getAncestorsAndSelfOfMultipleNodes(depGraph, this.changedProjects);
+            this.affectedProjectsUnfiltered = DirectedGraphUtil.getTopologicallySortedReverse(depGraph, affected);
+        } else {
+            this.affectedProjectsUnfiltered = yaniceConfig.projects.map((project) => project.projectName);
         }
         return this;
     }

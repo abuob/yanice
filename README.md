@@ -219,16 +219,13 @@ Custom plugins are javascript-files which yanice can require. See [here](https:/
 
 Yanice tries to work with as little dependencies as possible, currently relying only on the following transitive dependencies:
 
-| Name        | npm-package                                       | Purpose                                                                                |
-| :---------- | ------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| ajv         | [link](https://www.npmjs.com/package/ajv)         | Used for JSON-schema validation of the `yanice.json`.                                  |
-| async       | [link](https://www.npmjs.com/package/async)       | Used to queue and parallelize commands when using `run`. On the roadmap to be removed. |
-| minimatch   | [link](https://www.npmjs.com/package/minimatch)   | Used for glob-expression matching.                                                     |
-| graceful-fs | [link](https://www.npmjs.com/package/graceful-fs) | Used to read files (avoid EMFILE-errors, especially on windows)                        |
+| Name      | npm-package                                     | Purpose                                               |
+| :-------- | ----------------------------------------------- | ----------------------------------------------------- |
+| ajv       | [link](https://www.npmjs.com/package/ajv)       | Used for JSON-schema validation of the `yanice.json`. |
+| minimatch | [link](https://www.npmjs.com/package/minimatch) | Used for glob-expression matching.                    |
 
 ### Roadmap:
 
--   For command-queuing and parallelization, we currently use the `async`-library as mentioned above. We could do without.
 -   Currently, maintenance/setup of the `yanice.json` can get cumbersome by an increasing/changing amount of projects
     inside the repository.
 -   Built-in incremental change-detection: Currently, if you run the same yanice-command twice (e.g. test), yanice will
