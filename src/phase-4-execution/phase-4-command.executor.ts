@@ -24,10 +24,10 @@ export class Phase4CommandExecutor extends AbstractPhase4Executor {
     }
 
     public static execute(phase3Result: Phase3Result, yaniceRunArgs: YaniceCliArgsRun): void {
-        new Phase4CommandExecutor(phase3Result).executeCommandsV2(yaniceRunArgs);
+        new Phase4CommandExecutor(phase3Result).executeCommands(yaniceRunArgs);
     }
 
-    public executeCommandsV2(yaniceRunArgs: YaniceCliArgsRun): void {
+    public executeCommands(yaniceRunArgs: YaniceCliArgsRun): void {
         const yaniceConfig: YaniceConfig = this.phase3Result.phase2Result.phase1Result.yaniceConfig;
         const baseDirectory: string = this.phase3Result.phase2Result.phase1Result.yaniceJsonDirectoryPath;
         const affectedProjects: string[] = this.phase3Result.affectedProjects;
