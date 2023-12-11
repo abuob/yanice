@@ -9,7 +9,3 @@ project-B/project-b.ts:
     Import statement:  import { dummyC } from '../project-C/project-c'
     Allowed Imports:   (none)
     Actual import:     C
-
-Too many skipped imports:
-    Found 2 skipped imports, maximum allowed amount is 0
-

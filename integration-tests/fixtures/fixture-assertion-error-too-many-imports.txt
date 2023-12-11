@@ -1,0 +1,3 @@
+Amount of skipped imports is not the configured amount:
+    Expected 0 skipped imports as per config, but found 2 instead.
+    Did you add or remove an import-exclusion without changing the configured amount in the yanice.json?

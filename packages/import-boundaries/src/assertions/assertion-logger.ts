@@ -28,15 +28,21 @@ export class AssertionLogger {
                 LogUtil.log(`${violation.withinProject}:`);
                 LogUtil.log(`    Imports to "${violation.unusedProject}" are allowed and configured but do not exist\n`);
                 return null;
-            case 'too-many-skipped-imports':
+            case 'skipped-imports:too-many':
                 LogUtil.log(`Too many skipped imports:`);
                 LogUtil.log(`    Found ${violation.actualAmount} skipped imports, maximum allowed amount is ${violation.maxAmount}\n`);
                 return null;
-            case 'amount-of-skipped-imports-not-configured':
-                LogUtil.log(`Maximum amount of skipped imports not configured:`);
+            case 'skipped-imports:not-configured':
+                LogUtil.log(`No configuration found for skipped imports:`);
                 LogUtil.log(
-                    `    The "max-skipped-imports"-assertion is enabled in the yanice.json, but "assertionOptions.maximumSkippedImports" is not configured\n`
+                    `    In order to run assertions on skipped imports, please configure the corresponding options in the yanice.json`
                 );
+                return null;
+            case 'skipped-imports:not-equals-configured':
+                const expectedAmountWarning: string = `Expected ${violation.expectedAmount} skipped imports as per config, but found ${violation.actualAmount} instead.`;
+                LogUtil.log(`Amount of skipped imports is not the configured amount:`);
+                LogUtil.log(`    ${expectedAmountWarning}`);
+                LogUtil.log(`    Did you add or remove an import-exclusion without changing the configured amount in the yanice.json?`);
                 return null;
         }
     }

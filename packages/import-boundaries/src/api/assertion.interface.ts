@@ -1,13 +1,13 @@
-import { Phase3Result } from 'yanice';
+import { Phase3Result, YanicePluginImportBoundariesOptions } from 'yanice';
 
-import { FileImportMap } from './import-resolver.interface';
-import { ProjectImportByFilesMap } from './project-import-map.interface';
+import { ImportBoundaryAssertionData } from './import-boundary-assertion-data';
 
 export type YaniceImportBoundariesAssertionViolation =
-    | AssertionViolationAmountOfSkippedImportsNotConfigured
     | AssertionViolationConfiguredImportUnused
     | AssertionViolationImportNotConfigured
-    | AssertionViolationTooManySkippedImports
+    | AssertionViolationSkippedImportOptionsNotConfigured
+    | AssertionViolationSkippedImportsNotEqualsConfiguredAmount
+    | AssertionViolationSkippedImportsTooMany
     | AssertionViolationUnknownImport;
 
 export interface AssertionViolationUnknownImport {
@@ -32,19 +32,25 @@ export interface AssertionViolationConfiguredImportUnused {
     unusedProject: string;
 }
 
-export interface AssertionViolationTooManySkippedImports {
-    type: 'too-many-skipped-imports';
+export interface AssertionViolationSkippedImportsTooMany {
+    type: 'skipped-imports:too-many';
     maxAmount: number;
     actualAmount: number;
 }
-export interface AssertionViolationAmountOfSkippedImportsNotConfigured {
-    type: 'amount-of-skipped-imports-not-configured';
+
+export interface AssertionViolationSkippedImportsNotEqualsConfiguredAmount {
+    type: 'skipped-imports:not-equals-configured';
+    expectedAmount: number;
+    actualAmount: number;
+}
+export interface AssertionViolationSkippedImportOptionsNotConfigured {
+    type: 'skipped-imports:not-configured';
 }
 
 export interface YaniceImportBoundariesAssertion {
     assertBoundaries: (
         phase3Results: Phase3Result,
-        fileImportMaps: FileImportMap[],
-        projectImportByFilesMap: ProjectImportByFilesMap
+        importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
+        assertionData: ImportBoundaryAssertionData
     ) => Promise<YaniceImportBoundariesAssertionViolation[]>;
 }

@@ -1,8 +1,14 @@
-export interface YanicePluginImportBoundariesOptionsInterface {
+export interface YanicePluginImportBoundariesSkippedImportsOptions {
+    mode: 'exact' | 'max';
+    amount: number;
+}
+
+export interface YanicePluginImportBoundariesOptions {
     importResolvers: Record<string, string[]>;
     postResolve?: string[];
     assertionOptions?: {
-        maximumSkippedImports?: number;
+        skippedImports?: YanicePluginImportBoundariesSkippedImportsOptions;
+        ignoredProjects: string[];
     };
     assertions?: string[];
     excluded?: string[];

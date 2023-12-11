@@ -1,30 +1,36 @@
 import path from 'node:path';
 
-import { FileImportMap } from '../api/import-resolver.interface';
-import { YaniceImportBoundariesPostResolver } from '../api/post-resolve.interface';
+import { ImportResolutions } from '../api/import-resolver.interface';
+import { YaniceImportBoundariesPostResolverV2 } from '../api/post-resolve.interface';
 
 export class PostResolver {
     public static async postResolveProcessing(
-        fileImportMaps: FileImportMap[],
+        fileToResolvedImportsMap: Record<string, ImportResolutions[]>,
         yaniceJsonDirectoryPath: string,
         postResolversLocations: string[]
-    ): Promise<FileImportMap[]> {
-        const postResolvers: YaniceImportBoundariesPostResolver[] = PostResolver.loadPostResolvers(
+    ): Promise<Record<string, ImportResolutions[]>> {
+        const postResolvers: YaniceImportBoundariesPostResolverV2[] = PostResolver.loadPostResolvers(
             yaniceJsonDirectoryPath,
             postResolversLocations
         );
-        let updatedFileImportMaps: FileImportMap[] = fileImportMaps;
-        for (const postResolver of postResolvers) {
-            updatedFileImportMaps = await postResolver.postProcess(updatedFileImportMaps);
+        const updatedFileToResolvedImportsMap: Record<string, ImportResolutions[]> = fileToResolvedImportsMap;
+        const absoluteFilePaths: string[] = Object.keys(fileToResolvedImportsMap);
+        for (const absoluteFilePath of absoluteFilePaths) {
+            for (const postResolver of postResolvers) {
+                fileToResolvedImportsMap[absoluteFilePath] = await postResolver.postProcess(
+                    absoluteFilePath,
+                    fileToResolvedImportsMap[absoluteFilePath] ?? []
+                );
+            }
         }
-        return updatedFileImportMaps;
+        return updatedFileToResolvedImportsMap;
     }
 
     private static loadPostResolvers(
         yaniceJsonDirectoryPath: string,
         postResolverLocations: string[]
-    ): YaniceImportBoundariesPostResolver[] {
-        return postResolverLocations.map((postResolverLocation: string): YaniceImportBoundariesPostResolver => {
+    ): YaniceImportBoundariesPostResolverV2[] {
+        return postResolverLocations.map((postResolverLocation: string): YaniceImportBoundariesPostResolverV2 => {
             return require(path.join(yaniceJsonDirectoryPath, postResolverLocation));
         });
     }

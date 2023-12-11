@@ -3,15 +3,15 @@ import path from 'node:path';
 
 import { GlobTester, PromiseCreator, PromiseQueue } from 'yanice';
 
-import { FileImportMap, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
+import { ImportResolutions, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
 import { importResolverEs6 } from './es6/import-resolver.es6';
 
 export class ImportResolution {
-    public static async getImportMaps(
+    public static async getAbsoluteFilePathToImportResolutionsMap(
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importResolverMap: Record<string, string[] | undefined>
-    ): Promise<FileImportMap[]> {
+    ): Promise<Record<string, ImportResolutions[]>> {
         const pathGlobs: string[] = Object.keys(importResolverMap);
         const loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined> = pathGlobs.reduce(
             (
@@ -26,16 +26,16 @@ export class ImportResolution {
             },
             {}
         );
-        return ImportResolution.getAllFileImportMapPromisesStaggered(absolutePaths, pathGlobs, loadedResolvers, 100);
+        return ImportResolution.resolveFileImportsStaggered(absolutePaths, pathGlobs, loadedResolvers, 100);
     }
 
-    private static async getAllFileImportMapPromisesStaggered(
+    private static async resolveFileImportsStaggered(
         absolutePaths: string[],
         pathGlobs: string[],
         loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined>,
         maxConcurrency: number
-    ): Promise<FileImportMap[]> {
-        const allFileImportMaps: FileImportMap[] = [];
+    ): Promise<Record<string, ImportResolutions[]>> {
+        const fileToResolvedImportsMap: Record<string, ImportResolutions[]> = {};
         const promiseCreators: PromiseCreator[] = absolutePaths.reduce(
             (prev: PromiseCreator[], absoluteFilePath: string): PromiseCreator[] => {
                 const promiseCreatorsForGivenFile: PromiseCreator[] = pathGlobs
@@ -43,11 +43,7 @@ export class ImportResolution {
                     .map((pathGlob: string): PromiseCreator => {
                         const resolvers: YaniceImportBoundariesImportResolver[] = loadedResolvers[pathGlob] ?? [];
                         return async (): Promise<void> => {
-                            const fileImportMap: FileImportMap[] = await ImportResolution.getFileImportMapPromises(
-                                absoluteFilePath,
-                                resolvers
-                            );
-                            allFileImportMaps.push(...fileImportMap);
+                            fileToResolvedImportsMap[absoluteFilePath] = await ImportResolution.resolveImports(absoluteFilePath, resolvers);
                         };
                     });
                 return prev.concat(promiseCreatorsForGivenFile);
@@ -56,21 +52,23 @@ export class ImportResolution {
         );
         const promiseQueue: PromiseQueue = PromiseQueue.createSimpleQueue(promiseCreators, maxConcurrency);
         await promiseQueue.startQueue();
-        return allFileImportMaps;
+        return fileToResolvedImportsMap;
     }
 
-    private static async getFileImportMapPromises(
+    private static async resolveImports(
         absoluteFilePath: string,
         resolvers: YaniceImportBoundariesImportResolver[]
-    ): Promise<FileImportMap[]> {
+    ): Promise<ImportResolutions[]> {
         const fileContent: string = await fs.readFile(absoluteFilePath, { encoding: 'utf-8' });
-        const fileImportMapPromises: Promise<FileImportMap | null>[] = resolvers.map(
-            (resolver: YaniceImportBoundariesImportResolver): Promise<FileImportMap | null> => {
+        const importResolutionsPromise: Promise<ImportResolutions | null>[] = resolvers.map(
+            (resolver: YaniceImportBoundariesImportResolver): Promise<ImportResolutions | null> => {
                 return resolver.getFileImportMap(absoluteFilePath, fileContent);
             }
         );
-        return Promise.all(fileImportMapPromises).then((fileImportMaps: (FileImportMap | null)[]): FileImportMap[] => {
-            return fileImportMaps.filter((fileImportMap: FileImportMap | null): fileImportMap is FileImportMap => !!fileImportMap);
+        return Promise.all(importResolutionsPromise).then((importResolutionsOrNull: (ImportResolutions | null)[]): ImportResolutions[] => {
+            return importResolutionsOrNull.filter(
+                (importResolutions: ImportResolutions | null): importResolutions is ImportResolutions => !!importResolutions
+            );
         });
     }
 

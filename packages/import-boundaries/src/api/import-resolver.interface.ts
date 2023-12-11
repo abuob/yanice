@@ -1,30 +1,29 @@
 export type ParsedImportStatement = PackageLikeImportStatement | RelativeImportStatement | SkipNextImportStatement | UnknownStatement;
 
-export interface RelativeImportStatement {
+interface AbstractImportStatement {
+    raw: string;
+}
+
+export interface RelativeImportStatement extends AbstractImportStatement {
     type: 'relative';
-    raw: string;
     fromClause: string;
 }
 
-export interface PackageLikeImportStatement {
+export interface PackageLikeImportStatement extends AbstractImportStatement {
     type: 'package-like';
-    raw: string;
     fromClause: string;
 }
 
-export interface SkipNextImportStatement {
+export interface SkipNextImportStatement extends AbstractImportStatement {
     type: 'skip';
-    raw: string;
 }
 
-export interface UnknownStatement {
+export interface UnknownStatement extends AbstractImportStatement {
     type: 'unknown';
-    raw: string;
 }
 
-export interface FileImportMap {
+export interface ImportResolutions {
     createdBy: string;
-    absoluteFilePath: string;
     resolvedImports: {
         parsedImportStatement: ParsedImportStatement;
         resolvedAbsoluteFilePath: string;
@@ -39,5 +38,5 @@ export interface FileImportMap {
 
 export interface YaniceImportBoundariesImportResolver {
     name: string;
-    getFileImportMap: (absoluteFilePath: string, fileContent: string) => Promise<FileImportMap | null>;
+    getFileImportMap: (absoluteFilePath: string, fileContent: string) => Promise<ImportResolutions | null>;
 }

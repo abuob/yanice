@@ -61,7 +61,8 @@ Currently supported:
 The plugin can be invoked with the following parameters:
 
 -   `--print-file-imports`: Will print file-import-maps as soon as they are available, without any yanice-project-related information.
--   `--print-project-imports`: Similar to the above, will print the project-import-map, containing not just which file imports which but also to which yanice-projects everything corresponds.
+-   `--print-assertion-data`: Will print all data that is being generated to run assertions.
+    The aforementioned file-import-map, which file belongs to which project, and which project imports which project.
 -   `--skip-post-resolvers`: Skips the post-resolvers.
 -   `--generate`: Will print the project-dependencies based on the imports in the format that the yanice.json uses
 -   `--assert`: The default-mode; will be used when `--print*` or `--generate` is not present. Runs the configured assertions.

@@ -1,6 +1,6 @@
-import { ParsedImportStatement } from '../../api/import-resolver.interface';
+import { ParsedImportStatement } from '../../../api/import-resolver.interface';
 
-export class ImportStatementParser {
+export class ImportStatementParserV2 {
     public static parseImportStatement(statement: string): ParsedImportStatement {
         if (/@yanice:import-boundaries ignore-next-statement/.test(statement)) {
             return {
@@ -8,7 +8,7 @@ export class ImportStatementParser {
                 raw: statement
             };
         }
-        const fromClause: string = ImportStatementParser.extractFromClause(statement);
+        const fromClause: string = ImportStatementParserV2.extractFromClause(statement);
         if (/^\./.test(fromClause)) {
             return {
                 type: 'relative',

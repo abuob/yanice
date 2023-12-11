@@ -49,10 +49,21 @@
                                 "assertionOptions": {
                                     "type": "object",
                                     "properties": {
-                                        "maximumSkippedImports": {
-                                            "type": "number"
+                                        "skippedImports": {
+                                            "type": "object",
+                                            "properties": {
+                                                "mode": {
+                                                    "enum": ["exact", "max"]
+                                                },
+                                                "amount": {
+                                                    "type": "number"
+                                                }
+                                            },
+                                            "required": ["mode", "amount"],
+                                            "additionalProperties": false
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             },
                             "additionalProperties": false,

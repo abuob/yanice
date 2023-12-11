@@ -150,8 +150,8 @@ export class YaniceCliArgsParser {
         if (YaniceCliArgsParser.hasArgument(args, /^--print-file-imports$/)) {
             return 'print-file-imports';
         }
-        if (YaniceCliArgsParser.hasArgument(args, /^--print-project-imports$/)) {
-            return 'print-project-imports';
+        if (YaniceCliArgsParser.hasArgument(args, /^--print-assertion-data$/)) {
+            return 'print-assertion-data';
         }
         if (YaniceCliArgsParser.hasArgument(args, /^--generate$/)) {
             return 'generate';

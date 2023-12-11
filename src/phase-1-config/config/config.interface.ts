@@ -1,6 +1,6 @@
 import { commandOutputFilterType } from '../../util/output-filter';
 import { YaniceCustomPluginOptions } from './plugin-config/custom.plugin.type';
-import { YanicePluginImportBoundariesOptionsInterface } from './plugin-config/import-boundaries.plugin.type';
+import { YanicePluginImportBoundariesOptions } from './plugin-config/import-boundaries.plugin.type';
 
 export type commandOutputOptionsType = 'append-at-end-on-error' | 'append-at-end' | 'ignore';
 
@@ -19,7 +19,7 @@ export interface YaniceJsonType {
     schemaVersion: number;
     plugins?: {
         officiallySupported: {
-            'import-boundaries'?: YanicePluginImportBoundariesOptionsInterface;
+            'import-boundaries'?: YanicePluginImportBoundariesOptions;
         };
         custom: Record<string, YaniceCustomPluginOptions<unknown>>;
     };
@@ -71,7 +71,7 @@ export interface YaniceConfigOptions {
 }
 
 export interface YaniceOfficiallySupportedPluginOptions {
-    'import-boundaries': YanicePluginImportBoundariesOptionsInterface | null;
+    'import-boundaries': YanicePluginImportBoundariesOptions | null;
 }
 
 export interface YanicePluginOptions {

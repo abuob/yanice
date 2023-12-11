@@ -1,12 +1,12 @@
 /**
- * @type {import('../../packages/import-boundaries/src/api/post-resolve.interface').YaniceImportBoundariesPostResolver}
+ * @type {import('../../packages/import-boundaries/src/api/post-resolve.interface').YaniceImportBoundariesPostResolverV2}
  */
 const postResolve = {
     /**
-     * @returns {Promise<import('../../packages/import-boundaries/src/api/import-resolver.interface.ts').FileImportMap[]>}
+     * @returns {Promise<import('../../packages/import-boundaries/src/api/import-resolver.interface').ImportResolutions[]>}
      */
-    postProcess: async (fileImportMaps) => {
-        return fileImportMaps.filter((fileImportMap) => {
+    postProcess: async (absoluteFilePath, resolvedImports) => {
+        return resolvedImports.filter((fileImportMap) => {
             return fileImportMap.createdBy !== 'dummy-resolver';
         });
     }

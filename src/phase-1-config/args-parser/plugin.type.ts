@@ -1,6 +1,6 @@
 export type YanicePluginArgs = CustomYanicePluginArgs | ImportBoundariesYanicePluginArgs;
 
-export type YaniceImportBoundariesModeType = 'assert' | 'generate' | 'print-file-imports' | 'print-project-imports';
+export type YaniceImportBoundariesModeType = 'assert' | 'generate' | 'print-assertion-data' | 'print-file-imports';
 
 export interface CustomYanicePluginArgs {
     type: 'custom';

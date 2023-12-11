@@ -2,20 +2,20 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import {
-    FileImportMap,
+    ImportResolutions,
     PackageLikeImportStatement,
     ParsedImportStatement,
     RelativeImportStatement
-} from '../../api/import-resolver.interface';
+} from '../../../api/import-resolver.interface';
 
 export class ResolveImportStatements {
     public static async resolveImportStatements(
         absoluteFilePath: string,
-        parsedImportStatements: ParsedImportStatement[]
-    ): Promise<FileImportMap> {
-        const fileImportMap: FileImportMap = {
-            createdBy: 'import-resolver-es6',
-            absoluteFilePath,
+        parsedImportStatements: ParsedImportStatement[],
+        importResolverName: string
+    ): Promise<ImportResolutions> {
+        const fileImportMap: ImportResolutions = {
+            createdBy: importResolverName,
             skippedImports: [],
             resolvedImports: [],
             resolvedPackageImports: [],

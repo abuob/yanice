@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
-import { ParsedImportStatement } from '../../../api/import-resolver.interface';
-import { ImportStatementParser } from '../parse-import-statements';
+import { ParsedImportStatement } from '../../../../api/import-resolver.interface';
+import { ImportStatementParserV2 } from '../parse-import-statements';
 
 describe('ImportStatementParser', () => {
     describe('parseImportStatement', () => {
@@ -54,18 +54,18 @@ describe('ImportStatementParser', () => {
                 }
             };
             Object.keys(inputOutputMap).forEach((input: string) => {
-                expect(ImportStatementParser.parseImportStatement(input)).to.deep.equal(inputOutputMap[input]);
+                expect(ImportStatementParserV2.parseImportStatement(input)).to.deep.equal(inputOutputMap[input]);
             });
         });
     });
 
     describe('extractFromClause', () => {
         it('should extract the from clause', () => {
-            expect(ImportStatementParser.extractFromClause("import {something} from 'somewhere'")).to.equal('somewhere');
-            expect(ImportStatementParser.extractFromClause("import * as t from 'barrel'")).to.equal('barrel');
-            expect(ImportStatementParser.extractFromClause("import deffrom from 'default-export'")).to.equal('default-export');
-            expect(ImportStatementParser.extractFromClause("import importimportfrom from 'default-export'")).to.equal('default-export');
-            expect(ImportStatementParser.extractFromClause('import a from "b"')).to.equal('b');
+            expect(ImportStatementParserV2.extractFromClause("import {something} from 'somewhere'")).to.equal('somewhere');
+            expect(ImportStatementParserV2.extractFromClause("import * as t from 'barrel'")).to.equal('barrel');
+            expect(ImportStatementParserV2.extractFromClause("import deffrom from 'default-export'")).to.equal('default-export');
+            expect(ImportStatementParserV2.extractFromClause("import importimportfrom from 'default-export'")).to.equal('default-export');
+            expect(ImportStatementParserV2.extractFromClause('import a from "b"')).to.equal('b');
         });
     });
 });
