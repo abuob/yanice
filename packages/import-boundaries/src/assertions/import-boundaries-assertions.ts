@@ -4,7 +4,7 @@ import { Phase3Result, YanicePluginImportBoundariesOptions } from 'yanice';
 
 import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
 import { ImportBoundaryAssertionData } from '../api/import-boundary-assertion-data';
-import { maxSkippedImports } from './rules/max-skipped-imports';
+import { maxSkippedImports } from './rules/max-skipped-imports/max-skipped-imports';
 
 export class ImportBoundariesAssertions {
     public static async assertImportBoundaries(
