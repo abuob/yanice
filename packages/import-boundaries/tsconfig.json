@@ -1,6 +1,8 @@
 {
     "extends": "@tsconfig/node16/tsconfig.json",
     "compilerOptions": {
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
         "sourceMap": true,
         "resolveJsonModule": true,
         "outDir": "./dist",

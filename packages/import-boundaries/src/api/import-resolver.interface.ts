@@ -22,12 +22,14 @@ export interface UnknownStatement extends AbstractImportStatement {
     type: 'unknown';
 }
 
+export interface ImportResolutionResolvedImport {
+    parsedImportStatement: ParsedImportStatement;
+    resolvedAbsoluteFilePath: string;
+}
+
 export interface ImportResolutions {
     createdBy: string;
-    resolvedImports: {
-        parsedImportStatement: ParsedImportStatement;
-        resolvedAbsoluteFilePath: string;
-    }[];
+    resolvedImports: ImportResolutionResolvedImport[];
     resolvedPackageImports: {
         package: string;
         resolvedAbsoluteFilePath: string;

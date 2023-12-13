@@ -1,9 +1,3 @@
-project-A/project-a-1.ts:
-    In project:        A
-    Import statement:  import { dummyA2 } from './project-a-2'
-    Allowed Imports:   [B]
-    Actual import:     A
-
 project-B/project-b.ts:
     In project:        B
     Import statement:  import { dummyC } from '../project-C/project-c'

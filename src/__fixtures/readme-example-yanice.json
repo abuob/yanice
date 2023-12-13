@@ -19,7 +19,7 @@
                 },
                 "exclusionGlobs": ["**/dist/**"],
                 "postResolve": ["./custom-post-resolve.js"],
-                "assertions": ["only-allow-actual-imports-in-config", "only-allow-configured-imports", "./some-custom-assertion.js"]
+                "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"]
             }
         }
     },

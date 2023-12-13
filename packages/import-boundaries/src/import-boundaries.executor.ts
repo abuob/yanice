@@ -15,7 +15,7 @@ import { AssertionLogger } from './assertions/assertion-logger';
 import { ImportBoundariesAssertions } from './assertions/import-boundaries-assertions';
 import { FileDiscovery } from './file-discovery/file-discovery';
 import { FileToProjectMapper } from './file-to-project-mapper/file-to-project-mapper';
-import { ImportResolution } from './import-resolvers/import-resolution';
+import { ImportResolutionUtil } from './import-resolvers/import-resolution.util';
 import { PostResolver } from './post-resolver/post-resolver';
 import { ProjectDependencyGraph } from './project-dependency-graph/project-dependency-graph';
 
@@ -207,7 +207,7 @@ export class ImportBoundariesExecutor {
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
     ): Promise<Record<string, ImportResolutions[]>> {
         const fileToImportResolutionsMapRaw: Record<string, ImportResolutions[]> =
-            await ImportResolution.getAbsoluteFilePathToImportResolutionsMap(
+            await ImportResolutionUtil.getAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
                 importBoundariesPluginConfig.importResolvers

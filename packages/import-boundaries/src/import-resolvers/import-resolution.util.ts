@@ -6,7 +6,7 @@ import { GlobTester, PromiseCreator, PromiseQueue } from 'yanice';
 import { ImportResolutions, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
 import { importResolverEs6 } from './es6/import-resolver.es6';
 
-export class ImportResolution {
+export class ImportResolutionUtil {
     public static async getAbsoluteFilePathToImportResolutionsMap(
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
@@ -20,13 +20,13 @@ export class ImportResolution {
             ): Record<string, YaniceImportBoundariesImportResolver[] | undefined> => {
                 const resolverNamesOrLocations: string[] | undefined = importResolverMap[curr];
                 prev[curr] = resolverNamesOrLocations?.map((resolverNameOrLocation: string): YaniceImportBoundariesImportResolver => {
-                    return ImportResolution.getResolver(yaniceJsonDirectoryPath, resolverNameOrLocation);
+                    return ImportResolutionUtil.getResolver(yaniceJsonDirectoryPath, resolverNameOrLocation);
                 });
                 return prev;
             },
             {}
         );
-        return ImportResolution.resolveFileImportsStaggered(absolutePaths, pathGlobs, loadedResolvers, 100);
+        return ImportResolutionUtil.resolveFileImportsStaggered(absolutePaths, pathGlobs, loadedResolvers, 100);
     }
 
     private static async resolveFileImportsStaggered(
@@ -43,7 +43,10 @@ export class ImportResolution {
                     .map((pathGlob: string): PromiseCreator => {
                         const resolvers: YaniceImportBoundariesImportResolver[] = loadedResolvers[pathGlob] ?? [];
                         return async (): Promise<void> => {
-                            fileToResolvedImportsMap[absoluteFilePath] = await ImportResolution.resolveImports(absoluteFilePath, resolvers);
+                            fileToResolvedImportsMap[absoluteFilePath] = await ImportResolutionUtil.resolveImports(
+                                absoluteFilePath,
+                                resolvers
+                            );
                         };
                     });
                 return prev.concat(promiseCreatorsForGivenFile);

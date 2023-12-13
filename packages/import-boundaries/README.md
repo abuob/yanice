@@ -26,7 +26,7 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
         },
         "exclusionGlobs": ["**/dist/**"],
         "postResolve": ["./post-resolve.js"],
-        "assertions": ["only-allow-actual-imports-in-config", "only-allow-configured-imports", "./some-custom-assertion.js"]
+        "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"]
     }
 }
 ```
@@ -52,7 +52,7 @@ In case anything is amiss or the plugin was not able to resolve certain imports,
 Array of officially provided assertions or custom assertions.
 Currently supported:
 
--   `only-allow-actual-imports-in-config`
+-   `only-direct-imports`
 -   `only-allow-configured-imports`
 -   `max-skipped-imports`
 

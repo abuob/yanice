@@ -163,14 +163,14 @@ describe('yanice', () => {
                     expect(output).to.include(expected);
                 });
 
-                // Temporarily disabled due to ongoing refactoring
-                xit('should be able to print import-boundary-violations', async () => {
+                it('should be able to print import-boundary-violations', async () => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --assert'
                     );
                     const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
                     expect(commandResult.statusCode).to.equal(1);
-                    expect(output).to.include(IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-bad-imports.txt'));
+                    const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-bad-imports.txt');
+                    expect(output).to.include(expected);
                 });
             });
         });

@@ -15,7 +15,7 @@
                 },
                 "exclusionGlobs": ["**/dist/**"],
                 "postResolve": ["./post-resolve.js"],
-                "assertions": ["max-skipped-imports"],
+                "assertions": ["only-direct-imports", "max-skipped-imports"],
                 "assertionOptions": {
                     "skippedImports": {
                         "amount": 0,
