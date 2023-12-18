@@ -22,7 +22,7 @@ export class AssertionLogger {
                 LogUtil.log(`    In project:        ${violation.withinProject}`);
                 LogUtil.log(`    Import statement:  ${violation.importStatement}`);
                 LogUtil.log(`    Allowed Imports:   ${allowedImports}`);
-                LogUtil.log(`    Actual import:     ${violation.actualProject}\n`);
+                LogUtil.log(`    Actual import:     ${violation.importedProject}\n`);
                 return null;
             case 'configured-import-unused':
                 LogUtil.log(`${violation.withinProject}:`);

@@ -23,7 +23,7 @@ export interface AssertionViolationImportNotConfigured {
     filePath: string;
     allowedProjects: string[];
     importStatement: string;
-    actualProject: string;
+    importedProject: string;
 }
 
 export interface AssertionViolationConfiguredImportUnused {

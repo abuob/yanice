@@ -2,6 +2,7 @@ import { DirectedGraph, Phase3Result, YanicePluginImportBoundariesOptions } from
 
 import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from '../../../api/assertion.interface';
 import { ImportBoundaryAssertionData } from '../../../api/import-boundary-assertion-data';
+import { ImportBoundaryUtil } from '../../rule-utils/import-boundary.util';
 import { OnlyDirectImportsUtil } from './only-direct-imports.util';
 
 export const onlyDirectImports: YaniceImportBoundariesAssertion = {
@@ -11,10 +12,11 @@ export const onlyDirectImports: YaniceImportBoundariesAssertion = {
         assertionData: ImportBoundaryAssertionData
     ): Promise<YaniceImportBoundariesAssertionViolation[]> => {
         const dependencyGraph: DirectedGraph = phase3Results.phase2Result.phase1Result.depGraph;
-        return OnlyDirectImportsUtil.getRuleViolations(
+        const allowedDependenciesMap: Record<string, string[]> = OnlyDirectImportsUtil.getAllowedDependenciesMap(dependencyGraph) ?? [];
+        return ImportBoundaryUtil.getRuleViolations(
             assertionData.fileToProjectsMap,
             assertionData.importResolutionsMap,
-            dependencyGraph
+            allowedDependenciesMap
         );
     }
 };
