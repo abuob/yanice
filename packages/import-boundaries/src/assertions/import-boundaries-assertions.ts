@@ -6,6 +6,7 @@ import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolati
 import { ImportBoundaryAssertionData } from '../api/import-boundary-assertion-data';
 import { maxSkippedImports } from './rules/max-skipped-imports/max-skipped-imports';
 import { onlyDirectImports } from './rules/only-direct-dependencies/only-direct-imports';
+import { onlyTransitiveImports } from './rules/only-transitive-dependencies/only-transitive-imports';
 
 export class ImportBoundariesAssertions {
     public static async assertImportBoundaries(
@@ -39,6 +40,8 @@ export class ImportBoundariesAssertions {
         switch (resolverNameOrLocation) {
             case 'only-direct-imports':
                 return onlyDirectImports;
+            case 'only-transitive-dependencies':
+                return onlyTransitiveImports;
             case 'only-allow-configured-imports':
                 // TODO: Refactor/fix
                 return maxSkippedImports;

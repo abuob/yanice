@@ -53,6 +53,7 @@ Array of officially provided assertions or custom assertions.
 Currently supported:
 
 -   `only-direct-imports`
+-   `only-transitive-dependencies`
 -   `only-allow-configured-imports`
 -   `max-skipped-imports`
 
