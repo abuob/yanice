@@ -14,7 +14,9 @@ export class FileToProjectMapper {
                 yaniceJsonDirectoryPath,
                 absoluteFilePath
             );
-            fileToProjectsMap[absoluteFilePath] = ChangedProjects.getChangedProjectsRaw(yaniceProjects, [relativePathToYaniceJson]);
+            fileToProjectsMap[absoluteFilePath] = ChangedProjects.getChangedProjectsRaw(yaniceJsonDirectoryPath, yaniceProjects, [
+                relativePathToYaniceJson
+            ]);
         });
         return fileToProjectsMap;
     }

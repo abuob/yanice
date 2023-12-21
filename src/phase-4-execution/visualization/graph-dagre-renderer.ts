@@ -20,6 +20,7 @@ interface YaniceGraphNodeInfo {
 
 export class GraphDagreRenderer {
     public static getGraphData(
+        yaniceJsonDirectoryPath: string,
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
         yaniceVisualizeArgs: YaniceCliArgsVisualize,
@@ -42,7 +43,9 @@ export class GraphDagreRenderer {
                     descendants: DirectedGraphUtil.getDescendantsAndSelfForSingleNode(depGraph, node.name),
                     responsibles: projectOrUndefined ? projectOrUndefined.responsibles : [],
                     changedFiles: projectOrUndefined
-                        ? changedFiles.filter((filePath) => ChangedProjects.isFilePathPartOfProject(projectOrUndefined, filePath))
+                        ? changedFiles.filter((filePath: string): boolean =>
+                              ChangedProjects.isFilePathPartOfProject(yaniceJsonDirectoryPath, projectOrUndefined, filePath)
+                          )
                         : [],
                     isAffected: affectedProjects.includes(node.name),
                     command: projectOrUndefined ? projectOrUndefined.commands[scope] || null : null,

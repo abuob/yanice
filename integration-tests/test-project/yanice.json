@@ -28,7 +28,7 @@
     "projects": [
         {
             "projectName": "A",
-            "pathGlob": "project-A/**/*",
+            "pathGlob": "project-A/**",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "npm run test-log -- project-A flat-all-projects-have-commands"
@@ -44,7 +44,7 @@
         },
         {
             "projectName": "B",
-            "pathGlob": "project-B/**/*",
+            "projectFolder": "project-B",
             "commands": {
                 "flat-all-projects-have-commands": {
                     "command": "npm run test-log -- project-B flat-all-projects-have-commands"

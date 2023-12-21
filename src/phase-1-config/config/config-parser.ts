@@ -73,6 +73,7 @@ export class ConfigParser {
             });
             return {
                 projectName: project.projectName,
+                projectFolder: project.projectFolder ?? null,
                 pathGlob: project.pathGlob ?? null,
                 pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : null,
                 responsibles: project.responsibles ? project.responsibles : [],

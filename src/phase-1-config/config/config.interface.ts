@@ -25,6 +25,7 @@ export interface YaniceJsonType {
     };
     projects: {
         projectName: string;
+        projectFolder?: string;
         pathRegExp?: string;
         pathGlob?: string;
         commands?: {
@@ -48,6 +49,7 @@ export interface YaniceJsonType {
 
 export interface YaniceProject {
     projectName: string;
+    projectFolder: string | null;
     pathRegExp: RegExp | null;
     pathGlob: string | null;
     commands: YaniceCommandPerScope;

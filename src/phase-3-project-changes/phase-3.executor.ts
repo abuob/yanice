@@ -37,7 +37,12 @@ export class Phase3Executor extends PhaseExecutor {
             return this;
         }
         const yaniceConfig: YaniceConfig = this.phase2Result.phase1Result.yaniceConfig;
-        this.changedProjects = ChangedProjects.getChangedProjectsRaw(yaniceConfig.projects, this.phase2Result.changedFiles);
+        const yaniceJsonDirectoryPath: string = this.phase2Result.phase1Result.yaniceJsonDirectoryPath;
+        this.changedProjects = ChangedProjects.getChangedProjectsRaw(
+            yaniceJsonDirectoryPath,
+            yaniceConfig.projects,
+            this.phase2Result.changedFiles
+        );
         return this;
     }
 

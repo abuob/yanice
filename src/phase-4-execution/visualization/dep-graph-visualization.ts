@@ -14,6 +14,7 @@ import { GraphDotRenderer } from './graph-dot-renderer';
 
 export class DepGraphVisualization {
     public static createVisualizationHtml(
+        yaniceJsonDirectoryPath: string,
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
         yaniceCliArgsVisualize: YaniceCliArgsVisualize,
@@ -23,6 +24,7 @@ export class DepGraphVisualization {
         switch (yaniceCliArgsVisualize.renderer) {
             case 'dagrejs':
                 return DepGraphVisualization.createDagreVisualizationHtml(
+                    yaniceJsonDirectoryPath,
                     depGraph,
                     yaniceConfig,
                     yaniceCliArgsVisualize,
@@ -45,14 +47,20 @@ export class DepGraphVisualization {
         log(`Visualized graph can be seen at: http://localhost:${port}`);
     }
 
-    public static saveTemplateFile(baseDirectory: string, relativeFilePath: string, fileName: string, templateHtml: string): void {
-        const actualFilePath = path.join(baseDirectory, relativeFilePath, fileName);
+    public static saveTemplateFile(
+        yaniceJsonDirectoryPath: string,
+        relativeFilePath: string,
+        fileName: string,
+        templateHtml: string
+    ): void {
+        const actualFilePath: string = path.join(yaniceJsonDirectoryPath, relativeFilePath, fileName);
         log(`Storing graph visualization in: ${actualFilePath}`);
         fs.mkdirSync(path.dirname(actualFilePath), { recursive: true });
         fs.writeFileSync(actualFilePath, templateHtml);
     }
 
     private static createDagreVisualizationHtml(
+        yaniceJsonDirectoryPath: string,
         depGraph: DirectedGraph,
         yaniceConfig: YaniceConfig,
         yaniceCliArgsVisualize: YaniceCliArgsVisualize,
@@ -60,7 +68,14 @@ export class DepGraphVisualization {
         changedFiles: string[]
     ): string {
         const templateHtml = DepGraphVisualization.getDagreTemplateHtml();
-        const graphData = GraphDagreRenderer.getGraphData(depGraph, yaniceConfig, yaniceCliArgsVisualize, affectedProjects, changedFiles);
+        const graphData = GraphDagreRenderer.getGraphData(
+            yaniceJsonDirectoryPath,
+            depGraph,
+            yaniceConfig,
+            yaniceCliArgsVisualize,
+            affectedProjects,
+            changedFiles
+        );
         const diffTargetInfo: string = yaniceCliArgsVisualize.defaultArgs.diffTarget ?? 'None provided (use e.g. --rev=HEAD)';
         const actualHtml = templateHtml
             .replace('INSERT_GRAPH_DATA_OBJECT_HERE', JSON.stringify(graphData))
