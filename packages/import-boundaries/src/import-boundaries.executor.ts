@@ -24,6 +24,7 @@ export class ImportBoundariesExecutor {
         const yaniceConfig: YaniceConfig = phase3Result.phase2Result.phase1Result.yaniceConfig;
         const yaniceProjects: YaniceProject[] = yaniceConfig.projects;
         const yaniceJsonDirectoryPath: string = phase3Result.phase2Result.phase1Result.yaniceJsonDirectoryPath;
+        const gitRepoRootPath: string = phase3Result.phase2Result.phase1Result.gitRepoRootPath;
         const yaniceArgs: YaniceCliArgs = phase3Result.phase2Result.phase1Result.yaniceCliArgs;
         const importBoundariesPluginConfig: YanicePluginImportBoundariesOptions | null =
             yaniceConfig.plugins.officiallySupported['import-boundaries'];
@@ -55,6 +56,7 @@ export class ImportBoundariesExecutor {
 
         if (importBoundariesArgs.mode === 'print-assertion-data') {
             await ImportBoundariesExecutor.handlePrintAssertionData(
+                gitRepoRootPath,
                 yaniceJsonDirectoryPath,
                 allAbsoluteFilePaths,
                 importBoundariesPluginConfig,
@@ -66,6 +68,7 @@ export class ImportBoundariesExecutor {
 
         if (importBoundariesArgs.mode === 'generate') {
             await ImportBoundariesExecutor.handleGenerateMode(
+                gitRepoRootPath,
                 yaniceJsonDirectoryPath,
                 allAbsoluteFilePaths,
                 importBoundariesPluginConfig,
@@ -77,6 +80,7 @@ export class ImportBoundariesExecutor {
 
         if (importBoundariesArgs.mode === 'assert') {
             await ImportBoundariesExecutor.handleAssertMode(
+                gitRepoRootPath,
                 yaniceJsonDirectoryPath,
                 allAbsoluteFilePaths,
                 importBoundariesPluginConfig,
@@ -105,6 +109,7 @@ export class ImportBoundariesExecutor {
     }
 
     private static async handlePrintAssertionData(
+        gitRepoRootPath: string,
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
@@ -112,6 +117,7 @@ export class ImportBoundariesExecutor {
         yaniceProjects: YaniceProject[]
     ): Promise<void> {
         const assertionData: ImportBoundaryAssertionData = await ImportBoundariesExecutor.getImportBoundaryAssertionData(
+            gitRepoRootPath,
             yaniceJsonDirectoryPath,
             absolutePaths,
             importBoundariesPluginConfig,
@@ -122,6 +128,7 @@ export class ImportBoundariesExecutor {
     }
 
     private static async handleGenerateMode(
+        gitRepoRootPath: string,
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
@@ -129,6 +136,7 @@ export class ImportBoundariesExecutor {
         yaniceProjects: YaniceProject[]
     ): Promise<void> {
         const assertionData: ImportBoundaryAssertionData = await ImportBoundariesExecutor.getImportBoundaryAssertionData(
+            gitRepoRootPath,
             yaniceJsonDirectoryPath,
             absolutePaths,
             importBoundariesPluginConfig,
@@ -139,6 +147,7 @@ export class ImportBoundariesExecutor {
     }
 
     private static async handleAssertMode(
+        gitRepoRootPath: string,
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
@@ -147,6 +156,7 @@ export class ImportBoundariesExecutor {
         phase3Result: Phase3Result
     ): Promise<void> {
         const assertionData: ImportBoundaryAssertionData = await ImportBoundariesExecutor.getImportBoundaryAssertionData(
+            gitRepoRootPath,
             yaniceJsonDirectoryPath,
             absolutePaths,
             importBoundariesPluginConfig,
@@ -169,6 +179,7 @@ export class ImportBoundariesExecutor {
     }
 
     private static async getImportBoundaryAssertionData(
+        gitRepoRootPath: string,
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
@@ -182,11 +193,21 @@ export class ImportBoundariesExecutor {
                 importBoundariesPluginConfig,
                 importBoundariesArgs
             );
-        const fileToProjectsMap: Record<string, string[]> = FileToProjectMapper.getFileToProjectsMap(
-            absolutePaths,
+
+        // const fileToProjectsMap: Record<string, string[]> = FileToProjectMapper.getFileToProjectsMap(
+        //     absolutePaths,
+        //     yaniceJsonDirectoryPath,
+        //     yaniceProjects
+        // );
+
+        const fileToProjectsMap: Record<string, string[]> = await FileToProjectMapper.getFileToProjectsMapV2(
+            gitRepoRootPath,
             yaniceJsonDirectoryPath,
             yaniceProjects
         );
+
+        // console.log(JSON.stringify(fileToProjectsMap, null, 4));
+
         const allProjectNames: string[] = yaniceProjects.map((yaniceProject: YaniceProject): string => yaniceProject.projectName);
         const projectDependencyGraph: Record<string, string[]> = ProjectDependencyGraph.createProjectDependencyGraph(
             allProjectNames,

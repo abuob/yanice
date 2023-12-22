@@ -16,19 +16,28 @@ export class ChangedProjects {
     ): string[] {
         return yaniceProjects
             .filter((project: YaniceProject): boolean => {
-                return relativeFilePaths.some((changedFile: string): boolean =>
-                    ChangedProjects.isFilePathPartOfProject(yaniceJsonDirectoryPath, project, changedFile)
+                return relativeFilePaths.some((relativeFilePath: string): boolean =>
+                    ChangedProjects.isFilePathPartOfProject(yaniceJsonDirectoryPath, project, relativeFilePath)
                 );
             })
             .map((project: YaniceProject): string => project.projectName);
     }
 
-    public static isFilePathPartOfProject(yaniceJsonDirectoryPath: string, yaniceProject: YaniceProject, filePath: string): boolean {
+    /**
+     * @param yaniceJsonDirectoryPath
+     * @param yaniceProject
+     * @param relativeFilePath file path relative to the yanice.json
+     */
+    public static isFilePathPartOfProject(
+        yaniceJsonDirectoryPath: string,
+        yaniceProject: YaniceProject,
+        relativeFilePath: string
+    ): boolean {
         return (
-            (!yaniceProject.pathRegExp || yaniceProject.pathRegExp.test(filePath)) &&
-            (!yaniceProject.pathGlob || GlobTester.isGlobMatching(filePath, yaniceProject.pathGlob)) &&
+            (!yaniceProject.pathRegExp || yaniceProject.pathRegExp.test(relativeFilePath)) &&
+            (!yaniceProject.pathGlob || GlobTester.isGlobMatching(relativeFilePath, yaniceProject.pathGlob)) &&
             (!yaniceProject.projectFolder ||
-                ChangedProjects.isFileWithinDirectory(yaniceJsonDirectoryPath, yaniceProject.projectFolder, filePath))
+                ChangedProjects.isFileWithinDirectory(yaniceJsonDirectoryPath, yaniceProject.projectFolder, relativeFilePath))
         );
     }
 
