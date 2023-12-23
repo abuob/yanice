@@ -13,6 +13,16 @@ Install e.g. via npm as follows:
 npm install --save-dev @yanice/import-boundaries
 ```
 
+## Usage
+
+The plugin can be invoked via `yanice`:
+
+```
+yanice plugin:import-boundaries <scope> --assert
+```
+
+`scope` must be defined in the `yanice.json` under `dependencyScopes`. See further below for more examples and explanations.
+
 ## Configuration
 
 Configuration of the plugin is done in the `yanice.json`, see [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json) for an example:
@@ -24,9 +34,15 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
             "**/*.some-extension": ["./some-custom-resolver.js"],
             "**/*.{js,ts}": ["import-resolver-es6"]
         },
-        "exclusionGlobs": ["**/dist/**"],
         "postResolve": ["./post-resolve.js"],
-        "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"]
+        "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"],
+        "assertionOptions": {
+            "skippedImports": {
+                "amount": 0,
+                "mode": "exact"
+            },
+            "ignoredProjects": ["ALL-FILES"]
+        }
     }
 }
 ```
@@ -36,11 +52,6 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
 A map that maps glob-expressions to an array of import-resolvers.
 An import-resolver accepts a file and its filepath and creates an "import-map".
 See here for an example how a custom import resolver can be written: [dummy-resolver.js](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/dummy-resolver.js)
-
-### exclusionGlobs
-
-An array of glob-expressions; all files matching any expression will be ignored when searching for files.
-Note that by default, `.git`-folders and `node_modules`-folders are ignored.
 
 ### postResolve
 
@@ -52,10 +63,25 @@ In case anything is amiss or the plugin was not able to resolve certain imports,
 Array of officially provided assertions or custom assertions.
 Currently supported:
 
--   `only-direct-imports`
--   `only-transitive-dependencies`
--   `only-allow-configured-imports`
--   `max-skipped-imports`
+-   `only-direct-imports`: Forces that only imports to projects which are defined as a direct dependency in the given scope are allowed. E.g.: A file in `project-A` imports a file from `project-B` - this is only allowed if `"project-A": ["project-B", ...]` is declared in the `yanice.json`.
+-   `only-transitive-dependencies`: Similar to `only-direct-imports`, but allowing for transitive dependencies: When we declare `A` to depend on `B` which depends on `C`, `A` is also allowed to import from `C`.
+-   `only-allow-configured-imports` (TODO: implement)
+-   `max-skipped-imports`: See also how to ignore imports below. The rule allows to check/enforce only a certain amount of skipped imports.
+
+#### Assertion Options
+
+-   `skippedImports`: Only relevant when using `max-skipped-imports`. Define the amount of allowed skipped imports. The `mode`-property defines how the number is interpreted.
+-   `ignoredProjects`: The rules related to boundary-assertions will ignore any listed project. This is especially helpful for "metaprojects" like `all-files`, `all-typescript-files` etc.
+
+#### Ignoring a particular import
+
+No rule without an exception.
+When an import statement is preceded with an ignore-comment `// @yanice:import-boundaries ignore-next-statement`, the given import-statement is not considered for assertions:
+
+```typescript
+// @yanice:import-boundaries ignore-next-statement
+import { something } from './some/illegal/file';
+```
 
 ## Commands
 

@@ -11,5 +11,4 @@ export interface YanicePluginImportBoundariesOptions {
         ignoredProjects?: string[];
     };
     assertions?: string[];
-    exclusionGlobs?: string[];
 }

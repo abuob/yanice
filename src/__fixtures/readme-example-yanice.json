@@ -17,9 +17,15 @@
                     "**/*.txt": ["./custom-resolver.js"],
                     "**/*.ts": ["import-resolver-es6"]
                 },
-                "exclusionGlobs": ["**/dist/**"],
                 "postResolve": ["./custom-post-resolve.js"],
-                "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"]
+                "assertions": ["only-direct-imports", "max-skipped-imports", "./some-custom-assertion.js"],
+                "assertionOptions": {
+                    "skippedImports": {
+                        "amount": 0,
+                        "mode": "exact"
+                    },
+                    "ignoredProjects": ["test-utils"]
+                }
             }
         }
     },

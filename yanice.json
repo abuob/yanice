@@ -6,8 +6,7 @@
             "import-boundaries": {
                 "importResolvers": {
                     "**/*.ts": ["import-resolver-es6"]
-                },
-                "exclusionGlobs": ["**/dist/**"]
+                }
             }
         }
     },

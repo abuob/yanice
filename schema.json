@@ -28,12 +28,6 @@
                                         }
                                     }
                                 },
-                                "exclusionGlobs": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                },
                                 "postResolve": {
                                     "type": "array",
                                     "items": {

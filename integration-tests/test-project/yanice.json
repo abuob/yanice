@@ -13,7 +13,6 @@
                     "**/*.txt": ["./dummy-resolver.js"],
                     "**/*.ts": ["import-resolver-es6"]
                 },
-                "exclusionGlobs": ["**/dist/**"],
                 "postResolve": ["./post-resolve.js"],
                 "assertions": ["only-direct-imports", "max-skipped-imports"],
                 "assertionOptions": {
