@@ -20,12 +20,17 @@
                     "skippedImports": {
                         "amount": 0,
                         "mode": "exact"
-                    }
+                    },
+                    "ignoredProjects": ["ALL-FILES"]
                 }
             }
         }
     },
     "projects": [
+        {
+            "projectName": "ALL-FILES",
+            "projectFolder": "."
+        },
         {
             "projectName": "A",
             "pathGlob": "project-A/**",
@@ -69,6 +74,7 @@
     "dependencyScopes": {
         "flat-all-projects-have-commands": {
             "dependencies": {
+                "ALL-FILES": [],
                 "A": [],
                 "B": [],
                 "C": []
@@ -79,6 +85,7 @@
         },
         "a-depends-on-b": {
             "dependencies": {
+                "ALL-FILES": [],
                 "A": ["B"],
                 "B": [],
                 "C": []

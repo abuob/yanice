@@ -23,7 +23,8 @@ describe('ImportBoundaryUtil', (): void => {
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
                 importResolutionsMap,
-                allowedDependenciesMap
+                allowedDependenciesMap,
+                []
             );
             expect(actual).to.deep.equal(expected);
         });
@@ -54,9 +55,33 @@ describe('ImportBoundaryUtil', (): void => {
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
                 importResolutionsMap,
-                allowedDependenciesMap
+                allowedDependenciesMap,
+                []
             );
             expect(actual).to.deep.equal(expected);
+        });
+
+        it('should return empty array if there is a rule violation caused by an ignored project', (): void => {
+            const fileToProjectsMap: Record<string, string[]> = {
+                'file-A': ['project-A'],
+                'file-B': ['project-B']
+            };
+            const importResolutionsMap: Record<string, ImportResolutions[]> = createImportResolutionsMap({
+                'file-A': ['file-B'],
+                'file-B': []
+            });
+            const allowedDependenciesMap: Record<string, string[]> = {
+                'project-A': [],
+                'project-B': []
+            };
+
+            const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
+                fileToProjectsMap,
+                importResolutionsMap,
+                allowedDependenciesMap,
+                ['project-A']
+            );
+            expect(actual).to.have.length(0);
         });
 
         it('should catch rule violations', (): void => {
@@ -99,7 +124,8 @@ describe('ImportBoundaryUtil', (): void => {
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
                 importResolutionsMap,
-                allowedDependenciesMap
+                allowedDependenciesMap,
+                []
             );
             expect(actual).to.deep.equal(expected);
         });

@@ -61,6 +61,12 @@
                                             },
                                             "required": ["mode", "amount"],
                                             "additionalProperties": false
+                                        },
+                                        "ignoredProjects": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
                                         }
                                     },
                                     "additionalProperties": false

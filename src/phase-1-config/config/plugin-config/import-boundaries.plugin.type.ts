@@ -8,9 +8,8 @@ export interface YanicePluginImportBoundariesOptions {
     postResolve?: string[];
     assertionOptions?: {
         skippedImports?: YanicePluginImportBoundariesSkippedImportsOptions;
-        ignoredProjects: string[];
+        ignoredProjects?: string[];
     };
     assertions?: string[];
-    excluded?: string[];
     exclusionGlobs?: string[];
 }

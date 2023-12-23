@@ -8,15 +8,17 @@ import { OnlyDirectImportsUtil } from './only-direct-imports.util';
 export const onlyDirectImports: YaniceImportBoundariesAssertion = {
     assertBoundaries: async (
         phase3Results: Phase3Result,
-        _config: YanicePluginImportBoundariesOptions,
+        config: YanicePluginImportBoundariesOptions,
         assertionData: ImportBoundaryAssertionData
     ): Promise<YaniceImportBoundariesAssertionViolation[]> => {
         const dependencyGraph: DirectedGraph = phase3Results.phase2Result.phase1Result.depGraph;
         const allowedDependenciesMap: Record<string, string[]> = OnlyDirectImportsUtil.getAllowedDependenciesMap(dependencyGraph) ?? [];
+        const ignoredProjects: string[] = config.assertionOptions?.ignoredProjects ?? [];
         return ImportBoundaryUtil.getRuleViolations(
             assertionData.fileToProjectsMap,
             assertionData.importResolutionsMap,
-            allowedDependenciesMap
+            allowedDependenciesMap,
+            ignoredProjects
         );
     }
 };

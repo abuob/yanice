@@ -171,6 +171,9 @@ describe('yanice', () => {
                     expect(commandResult.statusCode).to.equal(1);
                     const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-bad-imports.txt');
                     expect(output).to.include(expected);
+                    // counting occurrences of ".ts:" is not ideal; we want to count the amount of violations in the output:
+                    const amountOfImportBoundaryViolations: number = output.match(/\.ts:/g)?.length ?? 0;
+                    expect(amountOfImportBoundaryViolations).to.equal(1);
                 });
             });
         });
