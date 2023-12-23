@@ -13,8 +13,8 @@ import { ImportBoundaryAssertionData } from './api/import-boundary-assertion-dat
 import { ImportResolutions } from './api/import-resolver.interface';
 import { AssertionLogger } from './assertions/assertion-logger';
 import { ImportBoundariesAssertions } from './assertions/import-boundaries-assertions';
-import { FileDiscovery } from './file-discovery/file-discovery';
 import { FileToProjectMapper } from './file-to-project-mapper/file-to-project-mapper';
+import { GitLsFilesUtil } from './file-to-project-mapper/git-ls-files.util';
 import { ImportResolutionUtil } from './import-resolvers/import-resolution.util';
 import { PostResolver } from './post-resolver/post-resolver';
 import { ProjectDependencyGraph } from './project-dependency-graph/project-dependency-graph';
@@ -39,9 +39,9 @@ export class ImportBoundariesExecutor {
             ImportBoundariesExecutor.exitPlugin(1, 'Plugin "import-boundaries" not configured in yanice.json!');
         }
 
-        const allAbsoluteFilePaths: string[] = await FileDiscovery.getFilePathsRecursively(
-            yaniceJsonDirectoryPath,
-            importBoundariesPluginConfig.exclusionGlobs ?? []
+        const allAbsoluteFilePaths: string[] = await GitLsFilesUtil.getAllAbsoluteFilePathsInYaniceRoot(
+            gitRepoRootPath,
+            yaniceJsonDirectoryPath
         );
 
         if (importBoundariesArgs.mode === 'print-file-imports') {
@@ -186,6 +186,8 @@ export class ImportBoundariesExecutor {
         importBoundariesArgs: ImportBoundariesYanicePluginArgs,
         yaniceProjects: YaniceProject[]
     ): Promise<ImportBoundaryAssertionData> {
+        // TODO: Add performance logging here
+
         const importResolutionsMap: Record<string, ImportResolutions[]> =
             await ImportBoundariesExecutor.getPostResolvedAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
@@ -194,19 +196,11 @@ export class ImportBoundariesExecutor {
                 importBoundariesArgs
             );
 
-        // const fileToProjectsMap: Record<string, string[]> = FileToProjectMapper.getFileToProjectsMap(
-        //     absolutePaths,
-        //     yaniceJsonDirectoryPath,
-        //     yaniceProjects
-        // );
-
-        const fileToProjectsMap: Record<string, string[]> = await FileToProjectMapper.getFileToProjectsMapV2(
+        const fileToProjectsMap: Record<string, string[]> = await FileToProjectMapper.getFileToProjectsMap(
             gitRepoRootPath,
             yaniceJsonDirectoryPath,
             yaniceProjects
         );
-
-        // console.log(JSON.stringify(fileToProjectsMap, null, 4));
 
         const allProjectNames: string[] = yaniceProjects.map((yaniceProject: YaniceProject): string => yaniceProject.projectName);
         const projectDependencyGraph: Record<string, string[]> = ProjectDependencyGraph.createProjectDependencyGraph(
@@ -214,6 +208,7 @@ export class ImportBoundariesExecutor {
             fileToProjectsMap,
             importResolutionsMap
         );
+
         return {
             fileToProjectsMap,
             importResolutionsMap,

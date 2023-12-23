@@ -1,9 +1,19 @@
 import { spawn } from 'node:child_process';
+import path from 'node:path';
 
 export class GitLsFilesUtil {
+    public static async getAllAbsoluteFilePathsInYaniceRoot(gitRepoRootPath: string, yaniceJsonDirectoryPath: string): Promise<string[]> {
+        const allFilesInYaniceRootRelativeToGitRoot: string[] = await GitLsFilesUtil.gitLsFiles(gitRepoRootPath, yaniceJsonDirectoryPath);
+        return allFilesInYaniceRootRelativeToGitRoot.map((filePathRelativeToGitRoot: string): string => {
+            return path.join(gitRepoRootPath, filePathRelativeToGitRoot);
+        });
+    }
+
     public static async gitLsFiles(workingDirectory: string, lsFilesDirectoryParameter: string): Promise<string[]> {
         return new Promise((resolve): void => {
-            const gitProcess = spawn('git', ['ls-files', lsFilesDirectoryParameter, '-c', '-o'], { cwd: workingDirectory });
+            const gitProcess = spawn('git', ['ls-files', lsFilesDirectoryParameter, '-c', '-o', '--exclude-standard'], {
+                cwd: workingDirectory
+            });
             let gitProcessStdout: string = '';
             gitProcess.stdout.on('data', (data): void => {
                 gitProcessStdout += data.toString();

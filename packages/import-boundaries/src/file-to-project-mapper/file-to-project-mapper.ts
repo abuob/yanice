@@ -1,29 +1,11 @@
 import path from 'node:path';
 
-import { ChangedProjects, GlobTester, YaniceProject } from 'yanice';
+import { GlobTester, YaniceProject } from 'yanice';
 
 import { GitLsFilesUtil } from './git-ls-files.util';
 
 export class FileToProjectMapper {
-    public static getFileToProjectsMap(
-        absoluteFilePaths: string[],
-        yaniceJsonDirectoryPath: string,
-        yaniceProjects: YaniceProject[]
-    ): Record<string, string[]> {
-        const fileToProjectsMap: Record<string, string[]> = {};
-        absoluteFilePaths.forEach((absoluteFilePath: string): void => {
-            const relativePathToYaniceJson: string = FileToProjectMapper.convertAbsolutePathToYaniceJsonPath(
-                yaniceJsonDirectoryPath,
-                absoluteFilePath
-            );
-            fileToProjectsMap[absoluteFilePath] = ChangedProjects.getChangedProjectsRaw(yaniceJsonDirectoryPath, yaniceProjects, [
-                relativePathToYaniceJson
-            ]);
-        });
-        return fileToProjectsMap;
-    }
-
-    public static async getFileToProjectsMapV2(
+    public static async getFileToProjectsMap(
         gitRepoRootPath: string,
         yaniceJsonDirectoryPath: string,
         yaniceProjects: YaniceProject[]
@@ -66,10 +48,6 @@ export class FileToProjectMapper {
             });
         }
         return fileToProjectsMap;
-    }
-
-    private static convertAbsolutePathToYaniceJsonPath(yaniceJsonDir: string, absoluteFilePath: string): string {
-        return path.relative(yaniceJsonDir, absoluteFilePath);
     }
 
     private static async getFilesRelevantForYaniceProjectRelativeToYaniceRoot(
