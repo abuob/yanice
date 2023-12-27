@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { SkipNextLineStatement } from '../../../../api/import-resolver.interface';
+import { SkipNextLineStatement } from '../../../api/import-resolver.interface';
 import { SkipStatementHandlingResult, SkipStatementsUtil } from '../skip-statements.util';
 
 describe('SkipStatementsUtil', () => {

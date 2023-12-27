@@ -32,7 +32,7 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
     "import-boundaries": {
         "importResolvers": {
             "**/*.some-extension": ["./some-custom-resolver.js"],
-            "**/*.{js,ts}": ["import-resolver-es6"]
+            "**/*.{js,ts}": ["es6-declarative-import-resolver"]
         },
         "postResolve": ["./post-resolve.js"],
         "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"],

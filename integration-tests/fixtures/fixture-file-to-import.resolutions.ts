@@ -31,7 +31,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
         ],
         importResolutions: [
             {
-                createdBy: 'import-resolver-es6',
+                createdBy: 'es6-declarative-import-resolver',
                 resolvedImports: [
                     {
                         parsedImportStatement: {
@@ -59,7 +59,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
         skippedImports: [],
         importResolutions: [
             {
-                createdBy: 'import-resolver-es6',
+                createdBy: 'es6-declarative-import-resolver',
                 resolvedImports: [],
                 resolvedPackageImports: [],
                 unknownImports: []
@@ -74,7 +74,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
         skippedImports: [],
         importResolutions: [
             {
-                createdBy: 'import-resolver-es6',
+                createdBy: 'es6-declarative-import-resolver',
                 resolvedImports: [
                     {
                         parsedImportStatement: {
@@ -103,7 +103,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
         ],
         importResolutions: [
             {
-                createdBy: 'import-resolver-es6',
+                createdBy: 'es6-declarative-import-resolver',
                 resolvedImports: [],
                 resolvedPackageImports: [],
                 unknownImports: []

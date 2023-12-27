@@ -1,4 +1,4 @@
-import { SkipNextLineStatement } from '../../../api/import-resolver.interface';
+import { SkipNextLineStatement } from '../../api/import-resolver.interface';
 
 export interface SkipStatementHandlingResult {
     inputWithoutSkipStatements: string;

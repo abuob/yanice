@@ -9,8 +9,8 @@ import {
     ImportResolution,
     YaniceImportBoundariesImportResolver
 } from '../api/import-resolver.interface';
-import { importResolverEs6 } from './es6/import-resolver.es6';
-import { SkipStatementHandlingResult, SkipStatementsUtil } from './es6/util/skip-statements.util';
+import { es6DeclarativeImportResolver } from './es6-declarative-imports/es6-declarative-import.resolver';
+import { SkipStatementHandlingResult, SkipStatementsUtil } from './util/skip-statements.util';
 
 export class ImportResolutionUtil {
     public static async getAbsoluteFilePathToImportResolutionsMap(
@@ -91,8 +91,8 @@ export class ImportResolutionUtil {
 
     private static getResolver(yaniceJsonDirectoryPath: string, resolverNameOrLocation: string): YaniceImportBoundariesImportResolver {
         switch (resolverNameOrLocation) {
-            case 'import-resolver-es6':
-                return importResolverEs6;
+            case 'es6-declarative-import-resolver':
+                return es6DeclarativeImportResolver;
             default: {
                 return require(path.join(yaniceJsonDirectoryPath, resolverNameOrLocation));
             }

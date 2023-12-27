@@ -15,7 +15,7 @@
             "import-boundaries": {
                 "importResolvers": {
                     "**/*.txt": ["./custom-resolver.js"],
-                    "**/*.ts": ["import-resolver-es6"]
+                    "**/*.ts": ["es6-declarative-import-resolver"]
                 },
                 "postResolve": ["./custom-post-resolve.js"],
                 "assertions": ["only-direct-imports", "max-skipped-imports", "./some-custom-assertion.js"],

@@ -6,9 +6,9 @@ import {
     PackageLikeImportStatement,
     ParsedImportStatement,
     RelativeImportStatement
-} from '../../../api/import-resolver.interface';
+} from '../../api/import-resolver.interface';
 
-export class ResolveImportStatements {
+export class ResolveImportLocationUtil {
     public static async resolveImportStatements(
         absoluteFilePath: string,
         parsedImportStatements: ParsedImportStatement[],
@@ -24,7 +24,7 @@ export class ResolveImportStatements {
         const relativeImportPromises: Promise<void>[] = [];
         parsedImportStatements.forEach((parsedImportStatement: ParsedImportStatement): void => {
             if (parsedImportStatement.type === 'relative') {
-                const resolveRelativeImportStatementPromise: Promise<void> = ResolveImportStatements.resolveRelativeImportStatement(
+                const resolveRelativeImportStatementPromise: Promise<void> = ResolveImportLocationUtil.resolveRelativeImportStatement(
                     absoluteFilePath,
                     parsedImportStatement
                 ).then((resolvedImportOrNull: string | null): Promise<void> => {
@@ -42,7 +42,8 @@ export class ResolveImportStatements {
                 return;
             }
             if (parsedImportStatement.type === 'package-like') {
-                const resolvedPackageImportOrNull: string | null = ResolveImportStatements.resolvePackageLikeImport(parsedImportStatement);
+                const resolvedPackageImportOrNull: string | null =
+                    ResolveImportLocationUtil.resolvePackageLikeImport(parsedImportStatement);
                 if (resolvedPackageImportOrNull) {
                     fileImportMap.resolvedPackageImports.push({
                         package: parsedImportStatement.fromClause,
@@ -65,7 +66,7 @@ export class ResolveImportStatements {
         const directoryPath: string = path.dirname(absoluteFilePath);
         const fromClause: string = relativeImportStatement.fromClause;
         const pathJoinedWithTsExtension: string = path.join(directoryPath, `${fromClause}.ts`);
-        const isRelativeDirectImport: boolean = await ResolveImportStatements.isFile(pathJoinedWithTsExtension);
+        const isRelativeDirectImport: boolean = await ResolveImportLocationUtil.isFile(pathJoinedWithTsExtension);
         if (isRelativeDirectImport) {
             return pathJoinedWithTsExtension;
         }
@@ -73,8 +74,8 @@ export class ResolveImportStatements {
         const pathJoined: string = path.join(directoryPath, fromClause);
         const pathJoinedWithIndexTs: string = path.join(directoryPath, fromClause, 'index.ts');
         const isRelativeIndexTsImport: boolean = await Promise.all([
-            ResolveImportStatements.isDirectory(pathJoined),
-            ResolveImportStatements.isFile(pathJoinedWithIndexTs)
+            ResolveImportLocationUtil.isDirectory(pathJoined),
+            ResolveImportLocationUtil.isFile(pathJoinedWithIndexTs)
         ]).then(([isRelativeDirectoryImport, doesIndexTsFileExist]) => {
             return isRelativeDirectoryImport && doesIndexTsFileExist;
         });

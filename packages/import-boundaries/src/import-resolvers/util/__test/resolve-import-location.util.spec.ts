@@ -2,11 +2,17 @@ import path from 'node:path';
 
 import { expect } from 'chai';
 
-import { ImportResolution, PackageLikeImportStatement, RelativeImportStatement } from '../../../../api/import-resolver.interface';
-import { ResolveImportStatements } from '../resolve-import-statements';
+import { ImportResolution, PackageLikeImportStatement, RelativeImportStatement } from '../../../api/import-resolver.interface';
+import { ResolveImportLocationUtil } from '../resolve-import-location.util';
 
-describe('ResolveImportStatements', () => {
+describe('ResolveImportLocationUtil', () => {
     describe('resolveImportStatements', () => {
+        /**
+         * NOTE: Moving or renaming the imports used above will break this test!
+         * The setup is a bit crude but does the job.
+         * We use the imports in this test (from above) to see if we can resolve the corresponding files.
+         * If anything is moved or renamed, make sure to keep everything in sync below.
+         */
         it('should resolve import statements', async () => {
             const packageImportStatement: PackageLikeImportStatement = {
                 type: 'package-like',
@@ -15,15 +21,15 @@ describe('ResolveImportStatements', () => {
             };
             const relativeImportStatement1: RelativeImportStatement = {
                 type: 'relative',
-                raw: 'import { ResolveImportStatements } from "../resolve-import-statements";',
-                fromClause: '../resolve-import-statements'
+                raw: 'import { ResolveImportLocationUtil } from "../resolve-import-location.util";',
+                fromClause: '../resolve-import-location.util'
             };
             const relativeImportStatement2: RelativeImportStatement = {
                 type: 'relative',
-                raw: 'import { PackageLikeImportStatement } from "../../../../api/import-resolver.interface";',
-                fromClause: '../../../../api/import-resolver.interface'
+                raw: "import { PackageLikeImportStatement } from '../../../api/import-resolver.interface'",
+                fromClause: '../../../api/import-resolver.interface'
             };
-            const actual: ImportResolution = await ResolveImportStatements.resolveImportStatements(
+            const actual: ImportResolution = await ResolveImportLocationUtil.resolveImportStatements(
                 __filename,
                 [packageImportStatement, relativeImportStatement1, relativeImportStatement2],
                 'import-resolver-name'
@@ -33,11 +39,11 @@ describe('ResolveImportStatements', () => {
                 resolvedImports: [
                     {
                         parsedImportStatement: relativeImportStatement1,
-                        resolvedAbsoluteFilePath: path.join(__dirname, '../resolve-import-statements.ts')
+                        resolvedAbsoluteFilePath: path.join(__dirname, '../resolve-import-location.util.ts')
                     },
                     {
                         parsedImportStatement: relativeImportStatement2,
-                        resolvedAbsoluteFilePath: path.join(__dirname, '../../../../api/import-resolver.interface.ts')
+                        resolvedAbsoluteFilePath: path.join(__dirname, '../../../api/import-resolver.interface.ts')
                     }
                 ],
                 resolvedPackageImports: [

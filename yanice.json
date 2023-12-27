@@ -5,7 +5,7 @@
         "officiallySupported": {
             "import-boundaries": {
                 "importResolvers": {
-                    "**/*.ts": ["import-resolver-es6"]
+                    "**/*.ts": ["es6-declarative-import-resolver"]
                 }
             }
         }
