@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { YaniceImportBoundariesAssertionViolation } from '../../../api/assertion.interface';
-import { ImportResolutionResolvedImport, ImportResolutions } from '../../../api/import-resolver.interface';
+import { FileToImportResolutions, ImportResolution, ImportResolutionResolvedImport } from '../../../api/import-resolver.interface';
 import { ImportBoundaryUtil } from '../import-boundary.util';
 
 describe('ImportBoundaryUtil', (): void => {
@@ -11,7 +11,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-A': ['project-A'],
                 'file-B': ['project-B']
             };
-            const importResolutionsMap: Record<string, ImportResolutions[]> = createImportResolutionsMap({
+            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
                 'file-A': ['file-B'],
                 'file-B': []
             });
@@ -34,7 +34,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-A': ['project-A'],
                 'file-B': ['project-B']
             };
-            const importResolutionsMap: Record<string, ImportResolutions[]> = createImportResolutionsMap({
+            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
                 'file-A': ['file-B'],
                 'file-B': []
             });
@@ -66,7 +66,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-A': ['project-A'],
                 'file-B': ['project-B']
             };
-            const importResolutionsMap: Record<string, ImportResolutions[]> = createImportResolutionsMap({
+            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
                 'file-A': ['file-B'],
                 'file-B': []
             });
@@ -91,7 +91,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-C': ['project-C'],
                 'file-D': ['project-D']
             };
-            const importResolutionsMap: Record<string, ImportResolutions[]> = createImportResolutionsMap({
+            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
                 'file-A': ['file-B', 'file-C'],
                 'file-B': ['file-C'],
                 'file-C': ['file-D'],
@@ -132,31 +132,34 @@ describe('ImportBoundaryUtil', (): void => {
     });
 });
 
-function createImportResolutionsMap(simpleImportMap: Record<string, string[]>): Record<string, ImportResolutions[]> {
-    const emptyImportResolution: ImportResolutions = {
+function createImportResolutionsMap(simpleImportMap: Record<string, string[]>): Record<string, FileToImportResolutions> {
+    const emptyImportResolution: ImportResolution = {
         createdBy: 'createdBy',
         resolvedImports: [],
         resolvedPackageImports: [],
-        unknownImports: [],
-        skippedImports: []
+        unknownImports: []
     };
-    const result: Record<string, ImportResolutions[]> = {};
+    const result: Record<string, FileToImportResolutions> = {};
     Object.keys(simpleImportMap).forEach((file: string): void => {
         const importedFiles: string[] = simpleImportMap[file] ?? [];
-        result[file] = [
-            {
-                ...emptyImportResolution,
-                resolvedImports: importedFiles.map((importedFile: string): ImportResolutionResolvedImport => {
-                    return {
-                        parsedImportStatement: {
-                            type: 'unknown',
-                            raw: 'raw'
-                        },
-                        resolvedAbsoluteFilePath: importedFile
-                    };
-                })
-            }
-        ];
+        result[file] = {
+            skippedImports: [],
+            importResolutions: [
+                {
+                    ...emptyImportResolution,
+                    resolvedImports: importedFiles.map((importedFile: string): ImportResolutionResolvedImport => {
+                        return {
+                            parsedImportStatement: {
+                                type: 'relative',
+                                fromClause: 'fromClause',
+                                raw: 'raw'
+                            },
+                            resolvedAbsoluteFilePath: importedFile
+                        };
+                    })
+                }
+            ]
+        };
     });
     return result;
 }

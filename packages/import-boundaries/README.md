@@ -76,10 +76,10 @@ Currently supported:
 #### Ignoring a particular import
 
 No rule without an exception.
-When an import statement is preceded with an ignore-comment `// @yanice:import-boundaries ignore-next-statement`, the given import-statement is not considered for assertions:
+When an import statement is preceded with an ignore-comment `// @yanice:import-boundaries ignore-next-line`, the given import-statement is not considered for assertions:
 
 ```typescript
-// @yanice:import-boundaries ignore-next-statement
+// @yanice:import-boundaries ignore-next-line
 import { something } from './some/illegal/file';
 ```
 

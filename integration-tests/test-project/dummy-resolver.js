@@ -15,7 +15,7 @@ const dummyResolver = {
     name: 'dummy-resolver',
 
     /**
-     * @returns {Promise<import("../../packages/import-boundaries/src/api/import-resolver.interface").ImportResolutions | null>}
+     * @returns {Promise<import("../../packages/import-boundaries/src/api/import-resolver.interface").ImportResolution | null>}
      */
     getFileImportMap: async (absoluteFilePath, fileContent) => {
         const projectAPath = absolutePath('project-A/empty.txt');
@@ -23,7 +23,7 @@ const dummyResolver = {
             return Promise.resolve(null);
         }
         /**
-         * @type {import("../../packages/import-boundaries/src/api/import-resolver.interface").ImportResolutions}
+         * @type {import("../../packages/import-boundaries/src/api/import-resolver.interface").ImportResolution}
          */
         const result = {
             unknownImports: [],
@@ -38,8 +38,7 @@ const dummyResolver = {
                 }
             ],
             resolvedPackageImports: [],
-            createdBy: 'dummy-resolver',
-            skippedImports: []
+            createdBy: 'dummy-resolver'
         };
         return Promise.resolve(result);
     }

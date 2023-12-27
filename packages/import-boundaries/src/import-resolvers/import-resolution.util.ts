@@ -3,15 +3,16 @@ import path from 'node:path';
 
 import { GlobTester, PromiseCreator, PromiseQueue } from 'yanice';
 
-import { ImportResolutions, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
+import { FileToImportResolutions, ImportResolution, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
 import { importResolverEs6 } from './es6/import-resolver.es6';
+import { SkipStatementHandlingResult, SkipStatementsUtil } from './es6/util/skip-statements.util';
 
 export class ImportResolutionUtil {
     public static async getAbsoluteFilePathToImportResolutionsMap(
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importResolverMap: Record<string, string[] | undefined>
-    ): Promise<Record<string, ImportResolutions[]>> {
+    ): Promise<Record<string, FileToImportResolutions>> {
         const pathGlobs: string[] = Object.keys(importResolverMap);
         const loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined> = pathGlobs.reduce(
             (
@@ -34,8 +35,8 @@ export class ImportResolutionUtil {
         pathGlobs: string[],
         loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined>,
         maxConcurrency: number
-    ): Promise<Record<string, ImportResolutions[]>> {
-        const fileToResolvedImportsMap: Record<string, ImportResolutions[]> = {};
+    ): Promise<Record<string, FileToImportResolutions>> {
+        const fileToResolvedImportsMap: Record<string, FileToImportResolutions> = {};
         const promiseCreators: PromiseCreator[] = absolutePaths.reduce(
             (prev: PromiseCreator[], absoluteFilePath: string): PromiseCreator[] => {
                 const promiseCreatorsForGivenFile: PromiseCreator[] = pathGlobs
@@ -61,18 +62,26 @@ export class ImportResolutionUtil {
     private static async resolveImports(
         absoluteFilePath: string,
         resolvers: YaniceImportBoundariesImportResolver[]
-    ): Promise<ImportResolutions[]> {
-        const fileContent: string = await fs.readFile(absoluteFilePath, { encoding: 'utf-8' });
-        const importResolutionsPromise: Promise<ImportResolutions | null>[] = resolvers.map(
-            (resolver: YaniceImportBoundariesImportResolver): Promise<ImportResolutions | null> => {
-                return resolver.getFileImportMap(absoluteFilePath, fileContent);
+    ): Promise<FileToImportResolutions> {
+        const rawFileContent: string = await fs.readFile(absoluteFilePath, { encoding: 'utf-8' });
+        const skipStatementHandlingResult: SkipStatementHandlingResult = SkipStatementsUtil.handleSkipStatements(rawFileContent);
+        const importResolutionsPromise: Promise<ImportResolution | null>[] = resolvers.map(
+            (resolver: YaniceImportBoundariesImportResolver): Promise<ImportResolution | null> => {
+                return resolver.getFileImportMap(absoluteFilePath, skipStatementHandlingResult.inputWithoutSkipStatements);
             }
         );
-        return Promise.all(importResolutionsPromise).then((importResolutionsOrNull: (ImportResolutions | null)[]): ImportResolutions[] => {
-            return importResolutionsOrNull.filter(
-                (importResolutions: ImportResolutions | null): importResolutions is ImportResolutions => !!importResolutions
-            );
-        });
+        return Promise.all(importResolutionsPromise).then(
+            (importResolutionsOrNull: (ImportResolution | null)[]): FileToImportResolutions => {
+                const importResolutions: ImportResolution[] = importResolutionsOrNull.filter(
+                    (importResolutionOrNull: ImportResolution | null): importResolutionOrNull is ImportResolution =>
+                        !!importResolutionOrNull
+                );
+                return {
+                    skippedImports: skipStatementHandlingResult.skipStatements,
+                    importResolutions
+                };
+            }
+        );
     }
 
     private static getResolver(yaniceJsonDirectoryPath: string, resolverNameOrLocation: string): YaniceImportBoundariesImportResolver {

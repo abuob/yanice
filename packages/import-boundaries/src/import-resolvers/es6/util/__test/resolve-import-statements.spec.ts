@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { expect } from 'chai';
 
-import { ImportResolutions, PackageLikeImportStatement, RelativeImportStatement } from '../../../../api/import-resolver.interface';
+import { ImportResolution, PackageLikeImportStatement, RelativeImportStatement } from '../../../../api/import-resolver.interface';
 import { ResolveImportStatements } from '../resolve-import-statements';
 
 describe('ResolveImportStatements', () => {
@@ -23,12 +23,12 @@ describe('ResolveImportStatements', () => {
                 raw: 'import { PackageLikeImportStatement } from "../../../../api/import-resolver.interface";',
                 fromClause: '../../../../api/import-resolver.interface'
             };
-            const actual: ImportResolutions = await ResolveImportStatements.resolveImportStatements(
+            const actual: ImportResolution = await ResolveImportStatements.resolveImportStatements(
                 __filename,
                 [packageImportStatement, relativeImportStatement1, relativeImportStatement2],
                 'import-resolver-name'
             );
-            const expected: ImportResolutions = {
+            const expected: ImportResolution = {
                 createdBy: 'import-resolver-name',
                 resolvedImports: [
                     {
@@ -46,7 +46,6 @@ describe('ResolveImportStatements', () => {
                         resolvedAbsoluteFilePath: require.resolve('chai')
                     }
                 ],
-                skippedImports: [],
                 unknownImports: []
             };
             expect(actual).to.deep.equal(expected);

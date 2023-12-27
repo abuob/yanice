@@ -1,5 +1,5 @@
-import { ImportResolutions } from './import-resolver.interface';
+import { FileToImportResolutions } from './import-resolver.interface';
 
 export interface YaniceImportBoundariesPostResolverV2 {
-    postProcess: (absoluteFilePath: string, resolvedImports: ImportResolutions[]) => Promise<ImportResolutions[]>;
+    postProcess: (absoluteFilePath: string, fileToImportResolutions: FileToImportResolutions) => Promise<FileToImportResolutions>;
 }

@@ -1,0 +1,125 @@
+import { FileToImportResolutions, ImportResolution } from '../../packages/import-boundaries/src/api/import-resolver.interface';
+import { IntegrationTestUtil } from '../test-utils/integration-test.util';
+
+export const fixtureFileToImportResolutions: Record<string, FileToImportResolutions> = {
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/empty.txt')]: {
+        skippedImports: [],
+        importResolutions: [
+            {
+                createdBy: 'dummy-resolver',
+                resolvedImports: [
+                    {
+                        parsedImportStatement: {
+                            fromClause: 'somewhere',
+                            raw: 'import stuff from "somewhere"',
+                            type: 'relative'
+                        },
+                        resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-B/empty.txt')
+                    }
+                ],
+                resolvedPackageImports: [],
+                unknownImports: []
+            }
+        ]
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-1.ts')]: {
+        skippedImports: [
+            {
+                type: 'skip-next-line',
+                raw: "@yanice:import-boundaries ignore-next-line\nimport { dummyC } from '../project-C/project-c';\n"
+            }
+        ],
+        importResolutions: [
+            {
+                createdBy: 'import-resolver-es6',
+                resolvedImports: [
+                    {
+                        parsedImportStatement: {
+                            fromClause: '../project-B/project-b',
+                            raw: "import { dummyB } from '../project-B/project-b'",
+                            type: 'relative'
+                        },
+                        resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-B/project-b.ts')
+                    },
+                    {
+                        parsedImportStatement: {
+                            fromClause: './project-a-2',
+                            raw: "import { dummyA2 } from './project-a-2'",
+                            type: 'relative'
+                        },
+                        resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts')
+                    }
+                ],
+                resolvedPackageImports: [],
+                unknownImports: []
+            }
+        ]
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts')]: {
+        skippedImports: [],
+        importResolutions: [
+            {
+                createdBy: 'import-resolver-es6',
+                resolvedImports: [],
+                resolvedPackageImports: [],
+                unknownImports: []
+            }
+        ]
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-B/empty.txt')]: {
+        skippedImports: [],
+        importResolutions: []
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-B/project-b.ts')]: {
+        skippedImports: [],
+        importResolutions: [
+            {
+                createdBy: 'import-resolver-es6',
+                resolvedImports: [
+                    {
+                        parsedImportStatement: {
+                            fromClause: '../project-C/project-c',
+                            raw: "import { dummyC } from '../project-C/project-c'",
+                            type: 'relative'
+                        },
+                        resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-C/project-c.ts')
+                    }
+                ],
+                resolvedPackageImports: [],
+                unknownImports: []
+            }
+        ]
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-C/empty.txt')]: {
+        skippedImports: [],
+        importResolutions: []
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-C/project-c.ts')]: {
+        skippedImports: [
+            {
+                type: 'skip-next-line',
+                raw: "@yanice:import-boundaries ignore-next-line\nimport { dummyB } from '../project-B/project-b';\n"
+            }
+        ],
+        importResolutions: [
+            {
+                createdBy: 'import-resolver-es6',
+                resolvedImports: [],
+                resolvedPackageImports: [],
+                unknownImports: []
+            }
+        ]
+    }
+};
+
+export const fixtureFileImportMapWithoutDummyResolver: Record<string, FileToImportResolutions> = Object.keys(
+    fixtureFileToImportResolutions
+).reduce((prev: Record<string, FileToImportResolutions>, curr: string): Record<string, FileToImportResolutions> => {
+    prev[curr] = {
+        skippedImports: fixtureFileToImportResolutions[curr].skippedImports ?? [],
+        importResolutions: (fixtureFileToImportResolutions[curr].importResolutions ?? []).filter(
+            (importResolution: ImportResolution): boolean => importResolution.createdBy !== 'dummy-resolver'
+        )
+    };
+    return prev;
+}, {});

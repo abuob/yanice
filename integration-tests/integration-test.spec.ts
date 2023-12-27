@@ -3,8 +3,8 @@ import path from 'node:path';
 import { expect } from 'chai';
 
 import type { ImportBoundaryAssertionData } from '../packages/import-boundaries/src/api/import-boundary-assertion-data';
+import { fixtureFileImportMapWithoutDummyResolver, fixtureFileToImportResolutions } from './fixtures/fixture-file-to-import.resolutions';
 import { fixtureFileToProjectsMap } from './fixtures/fixture-file-to-projects.map';
-import { fixtureFileImportMapWithoutDummyResolver, fixtureImportResolutionsMap } from './fixtures/fixture-import-resolutions.map';
 import { fixtureProjectDependencyGraph } from './fixtures/fixture-project-dependency.graph';
 import { IntegrationTestUtil } from './test-utils/integration-test.util';
 
@@ -121,7 +121,7 @@ describe('yanice', () => {
                         'plugin:import-boundaries a-depends-on-b --print-file-imports --skip-post-resolvers'
                     );
                     const outputObject = JSON.parse(output.trim());
-                    expect(outputObject).to.deep.equal(fixtureImportResolutionsMap);
+                    expect(outputObject).to.deep.equal(fixtureFileToImportResolutions);
                 });
 
                 it('should be able to print the file-import-maps also when running post-resolvers', () => {
@@ -139,7 +139,7 @@ describe('yanice', () => {
                     const outputObject = JSON.parse(output.trim());
                     const expected: ImportBoundaryAssertionData = {
                         fileToProjectsMap: fixtureFileToProjectsMap,
-                        importResolutionsMap: fixtureImportResolutionsMap,
+                        fileToImportResolutionsMap: fixtureFileToImportResolutions,
                         projectDependencyGraph: fixtureProjectDependencyGraph
                     };
                     expect(outputObject).to.deep.equal(expected);

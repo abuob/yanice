@@ -16,7 +16,7 @@ export const onlyTransitiveImports: YaniceImportBoundariesAssertion = {
         const allowedDependenciesMap: Record<string, string[]> = OnlyTransitiveImportsUtil.getAllowedDependenciesMap(dependencyGraph) ?? [];
         return ImportBoundaryUtil.getRuleViolations(
             assertionData.fileToProjectsMap,
-            assertionData.importResolutionsMap,
+            assertionData.fileToImportResolutionsMap,
             allowedDependenciesMap,
             ignoredProjects
         );

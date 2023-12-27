@@ -1,19 +1,19 @@
-import { ImportResolutions } from '../api/import-resolver.interface';
+import { FileToImportResolutions, ImportResolution } from '../api/import-resolver.interface';
 
 export class ProjectDependencyGraph {
     public static createProjectDependencyGraph(
         allProjectNames: string[],
         absoluteFilePathToProjectsMap: Record<string, string[] | undefined>,
-        fileToResolvedImportsMap: Record<string, ImportResolutions[]>
+        fileToResolvedImportsMap: Record<string, FileToImportResolutions>
     ): Record<string, string[]> {
         const projectDependencyGraph: Record<string, string[]> = {};
         const allFilePaths: string[] = Object.keys(absoluteFilePathToProjectsMap);
         allFilePaths.forEach((filePath: string): void => {
             const projectsOfFile: string[] = absoluteFilePathToProjectsMap[filePath] ?? [];
-            const resolvedImportsOfFile: ImportResolutions[] = fileToResolvedImportsMap[filePath] ?? [];
+            const importResolutions: ImportResolution[] = fileToResolvedImportsMap[filePath]?.importResolutions ?? [];
             const importedProjectsOfFile: string[] = ProjectDependencyGraph.getImportedProjectsOfFile(
                 absoluteFilePathToProjectsMap,
-                resolvedImportsOfFile
+                importResolutions
             );
             ProjectDependencyGraph.extendDependencyGraph(projectDependencyGraph, projectsOfFile, importedProjectsOfFile);
         });
@@ -27,11 +27,11 @@ export class ProjectDependencyGraph {
 
     public static getImportedProjectsOfFile(
         absoluteFilePathToProjectsMap: Record<string, string[] | undefined>,
-        importResolutions: ImportResolutions[]
+        importResolutions: ImportResolution[]
     ): string[] {
         const projectsMatchingGivenImport: string[] = [];
-        importResolutions.forEach((importResolution: ImportResolutions): void => {
-            importResolution.resolvedImports.forEach((resolvedImport: ImportResolutions['resolvedImports'][number]): void => {
+        importResolutions.forEach((importResolution: ImportResolution): void => {
+            importResolution.resolvedImports.forEach((resolvedImport: ImportResolution['resolvedImports'][number]): void => {
                 absoluteFilePathToProjectsMap[resolvedImport.resolvedAbsoluteFilePath]?.forEach((matchingProject: string): void => {
                     if (!projectsMatchingGivenImport.includes(matchingProject)) {
                         projectsMatchingGivenImport.push(matchingProject);

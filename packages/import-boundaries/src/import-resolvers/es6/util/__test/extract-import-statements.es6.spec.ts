@@ -46,15 +46,15 @@ describe('ExtractImportStatementsEs6', () => {
             expect(actual2).to.have.length(expected2.length);
         });
 
-        it('should also extract ignore-next-statement-comment', () => {
+        it('should not consider skip-statements', () => {
             const fileInput: string = `
             import {something} from 'somewhere';
             // some comment
             import * as t from 'barrel';import def from 'default-export';
             import * as t from 'barrel';import def from 'default-export';
-            //@yanice:import-boundaries ignore-next-statement
-            // @yanice:import-boundaries ignore-next-statement\n\n \t
-            //  @yanice:import-boundaries ignore-next-statement
+            //@yanice:import-boundaries ignore-next-line
+            // @yanice:import-boundaries ignore-next-line\n\n \t
+            //  @yanice:import-boundaries ignore-next-line
             someCode();
             importfromsomewhere();
             import_from();
@@ -67,9 +67,6 @@ describe('ExtractImportStatementsEs6', () => {
                 "import def from 'default-export'",
                 "import * as t from 'barrel'",
                 "import def from 'default-export'",
-                '//@yanice:import-boundaries ignore-next-statement',
-                '// @yanice:import-boundaries ignore-next-statement',
-                '//  @yanice:import-boundaries ignore-next-statement',
                 'import a from "b"'
             ];
             expect(actual).to.have.same.members(expected);

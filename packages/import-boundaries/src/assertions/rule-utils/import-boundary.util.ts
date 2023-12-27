@@ -1,18 +1,18 @@
 import { AssertionViolationImportNotConfigured, YaniceImportBoundariesAssertionViolation } from '../../api/assertion.interface';
-import { ImportResolutionResolvedImport, ImportResolutions } from '../../api/import-resolver.interface';
+import { FileToImportResolutions, ImportResolution, ImportResolutionResolvedImport } from '../../api/import-resolver.interface';
 
 export class ImportBoundaryUtil {
     public static getRuleViolations(
         fileToProjectsMap: Record<string, string[]>,
-        importResolutionsMap: Record<string, ImportResolutions[]>,
+        importResolutionsMap: Record<string, FileToImportResolutions>,
         allowedDependenciesMap: Record<string, string[]>,
         ignoredProjects: string[]
     ): YaniceImportBoundariesAssertionViolation[] {
         const violations: AssertionViolationImportNotConfigured[] = [];
         Object.keys(fileToProjectsMap).forEach((filePath: string): void => {
-            const importResolutions: ImportResolutions[] = importResolutionsMap[filePath] ?? [];
+            const importResolutions: ImportResolution[] = importResolutionsMap[filePath]?.importResolutions ?? [];
             const resolvedImports: ImportResolutionResolvedImport[] = importResolutions
-                .map((importResolution: ImportResolutions) => importResolution.resolvedImports)
+                .map((importResolution: ImportResolution) => importResolution.resolvedImports)
                 .flat();
             const projectsOfFile: string[] = fileToProjectsMap[filePath] ?? [];
             projectsOfFile.forEach((projectNameOfFile: string): void => {

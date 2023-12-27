@@ -16,7 +16,7 @@ export const onlyDirectImports: YaniceImportBoundariesAssertion = {
         const ignoredProjects: string[] = config.assertionOptions?.ignoredProjects ?? [];
         return ImportBoundaryUtil.getRuleViolations(
             assertionData.fileToProjectsMap,
-            assertionData.importResolutionsMap,
+            assertionData.fileToImportResolutionsMap,
             allowedDependenciesMap,
             ignoredProjects
         );

@@ -1,15 +1,16 @@
 import { expect } from 'chai';
 
-import { ImportResolutions, ParsedImportStatement } from '../../api/import-resolver.interface';
+import { ImportResolution, ParsedImportStatement } from '../../api/import-resolver.interface';
 import { ProjectDependencyGraph } from '../project-dependency-graph';
 
 describe('ProjectDependencyGraph', () => {
     describe('getImportedProjectsOfFile', () => {
         const defaultParsedImportStatement: ParsedImportStatement = {
-            type: 'unknown',
+            type: 'relative',
+            fromClause: 'fromClause',
             raw: 'raw'
         };
-        const defaultResolvedImport: ImportResolutions['resolvedImports'][number] = {
+        const defaultResolvedImport: ImportResolution['resolvedImports'][number] = {
             resolvedAbsoluteFilePath: 'some/path',
             parsedImportStatement: defaultParsedImportStatement
         };
@@ -20,7 +21,7 @@ describe('ProjectDependencyGraph', () => {
         });
 
         it('should return all projects which match the resolved imports', () => {
-            const importResolution: ImportResolutions = {
+            const importResolution: ImportResolution = {
                 createdBy: 'createdBy',
                 resolvedImports: [
                     { ...defaultResolvedImport, resolvedAbsoluteFilePath: 'a' },
@@ -29,7 +30,6 @@ describe('ProjectDependencyGraph', () => {
                     { ...defaultResolvedImport, resolvedAbsoluteFilePath: 'some/path/matching/nothing' }
                 ],
                 resolvedPackageImports: [],
-                skippedImports: [],
                 unknownImports: []
             };
             const expected: string[] = ['b', 'c', 'some-project'];

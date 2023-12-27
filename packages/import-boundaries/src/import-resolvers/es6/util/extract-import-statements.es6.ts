@@ -1,8 +1,7 @@
 export class ExtractImportStatementsEs6 {
     public static extractImportStatements(fileContent: string): string[] {
         const preparedFileContent = ExtractImportStatementsEs6.stripBlockComments(fileContent);
-        const relevantStatementRegex: RegExp =
-            /(import[ \t\n](.|\n|\r)*?from[ \t\n]+?['"].*?['"]|\/\/[ ]*@yanice:import-boundaries ignore-next-statement)/g;
+        const relevantStatementRegex: RegExp = /(import[ \t\n](.|\n|\r)*?from[ \t\n]+?['"].*?['"])/g;
         let match: RegExpExecArray | null = null;
         const importStatements: string[] = [];
         while ((match = relevantStatementRegex.exec(preparedFileContent)) !== null) {

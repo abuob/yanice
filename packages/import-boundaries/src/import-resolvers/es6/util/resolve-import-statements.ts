@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import {
-    ImportResolutions,
+    ImportResolution,
     PackageLikeImportStatement,
     ParsedImportStatement,
     RelativeImportStatement
@@ -13,24 +13,16 @@ export class ResolveImportStatements {
         absoluteFilePath: string,
         parsedImportStatements: ParsedImportStatement[],
         importResolverName: string
-    ): Promise<ImportResolutions> {
-        const fileImportMap: ImportResolutions = {
+    ): Promise<ImportResolution> {
+        const fileImportMap: ImportResolution = {
             createdBy: importResolverName,
-            skippedImports: [],
             resolvedImports: [],
             resolvedPackageImports: [],
             unknownImports: []
         };
 
         const relativeImportPromises: Promise<void>[] = [];
-        parsedImportStatements.forEach((parsedImportStatement: ParsedImportStatement, index: number): void => {
-            if (index > 0 && parsedImportStatements[index - 1]?.type === 'skip') {
-                fileImportMap.skippedImports.push(parsedImportStatement);
-                return;
-            }
-            if (parsedImportStatement.type === 'skip') {
-                return;
-            }
+        parsedImportStatements.forEach((parsedImportStatement: ParsedImportStatement): void => {
             if (parsedImportStatement.type === 'relative') {
                 const resolveRelativeImportStatementPromise: Promise<void> = ResolveImportStatements.resolveRelativeImportStatement(
                     absoluteFilePath,

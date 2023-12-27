@@ -10,6 +10,6 @@ export const maxSkippedImports: YaniceImportBoundariesAssertion = {
         config: YanicePluginImportBoundariesOptions,
         assertionData: ImportBoundaryAssertionData
     ): Promise<YaniceImportBoundariesAssertionViolation[]> => {
-        return MaxSkippedImportsUtil.getRuleViolations(config?.assertionOptions?.skippedImports, assertionData.importResolutionsMap);
+        return MaxSkippedImportsUtil.getRuleViolations(config?.assertionOptions?.skippedImports, assertionData.fileToImportResolutionsMap);
     }
 };

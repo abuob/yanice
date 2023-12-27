@@ -1,5 +1,5 @@
 import { dummyB } from '../project-B/project-b';
-// @yanice:import-boundaries ignore-next-statement
+// @yanice:import-boundaries ignore-next-line
 import { dummyC } from '../project-C/project-c';
 import { dummyA2 } from './project-a-2';
 

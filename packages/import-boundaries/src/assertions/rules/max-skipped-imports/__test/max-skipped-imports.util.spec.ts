@@ -2,21 +2,21 @@ import { expect } from 'chai';
 import { YanicePluginImportBoundariesSkippedImportsOptions } from 'yanice';
 
 import { YaniceImportBoundariesAssertionViolation } from '../../../../api/assertion.interface';
-import { ImportResolutions, ParsedImportStatement } from '../../../../api/import-resolver.interface';
+import { FileToImportResolutions, SkipNextLineStatement } from '../../../../api/import-resolver.interface';
 import { MaxSkippedImportsUtil } from '../max-skipped-imports.util';
 
 describe('MaxSkippedImportsUtil', (): void => {
     describe('getRuleViolations', (): void => {
-        const emptyImportResolution: ImportResolutions = {
-            createdBy: 'createdBy',
-            resolvedImports: [],
-            resolvedPackageImports: [],
-            unknownImports: [],
-            skippedImports: []
+        const defaultFileToImportResolution: FileToImportResolutions = {
+            skippedImports: [],
+            importResolutions: []
         };
-        const dummyImportStatement: ParsedImportStatement = { type: 'skip', raw: 'raw' };
-        const importResolutionsMap: Record<string, ImportResolutions[]> = {
-            'file-A': [{ ...emptyImportResolution, skippedImports: [dummyImportStatement, dummyImportStatement] }]
+        const dummyImportStatement: SkipNextLineStatement = {
+            type: 'skip-next-line',
+            raw: 'raw'
+        };
+        const importResolutionsMap: Record<string, FileToImportResolutions> = {
+            'file-A': { ...defaultFileToImportResolution, skippedImports: [dummyImportStatement, dummyImportStatement] }
         };
 
         it('should return an error when no configuration is present', (): void => {

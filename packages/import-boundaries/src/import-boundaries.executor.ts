@@ -10,7 +10,7 @@ import {
 
 import { YaniceImportBoundariesAssertionViolation } from './api/assertion.interface';
 import { ImportBoundaryAssertionData } from './api/import-boundary-assertion-data';
-import { ImportResolutions } from './api/import-resolver.interface';
+import { FileToImportResolutions } from './api/import-resolver.interface';
 import { AssertionLogger } from './assertions/assertion-logger';
 import { ImportBoundariesAssertions } from './assertions/import-boundaries-assertions';
 import { FileToProjectMapper } from './file-to-project-mapper/file-to-project-mapper';
@@ -98,7 +98,7 @@ export class ImportBoundariesExecutor {
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
     ): Promise<void> {
-        const importResolutionsMap: Record<string, ImportResolutions[]> =
+        const importResolutionsMap: Record<string, FileToImportResolutions> =
             await ImportBoundariesExecutor.getPostResolvedAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
@@ -188,7 +188,7 @@ export class ImportBoundariesExecutor {
     ): Promise<ImportBoundaryAssertionData> {
         // TODO: Add performance logging here
 
-        const importResolutionsMap: Record<string, ImportResolutions[]> =
+        const importResolutionsMap: Record<string, FileToImportResolutions> =
             await ImportBoundariesExecutor.getPostResolvedAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
@@ -211,7 +211,7 @@ export class ImportBoundariesExecutor {
 
         return {
             fileToProjectsMap,
-            importResolutionsMap,
+            fileToImportResolutionsMap: importResolutionsMap,
             projectDependencyGraph
         };
     }
@@ -221,15 +221,15 @@ export class ImportBoundariesExecutor {
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
-    ): Promise<Record<string, ImportResolutions[]>> {
-        const fileToImportResolutionsMapRaw: Record<string, ImportResolutions[]> =
+    ): Promise<Record<string, FileToImportResolutions>> {
+        const fileToImportResolutionsMapRaw: Record<string, FileToImportResolutions> =
             await ImportResolutionUtil.getAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
                 importBoundariesPluginConfig.importResolvers
             );
 
-        const fileToImportResolutionsMap: Record<string, ImportResolutions[]> = await ImportBoundariesExecutor.postResolveIfNecessaryV2(
+        const fileToImportResolutionsMap: Record<string, FileToImportResolutions> = await ImportBoundariesExecutor.postResolveIfNecessaryV2(
             fileToImportResolutionsMapRaw,
             yaniceJsonDirectoryPath,
             importBoundariesPluginConfig.postResolve,
@@ -240,11 +240,11 @@ export class ImportBoundariesExecutor {
     }
 
     private static async postResolveIfNecessaryV2(
-        fileToResolvedImportsMap: Record<string, ImportResolutions[]>,
+        fileToResolvedImportsMap: Record<string, FileToImportResolutions>,
         yaniceJsonDirectoryPath: string,
         postResolverLocations: string[] | undefined,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
-    ): Promise<Record<string, ImportResolutions[]>> {
+    ): Promise<Record<string, FileToImportResolutions>> {
         if (!postResolverLocations || postResolverLocations.length === 0 || importBoundariesArgs.skipPostResolvers) {
             return Promise.resolve(fileToResolvedImportsMap);
         }
