@@ -66,7 +66,7 @@ const defaultTsRules = {
     '@typescript-eslint/prefer-function-type': 'error',
     '@typescript-eslint/quotes': 'off',
     '@typescript-eslint/semi': 'off',
-    '@typescript-eslint/sort-type-union-intersection-members': 'error',
+    '@typescript-eslint/sort-type-constituents': 'error',
     '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/typedef': [
         'error',

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <meta charset="utf-8" />
 <body>
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -234,12 +234,12 @@
             RENDER_OPTIONS.graphRenderDirection === 'TB'
                 ? 0
                 : RENDER_OPTIONS.graphRenderDirection === 'BT'
-                ? 1
-                : RENDER_OPTIONS.graphRenderDirection === 'LR'
-                ? 2
-                : RENDER_OPTIONS.graphRenderDirection === 'RL'
-                ? 3
-                : 0
+                  ? 1
+                  : RENDER_OPTIONS.graphRenderDirection === 'LR'
+                    ? 2
+                    : RENDER_OPTIONS.graphRenderDirection === 'RL'
+                      ? 3
+                      : 0
         ].selected = true;
         graphData.forEach((data) => {
             const select = document.querySelector('#graphFocusSelect');

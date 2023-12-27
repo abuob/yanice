@@ -22,7 +22,10 @@ interface InternalPromiseQueueEntry {
 export class PromiseQueue {
     private currentExecutionAmount: number = 0;
 
-    constructor(private maxConcurrency: number, private internalQueue: InternalPromiseQueueEntry[]) {}
+    constructor(
+        private maxConcurrency: number,
+        private internalQueue: InternalPromiseQueueEntry[]
+    ) {}
 
     public static createSimpleQueue(promiseCreators: PromiseCreator[], concurrency: number): PromiseQueue {
         const internalQueue: InternalPromiseQueueEntry[] = promiseCreators.map(
