@@ -6,12 +6,12 @@ import {
     AssertionViolationSkippedImportsTooMany,
     YaniceImportBoundariesAssertionViolation
 } from '../../../api/assertion.interface';
-import { FileToImportResolutions } from '../../../api/import-resolver.interface';
+import { FileToImportResolutions, FileToImportResolutionsMap } from '../../../api/import-resolver.interface';
 
 export class MaxSkippedImportsUtil {
     public static getRuleViolations(
         skippedImportsConfig: YanicePluginImportBoundariesSkippedImportsOptions | undefined,
-        importResolutionsMap: Record<string, FileToImportResolutions>
+        fileToImportResolutionsMap: FileToImportResolutionsMap
     ): YaniceImportBoundariesAssertionViolation[] {
         if (!skippedImportsConfig) {
             const notConfigured: AssertionViolationSkippedImportOptionsNotConfigured = {
@@ -19,7 +19,7 @@ export class MaxSkippedImportsUtil {
             };
             return [notConfigured];
         }
-        const amountOfSkippedImports: number = Object.values(importResolutionsMap)
+        const amountOfSkippedImports: number = Object.values(fileToImportResolutionsMap)
             .flat()
             .reduce((prev: number, curr: FileToImportResolutions): number => {
                 return prev + curr.skippedImports.length;

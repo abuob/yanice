@@ -1,16 +1,16 @@
-import { FileToImportResolutions, ImportResolution } from '../api/import-resolver.interface';
+import { FileToImportResolutionsMap, ImportResolution } from '../api/import-resolver.interface';
 
 export class ProjectDependencyGraph {
     public static createProjectDependencyGraph(
         allProjectNames: string[],
         absoluteFilePathToProjectsMap: Record<string, string[] | undefined>,
-        fileToResolvedImportsMap: Record<string, FileToImportResolutions>
+        fileToImportResolutionsMap: FileToImportResolutionsMap
     ): Record<string, string[]> {
         const projectDependencyGraph: Record<string, string[]> = {};
         const allFilePaths: string[] = Object.keys(absoluteFilePathToProjectsMap);
         allFilePaths.forEach((filePath: string): void => {
             const projectsOfFile: string[] = absoluteFilePathToProjectsMap[filePath] ?? [];
-            const importResolutions: ImportResolution[] = fileToResolvedImportsMap[filePath]?.importResolutions ?? [];
+            const importResolutions: ImportResolution[] = fileToImportResolutionsMap[filePath]?.importResolutions ?? [];
             const importedProjectsOfFile: string[] = ProjectDependencyGraph.getImportedProjectsOfFile(
                 absoluteFilePathToProjectsMap,
                 importResolutions

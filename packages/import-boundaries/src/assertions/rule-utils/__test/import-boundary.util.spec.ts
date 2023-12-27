@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { YaniceImportBoundariesAssertionViolation } from '../../../api/assertion.interface';
-import { FileToImportResolutions, ImportResolution, ImportResolutionResolvedImport } from '../../../api/import-resolver.interface';
+import { FileToImportResolutionsMap, ImportResolution, ImportResolutionResolvedImport } from '../../../api/import-resolver.interface';
 import { ImportBoundaryUtil } from '../import-boundary.util';
 
 describe('ImportBoundaryUtil', (): void => {
@@ -11,7 +11,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-A': ['project-A'],
                 'file-B': ['project-B']
             };
-            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
+            const fileToImportResolutionsMap: FileToImportResolutionsMap = createImportResolutionsMap({
                 'file-A': ['file-B'],
                 'file-B': []
             });
@@ -22,7 +22,7 @@ describe('ImportBoundaryUtil', (): void => {
             const expected: YaniceImportBoundariesAssertionViolation[] = [];
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
-                importResolutionsMap,
+                fileToImportResolutionsMap,
                 allowedDependenciesMap,
                 []
             );
@@ -34,7 +34,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-A': ['project-A'],
                 'file-B': ['project-B']
             };
-            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
+            const fileToImportResolutionsMap: FileToImportResolutionsMap = createImportResolutionsMap({
                 'file-A': ['file-B'],
                 'file-B': []
             });
@@ -54,7 +54,7 @@ describe('ImportBoundaryUtil', (): void => {
             ];
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
-                importResolutionsMap,
+                fileToImportResolutionsMap,
                 allowedDependenciesMap,
                 []
             );
@@ -66,7 +66,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-A': ['project-A'],
                 'file-B': ['project-B']
             };
-            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
+            const fileToImportResolutionsMap: FileToImportResolutionsMap = createImportResolutionsMap({
                 'file-A': ['file-B'],
                 'file-B': []
             });
@@ -77,7 +77,7 @@ describe('ImportBoundaryUtil', (): void => {
 
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
-                importResolutionsMap,
+                fileToImportResolutionsMap,
                 allowedDependenciesMap,
                 ['project-A']
             );
@@ -91,7 +91,7 @@ describe('ImportBoundaryUtil', (): void => {
                 'file-C': ['project-C'],
                 'file-D': ['project-D']
             };
-            const importResolutionsMap: Record<string, FileToImportResolutions> = createImportResolutionsMap({
+            const fileToImportResolutionsMap: FileToImportResolutionsMap = createImportResolutionsMap({
                 'file-A': ['file-B', 'file-C'],
                 'file-B': ['file-C'],
                 'file-C': ['file-D'],
@@ -123,7 +123,7 @@ describe('ImportBoundaryUtil', (): void => {
             ];
             const actual: YaniceImportBoundariesAssertionViolation[] = ImportBoundaryUtil.getRuleViolations(
                 fileToProjectsMap,
-                importResolutionsMap,
+                fileToImportResolutionsMap,
                 allowedDependenciesMap,
                 []
             );
@@ -132,14 +132,14 @@ describe('ImportBoundaryUtil', (): void => {
     });
 });
 
-function createImportResolutionsMap(simpleImportMap: Record<string, string[]>): Record<string, FileToImportResolutions> {
+function createImportResolutionsMap(simpleImportMap: Record<string, string[]>): FileToImportResolutionsMap {
     const emptyImportResolution: ImportResolution = {
         createdBy: 'createdBy',
         resolvedImports: [],
         resolvedPackageImports: [],
         unknownImports: []
     };
-    const result: Record<string, FileToImportResolutions> = {};
+    const result: FileToImportResolutionsMap = {};
     Object.keys(simpleImportMap).forEach((file: string): void => {
         const importedFiles: string[] = simpleImportMap[file] ?? [];
         result[file] = {

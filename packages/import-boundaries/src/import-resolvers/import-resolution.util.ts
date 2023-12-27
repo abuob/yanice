@@ -3,7 +3,12 @@ import path from 'node:path';
 
 import { GlobTester, PromiseCreator, PromiseQueue } from 'yanice';
 
-import { FileToImportResolutions, ImportResolution, YaniceImportBoundariesImportResolver } from '../api/import-resolver.interface';
+import {
+    FileToImportResolutions,
+    FileToImportResolutionsMap,
+    ImportResolution,
+    YaniceImportBoundariesImportResolver
+} from '../api/import-resolver.interface';
 import { importResolverEs6 } from './es6/import-resolver.es6';
 import { SkipStatementHandlingResult, SkipStatementsUtil } from './es6/util/skip-statements.util';
 
@@ -12,7 +17,7 @@ export class ImportResolutionUtil {
         yaniceJsonDirectoryPath: string,
         absolutePaths: string[],
         importResolverMap: Record<string, string[] | undefined>
-    ): Promise<Record<string, FileToImportResolutions>> {
+    ): Promise<FileToImportResolutionsMap> {
         const pathGlobs: string[] = Object.keys(importResolverMap);
         const loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined> = pathGlobs.reduce(
             (
@@ -35,8 +40,8 @@ export class ImportResolutionUtil {
         pathGlobs: string[],
         loadedResolvers: Record<string, YaniceImportBoundariesImportResolver[] | undefined>,
         maxConcurrency: number
-    ): Promise<Record<string, FileToImportResolutions>> {
-        const fileToResolvedImportsMap: Record<string, FileToImportResolutions> = {};
+    ): Promise<FileToImportResolutionsMap> {
+        const fileToResolvedImportsMap: FileToImportResolutionsMap = {};
         const promiseCreators: PromiseCreator[] = absolutePaths.reduce(
             (prev: PromiseCreator[], absoluteFilePath: string): PromiseCreator[] => {
                 const promiseCreatorsForGivenFile: PromiseCreator[] = pathGlobs

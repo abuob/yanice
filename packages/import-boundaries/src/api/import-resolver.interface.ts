@@ -39,6 +39,8 @@ export interface FileToImportResolutions {
     importResolutions: ImportResolution[];
 }
 
+export type FileToImportResolutionsMap = Record<string, FileToImportResolutions>;
+
 export interface YaniceImportBoundariesImportResolver {
     name: string;
     getFileImportMap: (absoluteFilePath: string, fileContent: string) => Promise<ImportResolution | null>;

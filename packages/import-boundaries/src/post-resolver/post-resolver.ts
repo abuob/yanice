@@ -1,27 +1,27 @@
 import path from 'node:path';
 
-import { FileToImportResolutions } from '../api/import-resolver.interface';
+import { FileToImportResolutions, FileToImportResolutionsMap } from '../api/import-resolver.interface';
 import { YaniceImportBoundariesPostResolverV2 } from '../api/post-resolve.interface';
 
 export class PostResolver {
     public static async postResolveProcessing(
-        fileToResolvedImportsMap: Record<string, FileToImportResolutions>,
+        fileToImportResolutionsMap: FileToImportResolutionsMap,
         yaniceJsonDirectoryPath: string,
         postResolversLocations: string[]
-    ): Promise<Record<string, FileToImportResolutions>> {
+    ): Promise<FileToImportResolutionsMap> {
         const postResolvers: YaniceImportBoundariesPostResolverV2[] = PostResolver.loadPostResolvers(
             yaniceJsonDirectoryPath,
             postResolversLocations
         );
-        const updatedFileToResolvedImportsMap: Record<string, FileToImportResolutions> = fileToResolvedImportsMap;
-        const absoluteFilePaths: string[] = Object.keys(fileToResolvedImportsMap);
+        const updatedFileToResolvedImportsMap: FileToImportResolutionsMap = fileToImportResolutionsMap;
+        const absoluteFilePaths: string[] = Object.keys(fileToImportResolutionsMap);
         for (const absoluteFilePath of absoluteFilePaths) {
             for (const postResolver of postResolvers) {
-                const currentFileToImportResolutions: FileToImportResolutions | undefined = fileToResolvedImportsMap[absoluteFilePath];
+                const currentFileToImportResolutions: FileToImportResolutions | undefined = fileToImportResolutionsMap[absoluteFilePath];
                 if (!currentFileToImportResolutions) {
                     continue;
                 }
-                fileToResolvedImportsMap[absoluteFilePath] = await postResolver.postProcess(
+                fileToImportResolutionsMap[absoluteFilePath] = await postResolver.postProcess(
                     absoluteFilePath,
                     currentFileToImportResolutions
                 );

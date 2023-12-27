@@ -10,7 +10,7 @@ import {
 
 import { YaniceImportBoundariesAssertionViolation } from './api/assertion.interface';
 import { ImportBoundaryAssertionData } from './api/import-boundary-assertion-data';
-import { FileToImportResolutions } from './api/import-resolver.interface';
+import { FileToImportResolutionsMap } from './api/import-resolver.interface';
 import { AssertionLogger } from './assertions/assertion-logger';
 import { ImportBoundariesAssertions } from './assertions/import-boundaries-assertions';
 import { FileToProjectMapper } from './file-to-project-mapper/file-to-project-mapper';
@@ -98,14 +98,14 @@ export class ImportBoundariesExecutor {
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
     ): Promise<void> {
-        const importResolutionsMap: Record<string, FileToImportResolutions> =
+        const fileToImportResolutionsMap: FileToImportResolutionsMap =
             await ImportBoundariesExecutor.getPostResolvedAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
                 importBoundariesPluginConfig,
                 importBoundariesArgs
             );
-        ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(importResolutionsMap, null, 4));
+        ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(fileToImportResolutionsMap, null, 4));
     }
 
     private static async handlePrintAssertionData(
@@ -188,7 +188,7 @@ export class ImportBoundariesExecutor {
     ): Promise<ImportBoundaryAssertionData> {
         // TODO: Add performance logging here
 
-        const importResolutionsMap: Record<string, FileToImportResolutions> =
+        const fileToImportResolutionsMap: FileToImportResolutionsMap =
             await ImportBoundariesExecutor.getPostResolvedAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
@@ -206,12 +206,12 @@ export class ImportBoundariesExecutor {
         const projectDependencyGraph: Record<string, string[]> = ProjectDependencyGraph.createProjectDependencyGraph(
             allProjectNames,
             fileToProjectsMap,
-            importResolutionsMap
+            fileToImportResolutionsMap
         );
 
         return {
             fileToProjectsMap,
-            fileToImportResolutionsMap: importResolutionsMap,
+            fileToImportResolutionsMap,
             projectDependencyGraph
         };
     }
@@ -221,15 +221,15 @@ export class ImportBoundariesExecutor {
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
-    ): Promise<Record<string, FileToImportResolutions>> {
-        const fileToImportResolutionsMapRaw: Record<string, FileToImportResolutions> =
+    ): Promise<FileToImportResolutionsMap> {
+        const fileToImportResolutionsMapRaw: FileToImportResolutionsMap =
             await ImportResolutionUtil.getAbsoluteFilePathToImportResolutionsMap(
                 yaniceJsonDirectoryPath,
                 absolutePaths,
                 importBoundariesPluginConfig.importResolvers
             );
 
-        const fileToImportResolutionsMap: Record<string, FileToImportResolutions> = await ImportBoundariesExecutor.postResolveIfNecessaryV2(
+        const fileToImportResolutionsMap: FileToImportResolutionsMap = await ImportBoundariesExecutor.postResolveIfNecessaryV2(
             fileToImportResolutionsMapRaw,
             yaniceJsonDirectoryPath,
             importBoundariesPluginConfig.postResolve,
@@ -240,11 +240,11 @@ export class ImportBoundariesExecutor {
     }
 
     private static async postResolveIfNecessaryV2(
-        fileToResolvedImportsMap: Record<string, FileToImportResolutions>,
+        fileToResolvedImportsMap: FileToImportResolutionsMap,
         yaniceJsonDirectoryPath: string,
         postResolverLocations: string[] | undefined,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs
-    ): Promise<Record<string, FileToImportResolutions>> {
+    ): Promise<FileToImportResolutionsMap> {
         if (!postResolverLocations || postResolverLocations.length === 0 || importBoundariesArgs.skipPostResolvers) {
             return Promise.resolve(fileToResolvedImportsMap);
         }

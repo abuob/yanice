@@ -1,7 +1,7 @@
-import { FileToImportResolutions, ImportResolution } from '../../packages/import-boundaries/src/api/import-resolver.interface';
+import { FileToImportResolutionsMap, ImportResolution } from '../../packages/import-boundaries/src/api/import-resolver.interface';
 import { IntegrationTestUtil } from '../test-utils/integration-test.util';
 
-export const fixtureFileToImportResolutions: Record<string, FileToImportResolutions> = {
+export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/empty.txt')]: {
         skippedImports: [],
         importResolutions: [
@@ -112,14 +112,15 @@ export const fixtureFileToImportResolutions: Record<string, FileToImportResoluti
     }
 };
 
-export const fixtureFileImportMapWithoutDummyResolver: Record<string, FileToImportResolutions> = Object.keys(
-    fixtureFileToImportResolutions
-).reduce((prev: Record<string, FileToImportResolutions>, curr: string): Record<string, FileToImportResolutions> => {
-    prev[curr] = {
-        skippedImports: fixtureFileToImportResolutions[curr].skippedImports ?? [],
-        importResolutions: (fixtureFileToImportResolutions[curr].importResolutions ?? []).filter(
-            (importResolution: ImportResolution): boolean => importResolution.createdBy !== 'dummy-resolver'
-        )
-    };
-    return prev;
-}, {});
+export const fixtureFileImportMapWithoutDummyResolver: FileToImportResolutionsMap = Object.keys(fixtureFileToImportResolutions).reduce(
+    (prev: FileToImportResolutionsMap, curr: string): FileToImportResolutionsMap => {
+        prev[curr] = {
+            skippedImports: fixtureFileToImportResolutions[curr].skippedImports ?? [],
+            importResolutions: (fixtureFileToImportResolutions[curr].importResolutions ?? []).filter(
+                (importResolution: ImportResolution): boolean => importResolution.createdBy !== 'dummy-resolver'
+            )
+        };
+        return prev;
+    },
+    {}
+);

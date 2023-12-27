@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { YanicePluginImportBoundariesSkippedImportsOptions } from 'yanice';
 
 import { YaniceImportBoundariesAssertionViolation } from '../../../../api/assertion.interface';
-import { FileToImportResolutions, SkipNextLineStatement } from '../../../../api/import-resolver.interface';
+import { FileToImportResolutions, FileToImportResolutionsMap, SkipNextLineStatement } from '../../../../api/import-resolver.interface';
 import { MaxSkippedImportsUtil } from '../max-skipped-imports.util';
 
 describe('MaxSkippedImportsUtil', (): void => {
@@ -15,7 +15,7 @@ describe('MaxSkippedImportsUtil', (): void => {
             type: 'skip-next-line',
             raw: 'raw'
         };
-        const importResolutionsMap: Record<string, FileToImportResolutions> = {
+        const fileToImportResolutionsMap: FileToImportResolutionsMap = {
             'file-A': { ...defaultFileToImportResolution, skippedImports: [dummyImportStatement, dummyImportStatement] }
         };
 
@@ -34,7 +34,7 @@ describe('MaxSkippedImportsUtil', (): void => {
             };
             const allActualErrors: YaniceImportBoundariesAssertionViolation[] = MaxSkippedImportsUtil.getRuleViolations(
                 config,
-                importResolutionsMap
+                fileToImportResolutionsMap
             );
             expect(allActualErrors).to.have.length(1);
             const actualError: YaniceImportBoundariesAssertionViolation | undefined = allActualErrors[0];
@@ -49,7 +49,7 @@ describe('MaxSkippedImportsUtil', (): void => {
             };
             const allActualErrors: YaniceImportBoundariesAssertionViolation[] = MaxSkippedImportsUtil.getRuleViolations(
                 config,
-                importResolutionsMap
+                fileToImportResolutionsMap
             );
             expect(allActualErrors).to.have.length(0);
         });
@@ -61,7 +61,7 @@ describe('MaxSkippedImportsUtil', (): void => {
             };
             const allActualErrors: YaniceImportBoundariesAssertionViolation[] = MaxSkippedImportsUtil.getRuleViolations(
                 config,
-                importResolutionsMap
+                fileToImportResolutionsMap
             );
             expect(allActualErrors).to.have.length(1);
             const actualError: YaniceImportBoundariesAssertionViolation | undefined = allActualErrors[0];
@@ -76,7 +76,7 @@ describe('MaxSkippedImportsUtil', (): void => {
             };
             const allActualErrors: YaniceImportBoundariesAssertionViolation[] = MaxSkippedImportsUtil.getRuleViolations(
                 config,
-                importResolutionsMap
+                fileToImportResolutionsMap
             );
             expect(allActualErrors).to.have.length(0);
         });
