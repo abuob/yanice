@@ -37,6 +37,18 @@
                                 "assertions": {
                                     "type": "array",
                                     "items": {
+                                        "enum": [
+                                            "only-direct-imports",
+                                            "only-transitive-dependencies",
+                                            "use-all-declared-dependencies",
+                                            "max-skipped-imports"
+                                        ]
+                                    }
+                                },
+                                "customAssertions": {
+                                    "type": "array",
+                                    "description": "Paths relative to scripts containing an assertion",
+                                    "items": {
                                         "type": "string"
                                     }
                                 },

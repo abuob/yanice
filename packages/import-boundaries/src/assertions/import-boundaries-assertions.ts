@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { Phase3Result, YanicePluginImportBoundariesOptions } from 'yanice';
+import { importBoundaryAssertionIdentifierType, Phase3Result, YanicePluginImportBoundariesOptions } from 'yanice';
 
 import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
 import { ImportBoundaryAssertionData } from '../api/import-boundary-assertion-data';
@@ -12,18 +12,25 @@ import { useAllDeclaredDependencies } from './rules/use-all-declared-dependencie
 export class ImportBoundariesAssertions {
     public static async assertImportBoundaries(
         yaniceJsonDirectoryPath: string,
-        assertionScriptLocations: string[],
+        officiallySupportedAssertionsIdentifiers: importBoundaryAssertionIdentifierType[],
+        customAssertionScriptPaths: string[],
         phase3Results: Phase3Result,
         assertionData: ImportBoundaryAssertionData,
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions
     ): Promise<YaniceImportBoundariesAssertionViolation[]> {
-        const assertions: YaniceImportBoundariesAssertion[] = assertionScriptLocations.map(
-            (assertionScriptLocation: string): YaniceImportBoundariesAssertion => {
-                return ImportBoundariesAssertions.getImportBoundariesAssertion(yaniceJsonDirectoryPath, assertionScriptLocation);
+        const officiallySupportedAssertions: YaniceImportBoundariesAssertion[] = officiallySupportedAssertionsIdentifiers.map(
+            (assertionIdentifier: importBoundaryAssertionIdentifierType): YaniceImportBoundariesAssertion => {
+                return ImportBoundariesAssertions.getOfficiallySupportedAssertions(assertionIdentifier);
             }
         );
+        const customAssertions: YaniceImportBoundariesAssertion[] = customAssertionScriptPaths.map(
+            (customAssertionScriptPath: string): YaniceImportBoundariesAssertion => {
+                return ImportBoundariesAssertions.getCustomAssertions(yaniceJsonDirectoryPath, customAssertionScriptPath);
+            }
+        );
+        const allAssertions: YaniceImportBoundariesAssertion[] = officiallySupportedAssertions.concat(customAssertions);
         const assertionViolations: YaniceImportBoundariesAssertionViolation[][] = [];
-        for (const assertion of assertions) {
+        for (const assertion of allAssertions) {
             const violations: YaniceImportBoundariesAssertionViolation[] = await assertion.assertBoundaries(
                 phase3Results,
                 importBoundariesPluginConfig,
@@ -34,11 +41,8 @@ export class ImportBoundariesAssertions {
         return assertionViolations.flat();
     }
 
-    private static getImportBoundariesAssertion(
-        yaniceJsonDirectoryPath: string,
-        resolverNameOrLocation: string
-    ): YaniceImportBoundariesAssertion {
-        switch (resolverNameOrLocation) {
+    private static getOfficiallySupportedAssertions(assertionType: importBoundaryAssertionIdentifierType): YaniceImportBoundariesAssertion {
+        switch (assertionType) {
             case 'only-direct-imports':
                 return onlyDirectImports;
             case 'only-transitive-dependencies':
@@ -47,9 +51,13 @@ export class ImportBoundariesAssertions {
                 return useAllDeclaredDependencies;
             case 'max-skipped-imports':
                 return maxSkippedImports;
-            default: {
-                return require(path.join(yaniceJsonDirectoryPath, resolverNameOrLocation));
-            }
         }
+    }
+
+    private static getCustomAssertions(
+        yaniceJsonDirectoryPath: string,
+        relativePathToAssertionScript: string
+    ): YaniceImportBoundariesAssertion {
+        return require(path.join(yaniceJsonDirectoryPath, relativePathToAssertionScript));
     }
 }

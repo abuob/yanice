@@ -35,7 +35,8 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
             "**/*.{js,ts}": ["es6-declarative-import-resolver"]
         },
         "postResolve": ["./post-resolve.js"],
-        "assertions": ["only-direct-imports", "use-all-declared-dependencies", "./some-custom-assertion.js"],
+        "assertions": ["only-direct-imports", "use-all-declared-dependencies"],
+        "customAssertions": ["./some-custom-assertion.js"],
         "assertionOptions": {
             "skippedImports": {
                 "amount": 0,

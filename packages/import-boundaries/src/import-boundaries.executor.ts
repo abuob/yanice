@@ -167,6 +167,7 @@ export class ImportBoundariesExecutor {
         const assertionViolations: YaniceImportBoundariesAssertionViolation[] = await ImportBoundariesAssertions.assertImportBoundaries(
             yaniceJsonDirectoryPath,
             importBoundariesPluginConfig.assertions ?? [],
+            importBoundariesPluginConfig.customAssertions ?? [],
             phase3Result,
             assertionData,
             importBoundariesPluginConfig

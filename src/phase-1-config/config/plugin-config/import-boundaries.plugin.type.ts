@@ -3,6 +3,12 @@ export interface YanicePluginImportBoundariesSkippedImportsOptions {
     amount: number;
 }
 
+export type importBoundaryAssertionIdentifierType =
+    | 'max-skipped-imports'
+    | 'only-direct-imports'
+    | 'only-transitive-dependencies'
+    | 'use-all-declared-dependencies';
+
 export interface YanicePluginImportBoundariesOptions {
     importResolvers: Record<string, string[]>;
     postResolve?: string[];
@@ -10,5 +16,6 @@ export interface YanicePluginImportBoundariesOptions {
         skippedImports?: YanicePluginImportBoundariesSkippedImportsOptions;
         ignoredProjects?: string[];
     };
-    assertions?: string[];
+    assertions?: importBoundaryAssertionIdentifierType[];
+    customAssertions?: string[];
 }

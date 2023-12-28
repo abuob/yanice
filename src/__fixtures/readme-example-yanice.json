@@ -18,7 +18,8 @@
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
                 "postResolve": ["./custom-post-resolve.js"],
-                "assertions": ["only-direct-imports", "max-skipped-imports", "./some-custom-assertion.js"],
+                "assertions": ["only-direct-imports", "max-skipped-imports"],
+                "customAssertions": ["./some-custom-assertion.js"],
                 "assertionOptions": {
                     "skippedImports": {
                         "amount": 0,
