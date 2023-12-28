@@ -25,8 +25,9 @@ export class AssertionLogger {
                 LogUtil.log(`    Actual import:     ${violation.importedProject}\n`);
                 return null;
             case 'configured-import-unused':
-                LogUtil.log(`${violation.withinProject}:`);
-                LogUtil.log(`    Imports to "${violation.unusedProject}" are allowed and configured but do not exist\n`);
+                LogUtil.log(`Unused dependency for "${violation.withinProject}":`);
+                LogUtil.log(`    Imports to "${violation.unusedProject}" are configured and therefore required but do not exist.`);
+                LogUtil.log(`    Requirement due to rule: "use-all-declared-dependencies"\n`);
                 return null;
             case 'skipped-imports:too-many':
                 LogUtil.log(`Too many skipped imports:`);
@@ -35,14 +36,14 @@ export class AssertionLogger {
             case 'skipped-imports:not-configured':
                 LogUtil.log(`No configuration found for skipped imports:`);
                 LogUtil.log(
-                    `    In order to run assertions on skipped imports, please configure the corresponding options in the yanice.json`
+                    `    In order to run assertions on skipped imports, please configure the corresponding options in the yanice.json\n`
                 );
                 return null;
             case 'skipped-imports:not-equals-configured':
                 const expectedAmountWarning: string = `Expected ${violation.expectedAmount} skipped imports as per config, but found ${violation.actualAmount} instead.`;
                 LogUtil.log(`Amount of skipped imports is not the configured amount:`);
                 LogUtil.log(`    ${expectedAmountWarning}`);
-                LogUtil.log(`    Did you add or remove an import-exclusion without changing the configured amount in the yanice.json?`);
+                LogUtil.log(`    Did you add or remove an import-exclusion without changing the configured amount in the yanice.json?\n`);
                 return null;
         }
     }

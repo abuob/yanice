@@ -14,7 +14,7 @@
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
                 "postResolve": ["./post-resolve.js"],
-                "assertions": ["only-direct-imports", "max-skipped-imports"],
+                "assertions": ["only-direct-imports", "max-skipped-imports", "use-all-declared-dependencies"],
                 "assertionOptions": {
                     "skippedImports": {
                         "amount": 0,
@@ -29,6 +29,10 @@
         {
             "projectName": "ALL-FILES",
             "projectFolder": "."
+        },
+        {
+            "projectName": "EMPTY-PROJECT",
+            "projectFolder": "non-existent"
         },
         {
             "projectName": "A",
@@ -88,6 +92,14 @@
                 "A": ["B"],
                 "B": [],
                 "C": []
+            }
+        },
+        "unused-dependencies-exist": {
+            "dependencies": {
+                "ALL-FILES": [],
+                "A": ["B"],
+                "B": ["C"],
+                "C": ["EMPTY-PROJECT"]
             }
         }
     }

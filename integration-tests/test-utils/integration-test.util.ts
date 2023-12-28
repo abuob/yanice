@@ -1,4 +1,4 @@
-import { exec, execSync } from 'node:child_process';
+import { exec, ExecException, execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -14,6 +14,7 @@ type TestLog = Partial<Record<allProjectsType, TestLogEntry[]>>;
 interface CommandResult {
     statusCode: number | undefined;
     stdout: string;
+    execException: ExecException | null;
 }
 
 export class IntegrationTestUtil {
@@ -31,11 +32,13 @@ export class IntegrationTestUtil {
         const pathToBin: string = path.join(__dirname, '../../dist/bin.js');
         const pathToTestProject: string = path.join(__dirname, '../test-project');
         return new Promise((resolve) => {
-            exec(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }, (error, stdout) => {
-                resolve({
+            exec(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }, (error: ExecException | null, stdout: string) => {
+                const commandResult: CommandResult = {
                     stdout,
-                    statusCode: error?.code
-                });
+                    statusCode: error?.code,
+                    execException: error
+                };
+                resolve(commandResult);
             });
         });
     }
@@ -91,6 +94,11 @@ export class IntegrationTestUtil {
     public static getTextFixtureContent(fileName: string): string {
         const fileContent: string = fs.readFileSync(path.join(__dirname, '../fixtures', fileName), { encoding: 'utf-8' });
         return IntegrationTestUtil.normalizeTextOutput(fileContent);
+    }
+
+    public static getAmountOfImportBoundaryViolations(stdout: string): number {
+        // counting occurrences of ".ts:" is not ideal; we want to count the amount of violations in the output:
+        return stdout.match(/\.ts:/g)?.length ?? 0;
     }
 
     private static getAllEmptyFilePathsRelativeToRoot(): string[] {

@@ -1,0 +1,3 @@
+Unused dependency for "C":
+    Imports to "EMPTY-PROJECT" are configured and therefore required but do not exist.
+    Requirement due to rule: "use-all-declared-dependencies"

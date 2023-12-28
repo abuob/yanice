@@ -35,7 +35,7 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
             "**/*.{js,ts}": ["es6-declarative-import-resolver"]
         },
         "postResolve": ["./post-resolve.js"],
-        "assertions": ["only-direct-imports", "only-allow-configured-imports", "./some-custom-assertion.js"],
+        "assertions": ["only-direct-imports", "use-all-declared-dependencies", "./some-custom-assertion.js"],
         "assertionOptions": {
             "skippedImports": {
                 "amount": 0,
@@ -65,7 +65,7 @@ Currently supported:
 
 -   `only-direct-imports`: Forces that only imports to projects which are defined as a direct dependency in the given scope are allowed. E.g.: A file in `project-A` imports a file from `project-B` - this is only allowed if `"project-A": ["project-B", ...]` is declared in the `yanice.json`.
 -   `only-transitive-dependencies`: Similar to `only-direct-imports`, but allowing for transitive dependencies: When we declare `A` to depend on `B` which depends on `C`, `A` is also allowed to import from `C`.
--   `only-allow-configured-imports` (TODO: implement)
+-   `use-all-declared-dependencies`: Similar to `only-direct-imports`, but the other way around: Any declared dependency _must_ be used. I.e., if `project-A` depends on `project-B` as per `yanice.json`, then `project-A` must indeed import `project-B`.
 -   `max-skipped-imports`: See also how to ignore imports below. The rule allows to check/enforce only a certain amount of skipped imports.
 
 #### Assertion Options

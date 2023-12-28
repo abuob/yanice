@@ -171,9 +171,20 @@ describe('yanice', () => {
                     expect(commandResult.statusCode).to.equal(1);
                     const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-bad-imports.txt');
                     expect(output).to.include(expected);
-                    // counting occurrences of ".ts:" is not ideal; we want to count the amount of violations in the output:
-                    const amountOfImportBoundaryViolations: number = output.match(/\.ts:/g)?.length ?? 0;
+                    const amountOfImportBoundaryViolations: number = IntegrationTestUtil.getAmountOfImportBoundaryViolations(output);
                     expect(amountOfImportBoundaryViolations).to.equal(1);
+                });
+
+                it('should report unused dependencies because of the "use-all-declared-dependencies"-rule', async () => {
+                    const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
+                        'plugin:import-boundaries unused-dependencies-exist --assert'
+                    );
+                    const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
+                    expect(commandResult.statusCode).to.equal(1);
+                    const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-unused-dependency.txt');
+                    expect(output).to.include(expected);
+                    const amountOfImportBoundaryViolations: number = IntegrationTestUtil.getAmountOfImportBoundaryViolations(output);
+                    expect(amountOfImportBoundaryViolations).to.equal(0);
                 });
             });
         });
