@@ -20,7 +20,8 @@ describe('YaniceCliArgsParser', () => {
                     scope: 'some-scope',
                     diffTarget: null,
                     includeAllProjects: false,
-                    includeUncommitted: true
+                    includeUncommitted: true,
+                    isPerformanceLoggingEnabled: false
                 }
             };
             expect(YaniceCliArgsParser.parseArgs(['run', 'some-scope', '--concurrency=4'])).to.deep.equal(expected);
@@ -35,7 +36,8 @@ describe('YaniceCliArgsParser', () => {
                     scope: 'some-scope',
                     diffTarget: null,
                     includeAllProjects: false,
-                    includeUncommitted: true
+                    includeUncommitted: true,
+                    isPerformanceLoggingEnabled: false
                 }
             };
             const expectedAppendAtEndOnError: YaniceCliArgs = {
@@ -69,10 +71,13 @@ describe('YaniceCliArgsParser', () => {
                     scope: 'some-scope',
                     diffTarget: null,
                     includeAllProjects: true,
-                    includeUncommitted: true
+                    includeUncommitted: true,
+                    isPerformanceLoggingEnabled: true
                 }
             };
-            expect(YaniceCliArgsParser.parseArgs(['output-only', 'some-scope', '--all', '--responsibles'])).to.deep.equal(expected);
+            expect(YaniceCliArgsParser.parseArgs(['output-only', 'some-scope', '--all', '--responsibles', '--perf-log'])).to.deep.equal(
+                expected
+            );
         });
     });
 
@@ -86,7 +91,8 @@ describe('YaniceCliArgsParser', () => {
                     scope: 'some-scope',
                     diffTarget: 'HEAD',
                     includeAllProjects: false,
-                    includeUncommitted: true
+                    includeUncommitted: true,
+                    isPerformanceLoggingEnabled: false
                 }
             };
             expect(
@@ -108,7 +114,8 @@ describe('YaniceCliArgsParser', () => {
                     scope: 'some-scope',
                     diffTarget: 'origin/main',
                     includeAllProjects: false,
-                    includeUncommitted: false
+                    includeUncommitted: false,
+                    isPerformanceLoggingEnabled: false
                 }
             };
             expect(

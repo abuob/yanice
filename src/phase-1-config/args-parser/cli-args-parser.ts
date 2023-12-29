@@ -125,11 +125,13 @@ export class YaniceCliArgsParser {
         });
         const diffTarget: string | null = diffTargetParameter ? diffTargetParameter.replace(/--.*?=/, '') : null;
         const includeUncommitted: boolean = !args.some((arg: string) => /^--exclude-uncommitted$/.test(arg));
+        const isPerformanceLoggingEnabled: boolean = YaniceCliArgsParser.hasArgument(args, /^--(performance-logging|perf-log)$/);
         return {
             includeAllProjects: args.includes('--all'),
             diffTarget,
             scope,
-            includeUncommitted
+            includeUncommitted,
+            isPerformanceLoggingEnabled
         };
     }
 

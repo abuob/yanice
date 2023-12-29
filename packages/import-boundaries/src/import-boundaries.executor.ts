@@ -4,6 +4,7 @@ import {
     Phase3Result,
     YaniceCliArgs,
     YaniceConfig,
+    YanicePerformanceLogger,
     YanicePluginImportBoundariesOptions,
     YaniceProject
 } from 'yanice';
@@ -19,6 +20,8 @@ import { ImportResolutionUtil } from './import-resolvers/import-resolution.util'
 import { PostResolver } from './post-resolver/post-resolver';
 import { ProjectDependencyGraph } from './project-dependency-graph/project-dependency-graph';
 
+type stopWatchIdentifiersType = 'file-to-import-resolution-map' | 'file-to-project-map' | 'project-dependency-graph';
+
 export class ImportBoundariesExecutor {
     public static async execute(phase3Result: Phase3Result): Promise<void> {
         const yaniceConfig: YaniceConfig = phase3Result.phase2Result.phase1Result.yaniceConfig;
@@ -28,6 +31,11 @@ export class ImportBoundariesExecutor {
         const yaniceArgs: YaniceCliArgs = phase3Result.phase2Result.phase1Result.yaniceCliArgs;
         const importBoundariesPluginConfig: YanicePluginImportBoundariesOptions | null =
             yaniceConfig.plugins.officiallySupported['import-boundaries'];
+
+        const performanceLogger: YanicePerformanceLogger<stopWatchIdentifiersType> = new YanicePerformanceLogger(
+            'ImportBoundariesExecutor',
+            yaniceArgs.defaultArgs.isPerformanceLoggingEnabled
+        );
 
         if (yaniceArgs.type !== 'plugin' || yaniceArgs.selectedPlugin.type !== 'import-boundaries') {
             ImportBoundariesExecutor.exitPlugin(1, 'Incorrect arguments passed to "import-boundaries"-plugin, abort!');
@@ -61,7 +69,8 @@ export class ImportBoundariesExecutor {
                 allAbsoluteFilePaths,
                 importBoundariesPluginConfig,
                 importBoundariesArgs,
-                yaniceProjects
+                yaniceProjects,
+                performanceLogger
             );
             return;
         }
@@ -73,7 +82,8 @@ export class ImportBoundariesExecutor {
                 allAbsoluteFilePaths,
                 importBoundariesPluginConfig,
                 importBoundariesArgs,
-                yaniceProjects
+                yaniceProjects,
+                performanceLogger
             );
             return;
         }
@@ -86,7 +96,8 @@ export class ImportBoundariesExecutor {
                 importBoundariesPluginConfig,
                 importBoundariesArgs,
                 yaniceProjects,
-                phase3Result
+                phase3Result,
+                performanceLogger
             );
             return;
         }
@@ -114,7 +125,8 @@ export class ImportBoundariesExecutor {
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs,
-        yaniceProjects: YaniceProject[]
+        yaniceProjects: YaniceProject[],
+        performanceLogger: YanicePerformanceLogger<stopWatchIdentifiersType>
     ): Promise<void> {
         const assertionData: ImportBoundaryAssertionData = await ImportBoundariesExecutor.getImportBoundaryAssertionData(
             gitRepoRootPath,
@@ -122,7 +134,8 @@ export class ImportBoundariesExecutor {
             absolutePaths,
             importBoundariesPluginConfig,
             importBoundariesArgs,
-            yaniceProjects
+            yaniceProjects,
+            performanceLogger
         );
         ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(assertionData, null, 4));
     }
@@ -133,7 +146,8 @@ export class ImportBoundariesExecutor {
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs,
-        yaniceProjects: YaniceProject[]
+        yaniceProjects: YaniceProject[],
+        performanceLogger: YanicePerformanceLogger<stopWatchIdentifiersType>
     ): Promise<void> {
         const assertionData: ImportBoundaryAssertionData = await ImportBoundariesExecutor.getImportBoundaryAssertionData(
             gitRepoRootPath,
@@ -141,7 +155,8 @@ export class ImportBoundariesExecutor {
             absolutePaths,
             importBoundariesPluginConfig,
             importBoundariesArgs,
-            yaniceProjects
+            yaniceProjects,
+            performanceLogger
         );
         ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(assertionData.projectDependencyGraph, null, 4));
     }
@@ -153,7 +168,8 @@ export class ImportBoundariesExecutor {
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs,
         yaniceProjects: YaniceProject[],
-        phase3Result: Phase3Result
+        phase3Result: Phase3Result,
+        performanceLogger: YanicePerformanceLogger<stopWatchIdentifiersType>
     ): Promise<void> {
         const assertionData: ImportBoundaryAssertionData = await ImportBoundariesExecutor.getImportBoundaryAssertionData(
             gitRepoRootPath,
@@ -161,7 +177,8 @@ export class ImportBoundariesExecutor {
             absolutePaths,
             importBoundariesPluginConfig,
             importBoundariesArgs,
-            yaniceProjects
+            yaniceProjects,
+            performanceLogger
         );
 
         const assertionViolations: YaniceImportBoundariesAssertionViolation[] = await ImportBoundariesAssertions.assertImportBoundaries(
@@ -185,9 +202,10 @@ export class ImportBoundariesExecutor {
         absolutePaths: string[],
         importBoundariesPluginConfig: YanicePluginImportBoundariesOptions,
         importBoundariesArgs: ImportBoundariesYanicePluginArgs,
-        yaniceProjects: YaniceProject[]
+        yaniceProjects: YaniceProject[],
+        performanceLogger: YanicePerformanceLogger<stopWatchIdentifiersType>
     ): Promise<ImportBoundaryAssertionData> {
-        // TODO: Add performance logging here
+        performanceLogger.startStopwatch('file-to-import-resolution-map');
 
         const fileToImportResolutionsMap: FileToImportResolutionsMap =
             await ImportBoundariesExecutor.getPostResolvedAbsoluteFilePathToImportResolutionsMap(
@@ -197,11 +215,16 @@ export class ImportBoundariesExecutor {
                 importBoundariesArgs
             );
 
+        performanceLogger.stopStopwatchAndLog('file-to-import-resolution-map', 'Created fileToImportResolutionMap in:');
+        performanceLogger.startStopwatch('file-to-project-map');
+
         const fileToProjectsMap: Record<string, string[]> = await FileToProjectMapper.getFileToProjectsMap(
             gitRepoRootPath,
             yaniceJsonDirectoryPath,
             yaniceProjects
         );
+        performanceLogger.stopStopwatchAndLog('file-to-project-map', 'Created fileToProjectsMap in:');
+        performanceLogger.startStopwatch('project-dependency-graph');
 
         const allProjectNames: string[] = yaniceProjects.map((yaniceProject: YaniceProject): string => yaniceProject.projectName);
         const projectDependencyGraph: Record<string, string[]> = ProjectDependencyGraph.createProjectDependencyGraph(
@@ -209,6 +232,8 @@ export class ImportBoundariesExecutor {
             fileToProjectsMap,
             fileToImportResolutionsMap
         );
+
+        performanceLogger.stopStopwatchAndLog('project-dependency-graph', 'Created projectDependencyGraph in:');
 
         return {
             fileToProjectsMap,

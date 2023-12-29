@@ -15,7 +15,8 @@ describe('ConfigParser', () => {
             scope: 'lint',
             diffTarget: null,
             includeAllProjects: false,
-            includeUncommitted: false
+            includeUncommitted: false,
+            isPerformanceLoggingEnabled: false
         }
     };
 

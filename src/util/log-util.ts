@@ -71,14 +71,7 @@ export class LogUtil {
         return `(${durationInfo}s, queue: ${queueSize})`;
     }
 
-    private static getCwdInfo(relativeCwd: string): string | null {
-        if (relativeCwd !== './') {
-            return relativeCwd;
-        }
-        return null;
-    }
-
-    private static getCommandDurationString(executionDurationInMs: number): string {
+    public static getCommandDurationString(executionDurationInMs: number): string {
         const durationInSeconds: number = executionDurationInMs / 1000;
         if (durationInSeconds < 1) {
             return durationInSeconds.toFixed(3);
@@ -90,6 +83,13 @@ export class LogUtil {
             return durationInSeconds.toFixed(1);
         }
         return Math.round(durationInSeconds).toString();
+    }
+
+    private static getCwdInfo(relativeCwd: string): string | null {
+        if (relativeCwd !== './') {
+            return relativeCwd;
+        }
+        return null;
     }
 
     private static printOutputChunkFilteredUnlessIgnored(chunk: string, appliedFilters: OutputFilter[], ignoreFlag: boolean): void {

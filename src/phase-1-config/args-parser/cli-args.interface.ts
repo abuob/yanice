@@ -37,4 +37,5 @@ export interface YaniceCliDefaultArgs {
     includeAllProjects: boolean;
     includeUncommitted: boolean;
     scope: string | null;
+    isPerformanceLoggingEnabled: boolean;
 }
