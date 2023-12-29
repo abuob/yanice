@@ -77,6 +77,7 @@ export class ConfigParser {
                 pathGlob: project.pathGlob ?? null,
                 pathRegExp: project.pathRegExp ? new RegExp(project.pathRegExp) : null,
                 responsibles: project.responsibles ? project.responsibles : [],
+                entryPoints: project.entrypoints ?? [],
                 commands
             };
         });

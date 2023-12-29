@@ -68,6 +68,8 @@ Currently supported:
 -   `only-transitive-dependencies`: Similar to `only-direct-imports`, but allowing for transitive dependencies: When we declare `A` to depend on `B` which depends on `C`, `A` is also allowed to import from `C`.
 -   `use-all-declared-dependencies`: Similar to `only-direct-imports`, but the other way around: Any declared dependency _must_ be used. I.e., if `project-A` depends on `project-B` as per `yanice.json`, then `project-A` must indeed import `project-B`.
 -   `max-skipped-imports`: See also how to ignore imports below. The rule allows to check/enforce only a certain amount of skipped imports.
+-   `access-via-entrypoints`: It is sometimes desirable to access a project from other projects only via defined entrypoints, such as e.g. an `index.ts`, `public_api.ts` or some such, and disallow "deep" imports to arbitrary files.
+    This rule helps with that. Define one or multiple entry-points via the `entrypoints`-property for each project. This rule will then ensure that every import from another project accesses the project via a defined entrypoint.
 
 #### Assertion Options
 

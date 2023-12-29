@@ -36,6 +36,7 @@ export interface YaniceJsonType {
             };
         };
         responsibles?: string[];
+        entrypoints?: string[];
     }[];
     dependencyScopes: {
         [scope: string]: {
@@ -54,6 +55,7 @@ export interface YaniceProject {
     pathGlob: string | null;
     commands: YaniceCommandPerScope;
     responsibles: string[];
+    entryPoints: string[];
 }
 
 export interface YaniceCommand {

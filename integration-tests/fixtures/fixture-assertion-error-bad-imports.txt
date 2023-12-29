@@ -1,5 +1,5 @@
 project-B/project-b.ts:
     In project:        B
     Import statement:  import { dummyC } from '../project-C/project-c'
-    Allowed Imports:   (none)
+    Allowed imports:   (none)
     Actual import:     C

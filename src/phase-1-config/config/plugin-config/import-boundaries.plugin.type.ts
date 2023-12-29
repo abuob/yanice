@@ -4,6 +4,7 @@ export interface YanicePluginImportBoundariesSkippedImportsOptions {
 }
 
 export type importBoundaryAssertionIdentifierType =
+    | 'access-via-entrypoints'
     | 'max-skipped-imports'
     | 'only-direct-imports'
     | 'only-transitive-dependencies'

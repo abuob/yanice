@@ -4,6 +4,7 @@ import { importBoundaryAssertionIdentifierType, Phase3Result, YanicePluginImport
 
 import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
 import { ImportBoundaryAssertionData } from '../api/import-boundary-assertion-data';
+import { accessViaEntryPoints } from './rules/access-via-entrypoints/access-via-entrypoints';
 import { maxSkippedImports } from './rules/max-skipped-imports/max-skipped-imports';
 import { onlyDirectImports } from './rules/only-direct-dependencies/only-direct-imports';
 import { onlyTransitiveImports } from './rules/only-transitive-dependencies/only-transitive-imports';
@@ -51,6 +52,8 @@ export class ImportBoundariesAssertions {
                 return useAllDeclaredDependencies;
             case 'max-skipped-imports':
                 return maxSkippedImports;
+            case 'access-via-entrypoints':
+                return accessViaEntryPoints;
         }
     }
 

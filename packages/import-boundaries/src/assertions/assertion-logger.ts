@@ -21,7 +21,7 @@ export class AssertionLogger {
                 LogUtil.log(`${violation.filePath}:`);
                 LogUtil.log(`    In project:        ${violation.withinProject}`);
                 LogUtil.log(`    Import statement:  ${violation.importStatement}`);
-                LogUtil.log(`    Allowed Imports:   ${allowedImports}`);
+                LogUtil.log(`    Allowed imports:   ${allowedImports}`);
                 LogUtil.log(`    Actual import:     ${violation.importedProject}\n`);
                 return null;
             case 'configured-import-unused':
@@ -44,6 +44,14 @@ export class AssertionLogger {
                 LogUtil.log(`Amount of skipped imports is not the configured amount:`);
                 LogUtil.log(`    ${expectedAmountWarning}`);
                 LogUtil.log(`    Did you add or remove an import-exclusion without changing the configured amount in the yanice.json?\n`);
+                return null;
+            case 'invalid-entrypoint':
+                LogUtil.log(`${violation.filePath}:`);
+                LogUtil.log(
+                    `    Invalid entrypoint for project "${violation.importedProject}" when imported to project "${violation.withinProject}":`
+                );
+                LogUtil.log(`    Expected entrypoints:  ${violation.expectedEntryPoints.join(', ')}`);
+                LogUtil.log(`    Import statement:      ${violation.importStatement}`);
                 return null;
         }
     }

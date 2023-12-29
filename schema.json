@@ -41,7 +41,8 @@
                                             "only-direct-imports",
                                             "only-transitive-dependencies",
                                             "use-all-declared-dependencies",
-                                            "max-skipped-imports"
+                                            "max-skipped-imports",
+                                            "access-via-entrypoints"
                                         ]
                                     }
                                 },
@@ -122,6 +123,13 @@
                     },
                     "responsibles": {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "entrypoints": {
+                        "type": "array",
+                        "description": "Only relevant for the access-via-entrypoints assertion of the @yanice/import-boundaries plugin",
                         "items": {
                             "type": "string"
                         }

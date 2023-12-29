@@ -5,63 +5,65 @@ import { ChangedProjects } from '../changed-projects';
 
 describe('ChangedProjects', () => {
     describe('getChangedProjectsRaw', () => {
+        const emptyYaniceProject: YaniceProject = {
+            projectName: 'projectName',
+            projectFolder: null,
+            pathRegExp: null,
+            pathGlob: null,
+            commands: {},
+            responsibles: [],
+            entryPoints: []
+        };
         it('should handle changed projects correctly', () => {
             const exampleProjects: YaniceProject[] = [
                 {
+                    ...emptyYaniceProject,
                     projectName: 'A',
                     projectFolder: null,
                     pathRegExp: new RegExp('path/to/dir/A'),
-                    pathGlob: '**',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: '**'
                 },
                 {
+                    ...emptyYaniceProject,
                     projectName: 'AAA',
                     projectFolder: null,
                     pathRegExp: new RegExp('path.*AAA'),
-                    pathGlob: '**',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: '**'
                 },
                 {
+                    ...emptyYaniceProject,
                     projectName: 'B',
                     projectFolder: null,
                     pathRegExp: /path\/to\/dir\/B/,
-                    pathGlob: '**',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: '**'
                 },
                 {
+                    ...emptyYaniceProject,
                     projectName: 'C',
                     projectFolder: 'path/lib/C',
                     pathRegExp: /.*/,
-                    pathGlob: 'path/lib/C/**',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: 'path/lib/C/**'
                 },
                 {
+                    ...emptyYaniceProject,
                     projectName: 'D',
                     projectFolder: null,
                     pathRegExp: new RegExp('path/lib/D'),
-                    pathGlob: '**',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: '**'
                 },
                 {
+                    ...emptyYaniceProject,
                     projectName: 'E',
                     projectFolder: null,
                     pathRegExp: new RegExp('some/random/location'),
-                    pathGlob: '**',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: '**'
                 },
                 {
+                    ...emptyYaniceProject,
                     projectName: 'all-javascript-files',
                     projectFolder: null,
                     pathRegExp: /.*\.js/,
-                    pathGlob: '**/*.js',
-                    commands: {},
-                    responsibles: []
+                    pathGlob: '**/*.js'
                 }
             ];
             const actual0 = ChangedProjects.getChangedProjectsRaw('/', exampleProjects, []);

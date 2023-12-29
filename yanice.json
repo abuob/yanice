@@ -18,7 +18,8 @@
                 "build": {
                     "command": "tsc -p tsconfig.build.json"
                 }
-            }
+            },
+            "entrypoints": []
         },
         {
             "projectName": "import-boundaries",
