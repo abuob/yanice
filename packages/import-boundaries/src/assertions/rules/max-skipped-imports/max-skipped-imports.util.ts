@@ -6,7 +6,7 @@ import {
     AssertionViolationSkippedImportsTooMany,
     YaniceImportBoundariesAssertionViolation
 } from '../../../api/assertion.interface';
-import { FileToImportResolutions, FileToImportResolutionsMap } from '../../../api/import-resolver.interface';
+import { FileToImportResolutionsMap, SkipNextLineStatement } from '../../../api/import-resolver.interface';
 
 export class MaxSkippedImportsUtil {
     public static getRuleViolations(
@@ -19,11 +19,10 @@ export class MaxSkippedImportsUtil {
             };
             return [notConfigured];
         }
-        const amountOfSkippedImports: number = Object.values(fileToImportResolutionsMap)
-            .flat()
-            .reduce((prev: number, curr: FileToImportResolutions): number => {
-                return prev + curr.skippedImports.length;
-            }, 0);
+        const allSkippedImports: SkipNextLineStatement[] = Object.keys(fileToImportResolutionsMap).flatMap(
+            (filePath: string): SkipNextLineStatement[] => fileToImportResolutionsMap[filePath]?.skippedImports ?? []
+        );
+        const amountOfSkippedImports: number = allSkippedImports.length;
         switch (skippedImportsConfig.mode) {
             case 'max':
                 return MaxSkippedImportsUtil.handleMaxMode(amountOfSkippedImports, skippedImportsConfig.amount);

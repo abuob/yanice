@@ -51,6 +51,7 @@ describe('AccessViaEntrypointsUtil', (): void => {
             };
 
             const actual: AssertionViolationInvalidEntrypoint[] = AccessViaEntrypointsUtil.getRuleViolations(
+                '',
                 projectToEntryPointsMap,
                 fileToImportResolutionsMap,
                 fileToProjectsMap,
@@ -86,6 +87,7 @@ describe('AccessViaEntrypointsUtil', (): void => {
             };
 
             const actual: AssertionViolationInvalidEntrypoint[] = AccessViaEntrypointsUtil.getRuleViolations(
+                '',
                 projectToEntryPointsMap,
                 fileToImportResolutionsMap,
                 fileToProjectsMap,

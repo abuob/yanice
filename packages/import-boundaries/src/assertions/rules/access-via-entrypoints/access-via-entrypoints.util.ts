@@ -7,6 +7,7 @@ import { FileToImportResolutionsMap, ImportResolution, ImportResolutionResolvedI
 
 export class AccessViaEntrypointsUtil {
     public static getRuleViolations(
+        yaniceJsonDirectoryPath: string,
         projectToEntryPointsMap: Record<string, string[]>,
         fileToImportResolutionsMap: FileToImportResolutionsMap,
         fileToProjectsMap: Record<string, string[]>,
@@ -41,11 +42,16 @@ export class AccessViaEntrypointsUtil {
                                 }
                             );
                             if (!isAllowedEntryPoint) {
+                                const entryPointsRelativeToYaniceJson: string[] = allowedEntryPointsOfImportedProject.map(
+                                    (entryPoint: string): string => {
+                                        return path.relative(yaniceJsonDirectoryPath, entryPoint);
+                                    }
+                                );
                                 result.push({
                                     type: 'invalid-entrypoint',
                                     importedProject,
                                     importStatement: resolvedImport.parsedImportStatement.raw,
-                                    expectedEntryPoints: allowedEntryPointsOfImportedProject,
+                                    expectedEntryPoints: entryPointsRelativeToYaniceJson,
                                     filePath,
                                     withinProject: projectName
                                 });

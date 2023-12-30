@@ -26,7 +26,9 @@ export class AssertionLogger {
                 return null;
             case 'configured-import-unused':
                 LogUtil.log(`Unused dependency for "${violation.withinProject}":`);
-                LogUtil.log(`    Imports to "${violation.unusedProject}" are configured and therefore required but do not exist.`);
+                LogUtil.log(
+                    `    As per configuration, "${violation.withinProject}" depends on "${violation.unusedProject}", but no import to "${violation.unusedProject}" exists.`
+                );
                 LogUtil.log(`    Requirement due to rule: "use-all-declared-dependencies"\n`);
                 return null;
             case 'skipped-imports:too-many':

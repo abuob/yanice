@@ -1,38 +1,24 @@
-import { FileToImportResolutionsMap, ImportResolution } from '../api/import-resolver.interface';
+import { FileToImportResolutionsMap, ImportResolution, ImportResolutionResolvedImport } from '../api/import-resolver.interface';
 
 export class ProjectDependencyGraph {
     public static createProjectDependencyGraph(
         allProjectNames: string[],
-        absoluteFilePathToProjectsMap: Record<string, string[] | undefined>,
-        fileToImportResolutionsMap: FileToImportResolutionsMap
+        fileToProjectsMap: Record<string, string[]>,
+        fileToImportResolutionsMap: FileToImportResolutionsMap,
+        ignoredProjects: string[]
     ): Record<string, string[]> {
-        const projectDependencyGraph: Record<string, string[]> = {};
-        const allFilePaths: string[] = Object.keys(absoluteFilePathToProjectsMap);
-        allFilePaths.forEach((filePath: string): void => {
-            const projectsOfFile: string[] = absoluteFilePathToProjectsMap[filePath] ?? [];
-            const importResolutions: ImportResolution[] = fileToImportResolutionsMap[filePath]?.importResolutions ?? [];
-            const importedProjectsOfFile: string[] = ProjectDependencyGraph.getImportedProjectsOfFile(
-                absoluteFilePathToProjectsMap,
-                importResolutions
-            );
-            ProjectDependencyGraph.extendDependencyGraph(projectDependencyGraph, projectsOfFile, importedProjectsOfFile);
-        });
-        allProjectNames.forEach((projectName: string) => {
-            if (!projectDependencyGraph[projectName]) {
-                projectDependencyGraph[projectName] = [];
-            }
-        });
-        return projectDependencyGraph;
+        const projectDependencyGraphRaw: Record<string, string[]> = ProjectDependencyGraph.createProjectDependencyGraphRaw(
+            fileToProjectsMap,
+            fileToImportResolutionsMap
+        );
+        return ProjectDependencyGraph.getProjectGraphCleaned(allProjectNames, projectDependencyGraphRaw, ignoredProjects);
     }
 
-    public static getImportedProjectsOfFile(
-        absoluteFilePathToProjectsMap: Record<string, string[] | undefined>,
-        importResolutions: ImportResolution[]
-    ): string[] {
+    public static getImportedProjectsOfFile(fileToProjectsMap: Record<string, string[]>, importResolutions: ImportResolution[]): string[] {
         const projectsMatchingGivenImport: string[] = [];
         importResolutions.forEach((importResolution: ImportResolution): void => {
-            importResolution.resolvedImports.forEach((resolvedImport: ImportResolution['resolvedImports'][number]): void => {
-                absoluteFilePathToProjectsMap[resolvedImport.resolvedAbsoluteFilePath]?.forEach((matchingProject: string): void => {
+            importResolution.resolvedImports.forEach((resolvedImport: ImportResolutionResolvedImport): void => {
+                fileToProjectsMap[resolvedImport.resolvedAbsoluteFilePath]?.forEach((matchingProject: string): void => {
                     if (!projectsMatchingGivenImport.includes(matchingProject)) {
                         projectsMatchingGivenImport.push(matchingProject);
                     }
@@ -40,6 +26,21 @@ export class ProjectDependencyGraph {
             });
         });
         return projectsMatchingGivenImport;
+    }
+
+    private static createProjectDependencyGraphRaw(
+        fileToProjectsMap: Record<string, string[]>,
+        fileToImportResolutionsMap: FileToImportResolutionsMap
+    ): Record<string, string[]> {
+        const projectDependencyGraph: Record<string, string[]> = {};
+        const allFilePaths: string[] = Object.keys(fileToProjectsMap);
+        allFilePaths.forEach((filePath: string): void => {
+            const importResolutions: ImportResolution[] = fileToImportResolutionsMap[filePath]?.importResolutions ?? [];
+            const importedProjectsOfFile: string[] = ProjectDependencyGraph.getImportedProjectsOfFile(fileToProjectsMap, importResolutions);
+            const projectsOfFile: string[] = fileToProjectsMap[filePath] ?? [];
+            ProjectDependencyGraph.extendDependencyGraph(projectDependencyGraph, projectsOfFile, importedProjectsOfFile);
+        });
+        return projectDependencyGraph;
     }
 
     /**
@@ -66,5 +67,24 @@ export class ProjectDependencyGraph {
                 }
             });
         });
+    }
+
+    private static getProjectGraphCleaned(
+        allProjectNames: string[],
+        projectDependencyGraphRaw: Record<string, string[]>,
+        ignoredProjects: string[]
+    ): Record<string, string[]> {
+        const allProjectNamesSorted: string[] = allProjectNames.slice(0).sort();
+        return allProjectNamesSorted.reduce((prev: Record<string, string[]>, curr: string): Record<string, string[]> => {
+            if (ignoredProjects.includes(curr)) {
+                return prev;
+            }
+            const dependencies: string[] = projectDependencyGraphRaw[curr] ?? [];
+            prev[curr] = dependencies
+                .filter((dependency: string) => !ignoredProjects.includes(dependency))
+                .slice(0)
+                .sort();
+            return prev;
+        }, {});
     }
 }

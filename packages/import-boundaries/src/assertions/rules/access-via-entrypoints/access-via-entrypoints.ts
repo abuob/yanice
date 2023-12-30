@@ -18,6 +18,7 @@ export const accessViaEntryPoints: YaniceImportBoundariesAssertion = {
         );
         const ignoredProjects: string[] = config.assertionOptions?.ignoredProjects ?? [];
         return AccessViaEntrypointsUtil.getRuleViolations(
+            yaniceJsonDirectoryPath,
             projectToEntryPointsMap,
             assertionData.fileToImportResolutionsMap,
             assertionData.fileToProjectsMap,

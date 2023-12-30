@@ -230,7 +230,8 @@ export class ImportBoundariesExecutor {
         const projectDependencyGraph: Record<string, string[]> = ProjectDependencyGraph.createProjectDependencyGraph(
             allProjectNames,
             fileToProjectsMap,
-            fileToImportResolutionsMap
+            fileToImportResolutionsMap,
+            importBoundariesPluginConfig.assertionOptions?.ignoredProjects ?? []
         );
 
         performanceLogger.stopStopwatchAndLog('project-dependency-graph', 'Created projectDependencyGraph in:');
