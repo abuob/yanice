@@ -3,7 +3,7 @@ import { ParsedImportStatement } from '../../api/import-resolver.interface';
 export class Es6DeclarativeImportResolverUtil {
     public static extractImportStatements(fileContent: string): string[] {
         const preparedFileContent: string = Es6DeclarativeImportResolverUtil.stripBlockComments(fileContent);
-        const relevantStatementRegex: RegExp = /(^|\s|;)import\s(.|\s)*?from\s+?['"].*?['"]/g;
+        const relevantStatementRegex: RegExp = /(^|[ \t\n\r]|;)import[ \t\n\r](.|\n|\r)*?from[ \t\n\r]+?['"].*?['"]/g;
         let match: RegExpExecArray | null = null;
         const importStatements: string[] = [];
         while ((match = relevantStatementRegex.exec(preparedFileContent)) !== null) {
@@ -38,7 +38,7 @@ export class Es6DeclarativeImportResolverUtil {
     }
 
     private static stripBlockComments(fileContent: string): string {
-        return fileContent.replace(/[/][*](.|\s)*?[*][/]/g, '');
+        return fileContent.replace(/[/][*](.|\n|\r)*?[*][/]/g, '');
     }
 
     private static normalizeImportStatement(importStatement: string): string {
