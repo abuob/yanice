@@ -52,7 +52,8 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
 
 A map that maps glob-expressions to an array of import-resolvers.
 An import-resolver accepts a file and its filepath and creates an "import-map".
-See here for an example how a custom import resolver can be written: [dummy-resolver.js](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/dummy-resolver.js)
+See here for an example how a custom import resolver can be written: [dummy-resolver.ts](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-resolver.ts).
+Note that we ultimately need to provide a JS-file, meaning, the aforementioned code would first need to be transpiled.
 
 ### postResolve
 

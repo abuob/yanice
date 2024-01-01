@@ -2,6 +2,64 @@ import { FileToImportResolutionsMap, ImportResolution } from '../../packages/imp
 import { IntegrationTestUtil } from '../test-utils/integration-test.util';
 
 export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-plugin.ts')]: {
+        importResolutions: [
+            {
+                createdBy: 'es6-declarative-import-resolver',
+                resolvedImports: [],
+                resolvedPackageImports: [
+                    {
+                        package: 'yanice',
+                        resolvedAbsoluteFilePath: require.resolve('yanice')
+                    }
+                ],
+                unknownImports: []
+            }
+        ],
+        skippedImports: []
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-resolver.ts')]: {
+        importResolutions: [
+            {
+                createdBy: 'es6-declarative-import-resolver',
+                resolvedImports: [],
+                resolvedPackageImports: [
+                    {
+                        package: 'node:path',
+                        resolvedAbsoluteFilePath: 'node:path'
+                    },
+                    {
+                        package: '@yanice/import-boundaries',
+                        resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
+                    }
+                ],
+                unknownImports: [
+                    {
+                        fromClause: 'somewhere',
+                        raw: 'import stuff from "somewhere"',
+                        type: 'package-like'
+                    }
+                ]
+            }
+        ],
+        skippedImports: []
+    },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/post-resolve.ts')]: {
+        importResolutions: [
+            {
+                createdBy: 'es6-declarative-import-resolver',
+                resolvedImports: [],
+                resolvedPackageImports: [
+                    {
+                        package: '@yanice/import-boundaries',
+                        resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
+                    }
+                ],
+                unknownImports: []
+            }
+        ],
+        skippedImports: []
+    },
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/empty.txt')]: {
         skippedImports: [],
         importResolutions: [

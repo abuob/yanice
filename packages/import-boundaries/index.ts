@@ -1,7 +1,12 @@
 import { Phase3Result, YanicePlugin } from 'yanice';
 
 import type { YaniceImportBoundariesAssertion } from './src/api/assertion.interface';
-import type { FileToImportResolutions, ImportResolution, ImportResolutionResolvedImport } from './src/api/import-resolver.interface';
+import type {
+    FileToImportResolutions,
+    ImportResolution,
+    ImportResolutionResolvedImport,
+    YaniceImportBoundariesImportResolver
+} from './src/api/import-resolver.interface';
 import type { YaniceImportBoundariesPostResolver } from './src/api/post-resolve.interface';
 import { ImportBoundariesExecutor } from './src/import-boundaries.executor';
 
@@ -22,5 +27,6 @@ export type {
     ImportResolution,
     ImportResolutionResolvedImport,
     YaniceImportBoundariesAssertion,
+    YaniceImportBoundariesImportResolver,
     YaniceImportBoundariesPostResolver
 };

@@ -1,0 +1,10 @@
+{
+    "extends": ["@tsconfig/strictest/tsconfig", "@tsconfig/node16/tsconfig.json"],
+    "compilerOptions": {
+        "sourceMap": true,
+        "isolatedModules": true,
+        "outDir": "./dist"
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["dist/**"]
+}

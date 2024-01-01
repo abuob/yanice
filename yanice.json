@@ -13,7 +13,7 @@
     "projects": [
         {
             "projectName": "yanice",
-            "pathGlob": "!packages/**",
+            "projectFolder": "./src",
             "commands": {
                 "build": {
                     "command": "tsc -p tsconfig.build.json"
@@ -23,11 +23,20 @@
         },
         {
             "projectName": "import-boundaries",
-            "pathGlob": "packages/import-boundaries/**",
+            "projectFolder": "./packages/import-boundaries",
             "commands": {
                 "build": {
                     "command": "tsc -p tsconfig.build.json",
                     "cwd": "packages/import-boundaries"
+                }
+            }
+        },
+        {
+            "projectName": "integration-tests",
+            "projectFolder": "./integration-tests",
+            "commands": {
+                "build": {
+                    "command": "tsc -p ./integration-tests/test-project/custom-scripts/tsconfig.json"
                 }
             }
         }
@@ -35,7 +44,8 @@
     "dependencyScopes": {
         "build": {
             "dependencies": {
-                "import-boundaries": ["yanice"]
+                "import-boundaries": ["yanice"],
+                "integration-tests": ["yanice", "import-boundaries"]
             }
         }
     }

@@ -4,16 +4,16 @@
     "plugins": {
         "custom": {
             "dummy-plugin": {
-                "scriptLocation": "./dummy-plugin.js"
+                "scriptLocation": "./custom-scripts/dist/dummy-plugin.js"
             }
         },
         "officiallySupported": {
             "import-boundaries": {
                 "importResolvers": {
-                    "**/*.txt": ["./dummy-resolver.js"],
+                    "**/*.txt": ["./custom-scripts/dist/dummy-resolver.js"],
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
-                "postResolve": ["./post-resolve.js"],
+                "postResolve": ["./custom-scripts/dist/post-resolve.js"],
                 "assertions": ["only-direct-imports", "max-skipped-imports", "use-all-declared-dependencies"],
                 "assertionOptions": {
                     "skippedImports": {
