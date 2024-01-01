@@ -1,5 +1,5 @@
 /**
- * @type {import('../../packages/import-boundaries/src/api/post-resolve.interface').YaniceImportBoundariesPostResolverV2}
+ * @type {import('../../packages/import-boundaries/src/api/post-resolve.interface').YaniceImportBoundariesPostResolver}
  */
 const postResolve = {
     /**

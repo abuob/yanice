@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { FileToImportResolutions, FileToImportResolutionsMap } from '../api/import-resolver.interface';
-import { YaniceImportBoundariesPostResolverV2 } from '../api/post-resolve.interface';
+import { YaniceImportBoundariesPostResolver } from '../api/post-resolve.interface';
 
 export class PostResolver {
     public static async postResolveProcessing(
@@ -9,7 +9,7 @@ export class PostResolver {
         yaniceJsonDirectoryPath: string,
         postResolversLocations: string[]
     ): Promise<FileToImportResolutionsMap> {
-        const postResolvers: YaniceImportBoundariesPostResolverV2[] = PostResolver.loadPostResolvers(
+        const postResolvers: YaniceImportBoundariesPostResolver[] = PostResolver.loadPostResolvers(
             yaniceJsonDirectoryPath,
             postResolversLocations
         );
@@ -33,8 +33,8 @@ export class PostResolver {
     private static loadPostResolvers(
         yaniceJsonDirectoryPath: string,
         postResolverLocations: string[]
-    ): YaniceImportBoundariesPostResolverV2[] {
-        return postResolverLocations.map((postResolverLocation: string): YaniceImportBoundariesPostResolverV2 => {
+    ): YaniceImportBoundariesPostResolver[] {
+        return postResolverLocations.map((postResolverLocation: string): YaniceImportBoundariesPostResolver => {
             return require(path.join(yaniceJsonDirectoryPath, postResolverLocation));
         });
     }
