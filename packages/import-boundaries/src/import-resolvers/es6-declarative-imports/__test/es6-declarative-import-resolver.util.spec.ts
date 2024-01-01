@@ -142,6 +142,12 @@ describe('Es6DeclarativeImportResolverUtil', () => {
             expect(actual).to.have.same.members(expected);
             expect(actual).to.have.length(expected.length);
         });
+
+        it('should not catch import-statements that are made within a string', () => {
+            const importStatementWithinString = "console.log('import * from 'somewhere')";
+            const actual: string[] = Es6DeclarativeImportResolverUtil.extractImportStatements(importStatementWithinString);
+            expect(actual).to.have.length(0);
+        });
     });
 
     describe('stripBlockComments', () => {

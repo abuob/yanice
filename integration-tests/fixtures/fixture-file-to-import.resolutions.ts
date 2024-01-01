@@ -33,13 +33,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
                         resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
                     }
                 ],
-                unknownImports: [
-                    {
-                        fromClause: 'somewhere',
-                        raw: 'import stuff from "somewhere"',
-                        type: 'package-like'
-                    }
-                ]
+                unknownImports: []
             }
         ],
         skippedImports: []

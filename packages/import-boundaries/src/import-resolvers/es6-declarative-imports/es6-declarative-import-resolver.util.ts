@@ -3,7 +3,7 @@ import { ParsedImportStatement } from '../../api/import-resolver.interface';
 export class Es6DeclarativeImportResolverUtil {
     public static extractImportStatements(fileContent: string): string[] {
         const preparedFileContent: string = Es6DeclarativeImportResolverUtil.stripBlockComments(fileContent);
-        const relevantStatementRegex: RegExp = /(import[ \t\n](.|\n|\r)*?from[ \t\n]+?['"].*?['"])/g;
+        const relevantStatementRegex: RegExp = /(^|\s|;)import\s(.|\s)*?from\s+?['"].*?['"]/g;
         let match: RegExpExecArray | null = null;
         const importStatements: string[] = [];
         while ((match = relevantStatementRegex.exec(preparedFileContent)) !== null) {
@@ -38,14 +38,13 @@ export class Es6DeclarativeImportResolverUtil {
     }
 
     private static stripBlockComments(fileContent: string): string {
-        return fileContent.replace(/[/][*](.|\n|\r)*?[*][/]/g, '');
+        return fileContent.replace(/[/][*](.|\s)*?[*][/]/g, '');
     }
 
     private static normalizeImportStatement(importStatement: string): string {
         return importStatement
             .trim()
-            .replace(/[\t\n\r]/g, ' ')
-            .replace(/[\s\t]+from[\s\t]+/, ' from ')
-            .replace(/[\s\t]*import[\s\t]+/, 'import ');
+            .replace(/\s+/g, ' ')
+            .replace(/;?import\s/, 'import ');
     }
 }
