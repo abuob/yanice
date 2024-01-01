@@ -1,4 +1,4 @@
-import { exec, ExecException, execSync } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -12,9 +12,9 @@ type allProjectsType = 'project-A' | 'project-B' | 'project-C';
 type TestLog = Partial<Record<allProjectsType, TestLogEntry[]>>;
 
 interface CommandResult {
-    statusCode: number | undefined;
+    statusCode: number | null;
     stdout: string;
-    execException: ExecException | null;
+    stderr: string | null;
 }
 
 export class IntegrationTestUtil {
@@ -22,21 +22,26 @@ export class IntegrationTestUtil {
     private static readonly repoRoot: string = path.join(__dirname, '../../');
     private static readonly testLogPath: string = path.join(__dirname, './test-log.json');
 
-    public static executeYaniceWithArgs(args: string): string {
-        const pathToBin: string = path.join(__dirname, '../../dist/bin.js');
-        const pathToTestProject: string = path.join(__dirname, '../test-project');
-        return execSync(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }).toString();
-    }
-
     public static async executeYaniceWithArgsAsync(args: string): Promise<CommandResult> {
         const pathToBin: string = path.join(__dirname, '../../dist/bin.js');
         const pathToTestProject: string = path.join(__dirname, '../test-project');
-        return new Promise((resolve) => {
-            exec(`node ${pathToBin} ${args}`, { cwd: pathToTestProject }, (error: ExecException | null, stdout: string) => {
+        return new Promise((resolve): void => {
+            const yaniceProcess = spawn('node', [pathToBin, ...args.split(' ')], {
+                cwd: pathToTestProject
+            });
+            let yaniceProcessStdout: string = '';
+            let yaniceProcessStderr: string = '';
+            yaniceProcess.stdout.on('data', (data): void => {
+                yaniceProcessStdout += data.toString();
+            });
+            yaniceProcess.stderr.on('data', (error): void => {
+                yaniceProcessStderr += error.toString();
+            });
+            yaniceProcess.on('close', (code: number | null): void => {
                 const commandResult: CommandResult = {
-                    stdout,
-                    statusCode: error?.code,
-                    execException: error
+                    stdout: yaniceProcessStdout,
+                    stderr: yaniceProcessStderr.length > 0 ? yaniceProcessStderr : null,
+                    statusCode: code
                 };
                 resolve(commandResult);
             });
