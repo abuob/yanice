@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 
 import schemaJson from '../../../schema.json';
-import { log } from '../../util/log';
+import { LogUtil } from '../../util/log-util';
 import { YaniceJsonType } from './config.interface';
 
 /**
@@ -25,14 +25,14 @@ export class ConfigVerifier {
     }
 
     public static printErrorOnVerifyYaniceJsonWithSchemaFailure(yaniceJson: any): void {
-        log('The yanice.json file does not conform to the json schema! Detected Error:');
+        LogUtil.log('The yanice.json file does not conform to the json schema! Detected Error:');
         const ajv = new Ajv();
         const validate = ajv.compile(schemaJson);
         const validationResult = validate(yaniceJson);
 
         // Due to terrible ajv-api: The errors of the validation are stored on the validate-object
         if (!validationResult && validate.errors) {
-            log(validate.errors);
+            LogUtil.consoleLog(validate.errors);
         }
     }
 
@@ -45,7 +45,7 @@ export class ConfigVerifier {
 
     public static printErrorOnVerifySchemaVersionFailure(yaniceJson: YaniceJsonType): void {
         const versionNumber: number = yaniceJson.schemaVersion;
-        log(
+        LogUtil.log(
             `schemaVersion ${versionNumber} is not or no longer supported! This version of yanice currently supports the following versions: ${ConfigVerifier.SUPPORTED_VERSIONS.join(
                 ', '
             )}`
@@ -73,14 +73,14 @@ export class ConfigVerifier {
         Object.keys(yaniceConfig.dependencyScopes).forEach((scope: string): void => {
             Object.keys(yaniceConfig.dependencyScopes?.[scope]?.dependencies ?? {}).forEach((project) => {
                 if (!allProjectNames.includes(project)) {
-                    log(
+                    LogUtil.log(
                         `Within scope "${scope}": There is no project with projectName "${project}" defined; only defined projects are allowed.`
                     );
                 }
                 const dependencies: string[] = yaniceConfig.dependencyScopes?.[scope]?.dependencies?.[project] ?? [];
                 dependencies.forEach((projectDependency: string): void => {
                     if (!allProjectNames.includes(projectDependency)) {
-                        log(
+                        LogUtil.log(
                             `Within scope "${scope}": For project "${project}": There is no project with projectName "${projectDependency}" defined; only defined projects are allowed.`
                         );
                     }
@@ -117,10 +117,10 @@ export class ConfigVerifier {
             } else {
                 const extendedScope = yaniceJson.dependencyScopes[extendsOrUndefined];
                 if (!extendedScope) {
-                    log(`yanice.json: "${scope}" extends "${extendsOrUndefined}", but there is no such scope defined!`);
+                    LogUtil.log(`yanice.json: "${scope}" extends "${extendsOrUndefined}", but there is no such scope defined!`);
                 } else {
                     if (extendedScope.extends) {
-                        log(
+                        LogUtil.log(
                             `yanice.json: "${scope}" extends "${extendsOrUndefined}", but that scope already extends "${extendedScope.extends}" - currently, only one level of extension is allowed. Sorry :(`
                         );
                     }

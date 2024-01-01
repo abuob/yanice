@@ -1,4 +1,3 @@
-import { log } from './log';
 import { LogUtil } from './log-util';
 
 export class YanicePerformanceLogger<stopWatchIdentifier extends string> {
@@ -27,7 +26,7 @@ export class YanicePerformanceLogger<stopWatchIdentifier extends string> {
         }
         const executionDurationInMs: number = Date.now() - startTime;
         const duration: string = LogUtil.getCommandDurationString(executionDurationInMs);
-        log(`[${this.context}] ${message} ${duration}s`);
+        LogUtil.log(`[${this.context}] ${message} ${duration}s`);
         this.startTimes[identifier] = undefined;
     }
 }

@@ -3,18 +3,18 @@
 import path from 'node:path';
 
 import { FindFileUtil } from './src/util/find-file';
-import { log } from './src/util/log';
+import { LogUtil } from './src/util/log-util';
 import { YaniceExecutor } from './src/yanice-executor';
 
 const yaniceJsonPath = FindFileUtil.findFileInParentDirsRecursively(process.cwd(), 'yanice.json');
 if (!yaniceJsonPath) {
-    log('yanice.json not found!');
+    LogUtil.log('yanice.json not found!');
     process.exit(1);
 }
 const yaniceJsonDirectory: string = path.dirname(yaniceJsonPath);
 const gitRepoRootPath: string | null = FindFileUtil.getGitRoot(yaniceJsonDirectory);
 if (!gitRepoRootPath) {
-    log('Could not find a .git folder, is the yanice.json inside a git-repository?');
+    LogUtil.log('Could not find a .git folder, is the yanice.json inside a git-repository?');
     process.exit(1);
 }
 

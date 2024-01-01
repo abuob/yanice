@@ -1,6 +1,6 @@
 import { YaniceCliArgsOutputOnly } from '../phase-1-config/args-parser/cli-args.interface';
 import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
-import { log } from '../util/log';
+import { LogUtil } from '../util/log-util';
 import { AbstractPhase4Executor } from './phase-4.executor';
 
 export class Phase4OutputOnlyExecutor extends AbstractPhase4Executor {
@@ -20,7 +20,7 @@ export class Phase4OutputOnlyExecutor extends AbstractPhase4Executor {
 
     public outputAffectedAndExitIfOutputOnlyMode(): void {
         const affectedProjects = this.phase3Result.affectedProjects;
-        affectedProjects.forEach((projectName: string) => log(projectName));
+        affectedProjects.forEach((projectName: string): void => LogUtil.log(projectName));
         this.exitYanice(0, null);
     }
 
@@ -36,7 +36,7 @@ export class Phase4OutputOnlyExecutor extends AbstractPhase4Executor {
     }
 
     public outputResponsiblesAndExitIfShowResponsiblesMode(): void {
-        this.responsibles.forEach((responsible: string) => log(responsible));
+        this.responsibles.forEach((responsible: string) => LogUtil.log(responsible));
         this.exitYanice(0, null);
     }
 }

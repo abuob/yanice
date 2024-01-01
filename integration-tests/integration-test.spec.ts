@@ -9,7 +9,7 @@ import { fixtureProjectDependencyGraph } from './fixtures/fixture-project-depend
 import { IntegrationTestUtil } from './test-utils/integration-test.util';
 
 describe('yanice', (): void => {
-    beforeEach(() => {
+    beforeEach((): void => {
         IntegrationTestUtil.assertCleanFiles();
     });
 
@@ -21,7 +21,9 @@ describe('yanice', (): void => {
         it('should exit non-zero and print a warning when first parameter is bad', async (): Promise<void> => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('totally-invalid');
             expect(commandResult.statusCode).to.equal(1);
-            const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
+            expect(commandResult.stderr).to.equal(null);
+
+            const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
             expect(output).to.deep.equal(IntegrationTestUtil.getTextFixtureContent('fixture-bad-input.txt'));
         });
     });
@@ -31,6 +33,9 @@ describe('yanice', (): void => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                 'output-only flat-all-projects-have-commands --all --rev=HEAD'
             );
+            expect(commandResult.stderr).to.equal(null);
+            expect(commandResult.statusCode).to.equal(0);
+
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
             expect(printedProjects).to.have.length(3);
             expect(printedProjects).to.have.same.members(['A', 'B', 'C']);
@@ -40,6 +45,9 @@ describe('yanice', (): void => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                 'output-only flat-projects-one-command --all --rev=HEAD'
             );
+            expect(commandResult.stderr).to.equal(null);
+            expect(commandResult.statusCode).to.equal(0);
+
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
             expect(printedProjects).to.have.length(1);
             expect(printedProjects).to.have.same.members(['A']);
@@ -48,6 +56,9 @@ describe('yanice', (): void => {
         it('should print the changed project and all its dependents', async (): Promise<void> => {
             IntegrationTestUtil.touchProject('project-B');
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('output-only a-depends-on-b --rev=HEAD');
+            expect(commandResult.stderr).to.equal(null);
+            expect(commandResult.statusCode).to.equal(0);
+
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
             expect(printedProjects).to.have.length(2);
             expect(printedProjects).to.have.same.members(['A', 'B']);
@@ -59,6 +70,9 @@ describe('yanice', (): void => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                 'output-only a-depends-on-b --responsibles --rev=HEAD'
             );
+            expect(commandResult.stderr).to.equal(null);
+            expect(commandResult.statusCode).to.equal(0);
+
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
             expect(printedProjects).to.have.length(2);
             expect(printedProjects).to.have.same.members(['Alice', 'Bob']);
@@ -71,6 +85,9 @@ describe('yanice', (): void => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                 'run flat-all-projects-have-commands --all --rev=HEAD'
             );
+            expect(commandResult.stderr).to.equal(null);
+            expect(commandResult.statusCode).to.equal(0);
+
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
             expect(printedProjects).to.have.length(3);
 
@@ -93,6 +110,9 @@ describe('yanice', (): void => {
             IntegrationTestUtil.touchProject('project-B');
 
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('run a-depends-on-b --rev=HEAD');
+            expect(commandResult.stderr).to.equal(null);
+            expect(commandResult.statusCode).to.equal(0);
+
             const printedProjects: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
             expect(printedProjects).to.have.length(2);
 
@@ -115,9 +135,10 @@ describe('yanice', (): void => {
         describe('custom', () => {
             it('it can start a plugin', async (): Promise<void> => {
                 const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('plugin:dummy-plugin a-depends-on-b --rev=HEAD');
-                const outputLines: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
-                expect(commandResult.statusCode).to.equal(0);
                 expect(commandResult.stderr).to.equal(null);
+                expect(commandResult.statusCode).to.equal(0);
+
+                const outputLines: string[] = IntegrationTestUtil.getNonEmptyLines(commandResult.stdout);
                 expect(outputLines).to.have.length(2);
                 expect(outputLines).to.have.same.members(['[DUMMY-PLUGIN] triggered', path.join(__dirname, 'test-project')]);
             });
@@ -128,8 +149,9 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --print-file-imports --skip-post-resolvers'
                     );
-                    expect(commandResult.statusCode).to.equal(0);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(0);
+
                     const outputObject = JSON.parse(commandResult.stdout.trim());
                     expect(outputObject).to.deep.equal(fixtureFileToImportResolutions);
                 });
@@ -138,8 +160,9 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --print-file-imports'
                     );
-                    expect(commandResult.statusCode).to.equal(0);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(0);
+
                     const outputObject = JSON.parse(commandResult.stdout.trim());
                     expect(outputObject).to.deep.equal(fixtureFileImportMapWithoutDummyResolver);
                 });
@@ -148,8 +171,9 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --print-assertion-data --skip-post-resolvers'
                     );
-                    expect(commandResult.statusCode).to.equal(0);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(0);
+
                     const outputObject = JSON.parse(commandResult.stdout.trim());
                     const expected: ImportBoundaryAssertionData = {
                         fileToProjectsMap: fixtureFileToProjectsMap,
@@ -163,8 +187,9 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --generate --skip-post-resolvers'
                     );
-                    expect(commandResult.statusCode).to.equal(0);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(0);
+
                     const outputObject = JSON.parse(commandResult.stdout.trim());
                     expect(outputObject).to.deep.equal(fixtureProjectDependencyGraph);
                 });
@@ -173,9 +198,10 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --assert'
                     );
-                    const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
-                    expect(commandResult.statusCode).to.equal(1);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(1);
+
+                    const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
                     const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-too-many-imports.txt');
                     expect(output).to.include(expected);
                 });
@@ -184,9 +210,10 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --assert'
                     );
-                    const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
-                    expect(commandResult.statusCode).to.equal(1);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(1);
+
+                    const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
                     const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-bad-imports.txt');
                     expect(output).to.include(expected);
                     const amountOfImportBoundaryViolations: number = IntegrationTestUtil.getAmountOfImportBoundaryViolations(output);
@@ -197,9 +224,10 @@ describe('yanice', (): void => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries unused-dependencies-exist --assert'
                     );
-                    const output = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
-                    expect(commandResult.statusCode).to.equal(1);
                     expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(1);
+
+                    const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
                     const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-unused-dependency.txt');
                     expect(output).to.include(expected);
                     const amountOfImportBoundaryViolations: number = IntegrationTestUtil.getAmountOfImportBoundaryViolations(output);

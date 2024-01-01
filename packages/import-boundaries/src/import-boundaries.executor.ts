@@ -116,7 +116,8 @@ export class ImportBoundariesExecutor {
                 importBoundariesPluginConfig,
                 importBoundariesArgs
             );
-        ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(fileToImportResolutionsMap, null, 4));
+        await LogUtil.writeToStdoutAsync(JSON.stringify(fileToImportResolutionsMap, null, 4));
+        ImportBoundariesExecutor.exitPlugin(0, null);
     }
 
     private static async handlePrintAssertionData(
@@ -137,7 +138,8 @@ export class ImportBoundariesExecutor {
             yaniceProjects,
             performanceLogger
         );
-        ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(assertionData, null, 4));
+        await LogUtil.writeToStdoutAsync(JSON.stringify(assertionData, null, 4));
+        ImportBoundariesExecutor.exitPlugin(0, null);
     }
 
     private static async handleGenerateMode(
@@ -158,7 +160,9 @@ export class ImportBoundariesExecutor {
             yaniceProjects,
             performanceLogger
         );
-        ImportBoundariesExecutor.exitPlugin(0, JSON.stringify(assertionData.projectDependencyGraph, null, 4));
+
+        await LogUtil.writeToStdoutAsync(JSON.stringify(assertionData.projectDependencyGraph, null, 4));
+        ImportBoundariesExecutor.exitPlugin(0, null);
     }
 
     private static async handleAssertMode(
@@ -278,10 +282,14 @@ export class ImportBoundariesExecutor {
         return PostResolver.postResolveProcessing(fileToResolvedImportsMap, yaniceJsonDirectoryPath, postResolverLocations);
     }
 
-    private static exitPlugin(exitCode: number, message: string | null): never {
-        if (message) {
-            LogUtil.log(message);
+    /**
+     * @param exitCode
+     * @param shortMessage must be below 8192 bytes; otherwise, use LogUtil.writeToStdoutAsync
+     */
+    private static exitPlugin(exitCode: number, shortMessage: string | null): never {
+        if (shortMessage) {
+            LogUtil.log(shortMessage);
         }
-        process.exit(exitCode);
+        return process.exit(exitCode);
     }
 }

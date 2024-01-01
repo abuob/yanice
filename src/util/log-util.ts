@@ -1,13 +1,29 @@
 import { YaniceConfig } from '../phase-1-config/config/config.interface';
 import { CommandExecutionResult } from '../phase-4-execution/phase-4-command.executor';
-import { log } from './log';
 import { commandOutputFilterType, OutputFilter } from './output-filter';
 import { KarmaProgressSuccessFilter } from './output-filters/karma-progress-success-filter';
 import { NpmErrorFilter } from './output-filters/npm-error-filter';
 
 export class LogUtil {
-    public static log(message: string): void {
-        log(message);
+    public static async writeToStdoutAsync(message: string): Promise<void> {
+        return new Promise((resolve): void => {
+            process.stdout.write(message, (): void => {
+                resolve();
+            });
+        });
+    }
+
+    /**
+     * @param shortMessage must be below 8192 bytes. Otherwise, if we call process.exit() immediately afterward,
+     * the message might be logged only partially. Use `writeToStdoutAsync` for those cases.
+     */
+    public static log(shortMessage: string): void {
+        process.stdout.write(`${shortMessage}\n`);
+    }
+
+    public static consoleLog(shortMessage: any): void {
+        // eslint-disable-next-line no-console
+        console.log(shortMessage);
     }
 
     public static printCommandSuccess(
@@ -17,7 +33,7 @@ export class LogUtil {
         queueSize: number
     ): void {
         const commandInfo: string = LogUtil.getCommandInfoString(commandExecutionResult.executionDurationInMs, relativeCwd, queueSize);
-        log(`  \x1B[1;32m ✔ ${command}\x1B[0m ${commandInfo}`);
+        LogUtil.log(`  \x1B[1;32m ✔ ${command}\x1B[0m ${commandInfo}`);
     }
 
     public static printCommandFailure(
@@ -27,7 +43,7 @@ export class LogUtil {
         queueSize: number
     ): void {
         const commandInfo: string = LogUtil.getCommandInfoString(commandExecutionResult.executionDurationInMs, relativeCwd, queueSize);
-        log(`  \x1B[1;31m ✘ ${command}\x1B[0m ${commandInfo}`);
+        LogUtil.log(`  \x1B[1;31m ✘ ${command}\x1B[0m ${commandInfo}`);
     }
 
     public static printOutputFormattedAfterAllCommandsCompleted(
@@ -101,7 +117,7 @@ export class LogUtil {
             .split('\n')
             .filter((line) => LogUtil.isOutputLineOkayToPrint(appliedFilters, line))
             .forEach((line) => {
-                log(line);
+                LogUtil.log(line);
             });
     }
 

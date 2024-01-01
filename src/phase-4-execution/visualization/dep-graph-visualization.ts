@@ -8,7 +8,7 @@ import { YaniceCliArgsVisualize } from '../../phase-1-config/args-parser/cli-arg
 import { YaniceConfig } from '../../phase-1-config/config/config.interface';
 import { DirectedGraph } from '../../phase-1-config/directed-graph/directed-graph';
 import { FindFileUtil } from '../../util/find-file';
-import { log } from '../../util/log';
+import { LogUtil } from '../../util/log-util';
 import { GraphDagreRenderer } from './graph-dagre-renderer';
 import { GraphDotRenderer } from './graph-dot-renderer';
 
@@ -44,7 +44,7 @@ export class DepGraphVisualization {
 
         server.listen(port, '127.0.0.1');
 
-        log(`Visualized graph can be seen at: http://localhost:${port}`);
+        LogUtil.log(`Visualized graph can be seen at: http://localhost:${port}`);
     }
 
     public static saveTemplateFile(
@@ -54,7 +54,7 @@ export class DepGraphVisualization {
         templateHtml: string
     ): void {
         const actualFilePath: string = path.join(yaniceJsonDirectoryPath, relativeFilePath, fileName);
-        log(`Storing graph visualization in: ${actualFilePath}`);
+        LogUtil.log(`Storing graph visualization in: ${actualFilePath}`);
         fs.mkdirSync(path.dirname(actualFilePath), { recursive: true });
         fs.writeFileSync(actualFilePath, templateHtml);
     }
