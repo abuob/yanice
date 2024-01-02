@@ -1,6 +1,6 @@
 {
     "name": "@yanice/import-boundaries",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "Plugin for Yanice: Assert import boundaries between projects",
     "engines": {
         "node": ">=14"

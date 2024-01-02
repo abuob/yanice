@@ -1,6 +1,6 @@
 {
     "name": "yanice",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "Yet another incremental command executor",
     "engines": {
         "node": ">=16"
