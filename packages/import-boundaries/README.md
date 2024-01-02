@@ -55,6 +55,15 @@ An import-resolver accepts a file and its filepath and creates an "import-map".
 See here for an example how a custom import resolver can be written: [dummy-resolver.ts](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-resolver.ts).
 Note that we ultimately need to provide a JS-file, meaning, the aforementioned code would first need to be transpiled.
 
+Officially available resolvers:
+
+-   `es6-declarative-import-resolver`: Resolves all `import ... from ...`-statements.
+
+Currently missing (will follow later):
+
+-   common-js: Use of `require` is currently ignored
+-   dynamic imports: `import(..)` and `await import(..)` are currently ignored as well
+
 ### postResolve
 
 The plugin will create an import-map for all files that matched.
