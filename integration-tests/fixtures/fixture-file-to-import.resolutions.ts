@@ -19,6 +19,26 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
         ],
         skippedImports: []
     },
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-assertion.ts')]: {
+        importResolutions: [
+            {
+                createdBy: 'es6-declarative-import-resolver',
+                resolvedImports: [],
+                resolvedPackageImports: [
+                    {
+                        package: '@yanice/import-boundaries',
+                        resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
+                    },
+                    {
+                        package: 'yanice',
+                        resolvedAbsoluteFilePath: require.resolve('yanice')
+                    }
+                ],
+                unknownImports: []
+            }
+        ],
+        skippedImports: []
+    },
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-resolver.ts')]: {
         importResolutions: [
             {
@@ -39,7 +59,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
         ],
         skippedImports: []
     },
-    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/post-resolve.ts')]: {
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-post-resolve.ts')]: {
         importResolutions: [
             {
                 createdBy: 'es6-declarative-import-resolver',

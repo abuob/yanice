@@ -1,6 +1,6 @@
 import { Phase3Result, YanicePlugin } from 'yanice';
 
-import type { YaniceImportBoundariesAssertion } from './src/api/assertion.interface';
+import type { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from './src/api/assertion.interface';
 import type { ImportBoundaryAssertionData } from './src/api/import-boundary-assertion-data';
 import type {
     FileToImportResolutions,
@@ -31,6 +31,7 @@ export type {
     ImportResolution,
     ImportResolutionResolvedImport,
     YaniceImportBoundariesAssertion,
+    YaniceImportBoundariesAssertionViolation,
     YaniceImportBoundariesImportResolver,
     YaniceImportBoundariesPostResolver
 };

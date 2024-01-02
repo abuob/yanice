@@ -55,6 +55,9 @@ export class AssertionLogger {
                 LogUtil.log(`    Expected entrypoints:  ${violation.expectedEntryPoints.join(', ')}`);
                 LogUtil.log(`    Import statement:      ${violation.importStatement}`);
                 return null;
+            case 'custom-assertion-violation':
+                LogUtil.log(violation.message);
+                return null;
         }
     }
 }

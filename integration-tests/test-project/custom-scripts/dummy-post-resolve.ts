@@ -1,6 +1,6 @@
 import type { FileToImportResolutions, ImportResolution, YaniceImportBoundariesPostResolver } from '@yanice/import-boundaries';
 
-const postResolve: YaniceImportBoundariesPostResolver = {
+const dummyPostResolve: YaniceImportBoundariesPostResolver = {
     postProcess: async (_absoluteFilePath: string, fileToImportResolutions: FileToImportResolutions): Promise<FileToImportResolutions> => {
         return {
             skippedImports: fileToImportResolutions.skippedImports,
@@ -11,4 +11,4 @@ const postResolve: YaniceImportBoundariesPostResolver = {
     }
 };
 
-module.exports = postResolve;
+module.exports = dummyPostResolve;

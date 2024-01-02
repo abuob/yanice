@@ -17,7 +17,7 @@ describe('yanice', (): void => {
         IntegrationTestUtil.resetChanges();
     });
 
-    describe('bad input', () => {
+    describe('bad input', (): void => {
         it('should exit non-zero and print a warning when first parameter is bad', async (): Promise<void> => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('totally-invalid');
             expect(commandResult.statusCode).to.equal(1);
@@ -28,7 +28,7 @@ describe('yanice', (): void => {
         });
     });
 
-    describe('output-only', () => {
+    describe('output-only', (): void => {
         it('should be able to read its config file and print out all project files for a given scope', async (): Promise<void> => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                 'output-only flat-all-projects-have-commands --all --rev=HEAD'
@@ -80,7 +80,7 @@ describe('yanice', (): void => {
         });
     });
 
-    describe('run', () => {
+    describe('run', (): void => {
         it('should execute all commands', async (): Promise<void> => {
             const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                 'run flat-all-projects-have-commands --all --rev=HEAD'
@@ -131,9 +131,9 @@ describe('yanice', (): void => {
         });
     });
 
-    describe('plugin', () => {
-        describe('custom', () => {
-            it('it can start a plugin', async (): Promise<void> => {
+    describe('plugin', (): void => {
+        describe('custom', (): void => {
+            it('it can start a custom plugin', async (): Promise<void> => {
                 const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('plugin:dummy-plugin a-depends-on-b --rev=HEAD');
                 expect(commandResult.stderr).to.equal(null);
                 expect(commandResult.statusCode).to.equal(0);
@@ -143,8 +143,22 @@ describe('yanice', (): void => {
                 expect(outputLines).to.have.same.members(['[DUMMY-PLUGIN] triggered', path.join(__dirname, 'test-project')]);
             });
         });
-        describe('officially supported', () => {
-            describe('import-boundaries', () => {
+        describe('officially supported', (): void => {
+            describe('import-boundaries', (): void => {
+                it('should be able to invoke a custom assertion', async (): Promise<void> => {
+                    const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
+                        'plugin:import-boundaries dummy-assertion-fail --assert --skip-post-resolvers'
+                    );
+                    expect(commandResult.stderr).to.equal(null);
+                    expect(commandResult.statusCode).to.equal(1);
+
+                    const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
+                    const expected: string = IntegrationTestUtil.getTextFixtureContent(
+                        'fixture-assertion-error-dummy-assertion-violation.txt'
+                    );
+                    expect(output).to.include(expected);
+                });
+
                 it('should be able to print the file-import-maps', async (): Promise<void> => {
                     const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync(
                         'plugin:import-boundaries a-depends-on-b --print-file-imports --skip-post-resolvers'
@@ -216,6 +230,12 @@ describe('yanice', (): void => {
                     const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
                     const expected: string = IntegrationTestUtil.getTextFixtureContent('fixture-assertion-error-bad-imports.txt');
                     expect(output).to.include(expected);
+
+                    const dummyAssertionFailure: string = IntegrationTestUtil.getTextFixtureContent(
+                        'fixture-assertion-error-dummy-assertion-violation.txt'
+                    );
+                    expect(output).to.not.include(dummyAssertionFailure); // returns violations only for the "dummy-assertion-fail"-scope
+
                     const amountOfImportBoundaryViolations: number = IntegrationTestUtil.getAmountOfImportBoundaryViolations(output);
                     expect(amountOfImportBoundaryViolations).to.equal(1);
                 });

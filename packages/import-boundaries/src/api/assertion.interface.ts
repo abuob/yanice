@@ -4,6 +4,7 @@ import { ImportBoundaryAssertionData } from './import-boundary-assertion-data';
 
 export type YaniceImportBoundariesAssertionViolation =
     | AssertionViolationConfiguredImportUnused
+    | AssertionViolationCustomAssertion
     | AssertionViolationImportNotConfigured
     | AssertionViolationInvalidEntrypoint
     | AssertionViolationSkippedImportOptionsNotConfigured
@@ -54,6 +55,11 @@ export interface AssertionViolationInvalidEntrypoint {
     importStatement: string;
     importedProject: string;
     expectedEntryPoints: string[];
+}
+
+export interface AssertionViolationCustomAssertion {
+    type: 'custom-assertion-violation';
+    message: string;
 }
 
 export interface YaniceImportBoundariesAssertion {

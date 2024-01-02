@@ -13,8 +13,9 @@
                     "**/*.txt": ["./custom-scripts/dist/dummy-resolver.js"],
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
-                "postResolve": ["./custom-scripts/dist/post-resolve.js"],
+                "postResolve": ["./custom-scripts/dist/dummy-post-resolve.js"],
                 "assertions": ["only-direct-imports", "max-skipped-imports", "use-all-declared-dependencies"],
+                "customAssertions": ["./custom-scripts/dist/dummy-assertion.js"],
                 "assertionOptions": {
                     "skippedImports": {
                         "amount": 0,
@@ -101,6 +102,9 @@
                 "B": ["C"],
                 "C": ["EMPTY-PROJECT"]
             }
+        },
+        "dummy-assertion-fail": {
+            "dependencies": {}
         }
     }
 }

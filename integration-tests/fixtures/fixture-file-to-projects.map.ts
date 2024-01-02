@@ -2,8 +2,9 @@ import { IntegrationTestUtil } from '../test-utils/integration-test.util';
 
 export const fixtureFileToProjectsMap: Record<string, string[]> = {
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-plugin.ts')]: ['ALL-FILES'],
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-assertion.ts')]: ['ALL-FILES'],
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-resolver.ts')]: ['ALL-FILES'],
-    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/post-resolve.ts')]: ['ALL-FILES'],
+    [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/dummy-post-resolve.ts')]: ['ALL-FILES'],
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('custom-scripts/tsconfig.json')]: ['ALL-FILES'],
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/empty.txt')]: ['ALL-FILES', 'A'],
     [IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-1.ts')]: ['ALL-FILES', 'A'],
