@@ -28,5 +28,7 @@ jobs:
               run: npm test
             - name: build yanice & packages
               run: npm run build
+            - name: assert package boundaries
+              run: npm run assert-boundaries
             - name: integration-tests
               run: npm run integration-tests
