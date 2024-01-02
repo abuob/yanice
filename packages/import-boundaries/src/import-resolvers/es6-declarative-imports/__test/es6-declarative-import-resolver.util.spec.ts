@@ -122,6 +122,7 @@ describe('Es6DeclarativeImportResolverUtil', () => {
             // some comment
             import * as t from 'barrel';import def from 'default-export';
             import * as t from 'barrel';import def from 'default-export';
+            import type {someType} from 'type-import';\n
             //@yanice:import-boundaries ignore-next-line
             // @yanice:import-boundaries ignore-next-line\n\n \t
             //  @yanice:import-boundaries ignore-next-line
@@ -137,6 +138,7 @@ describe('Es6DeclarativeImportResolverUtil', () => {
                 "import def from 'default-export'",
                 "import * as t from 'barrel'",
                 "import def from 'default-export'",
+                "import type {someType} from 'type-import'",
                 'import a from "b"'
             ];
             expect(actual).to.have.same.members(expected);

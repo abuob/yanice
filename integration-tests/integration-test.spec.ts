@@ -1,8 +1,8 @@
 import path from 'node:path';
 
+import type { ImportBoundaryAssertionData } from '@yanice/import-boundaries';
 import { expect } from 'chai';
 
-import type { ImportBoundaryAssertionData } from '../packages/import-boundaries/src/api/import-boundary-assertion-data';
 import { fixtureFileImportMapWithoutDummyResolver, fixtureFileToImportResolutions } from './fixtures/fixture-file-to-import.resolutions';
 import { fixtureFileToProjectsMap } from './fixtures/fixture-file-to-projects.map';
 import { fixtureProjectDependencyGraph } from './fixtures/fixture-project-dependency.graph';

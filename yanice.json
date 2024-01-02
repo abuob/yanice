@@ -6,6 +6,14 @@
             "import-boundaries": {
                 "importResolvers": {
                     "**/*.ts": ["es6-declarative-import-resolver"]
+                },
+                "assertions": ["only-direct-imports"],
+                "assertionOptions": {
+                    "skippedImports": {
+                        "amount": 0,
+                        "mode": "exact"
+                    },
+                    "ignoredProjects": ["ALL-FILES"]
                 }
             }
         }
@@ -46,6 +54,13 @@
             "dependencies": {
                 "import-boundaries": ["yanice"],
                 "integration-tests": ["yanice", "import-boundaries"]
+            }
+        },
+        "relative-import-boundaries": {
+            "dependencies": {
+                "yanice": [],
+                "import-boundaries": [],
+                "integration-tests": []
             }
         }
     }

@@ -1,4 +1,5 @@
-import { FileToImportResolutionsMap, ImportResolution } from '../../packages/import-boundaries/src/api/import-resolver.interface';
+import type { FileToImportResolutionsMap, ImportResolution } from '@yanice/import-boundaries';
+
 import { IntegrationTestUtil } from '../test-utils/integration-test.util';
 
 export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
