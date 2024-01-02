@@ -59,11 +59,11 @@ Note that we ultimately need to provide a JS-file, meaning, the aforementioned c
 
 The plugin will create an import-map for all files that matched.
 In case anything is amiss or the plugin was not able to resolve certain imports, in this step we can do one final mapping.
+One possible use-case is to resolve typescript-path-mappings here.
 
 ### assertions
 
-Array of officially provided assertions or custom assertions.
-Currently supported:
+Array of officially provided assertions. Currently supported:
 
 -   `only-direct-imports`: Forces that only imports to projects which are defined as a direct dependency in the given scope are allowed. E.g.: A file in `project-A` imports a file from `project-B` - this is only allowed if `"project-A": ["project-B", ...]` is declared in the `yanice.json`.
 -   `only-transitive-dependencies`: Similar to `only-direct-imports`, but allowing for transitive dependencies: When we declare `A` to depend on `B` which depends on `C`, `A` is also allowed to import from `C`.
@@ -72,7 +72,12 @@ Currently supported:
 -   `access-via-entrypoints`: It is sometimes desirable to access a project from other projects only via defined entrypoints, such as e.g. an `index.ts`, `public_api.ts` or some such, and disallow "deep" imports to arbitrary files.
     This rule helps with that. Define one or multiple entry-points via the `entrypoints`-property for each project. This rule will then ensure that every import from another project accesses the project via a defined entrypoint.
 
-#### Assertion Options
+### customAssertions
+
+Array of custom assertion scripts. See [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json#L18) on how to provide a script;
+the original untranspiled assertion-source-code can be found here: [link to dummy-assertion](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-assertion.ts).
+
+### assertionOptions
 
 -   `skippedImports`: Only relevant when using `max-skipped-imports`. Define the amount of allowed skipped imports. The `mode`-property defines how the number is interpreted.
 -   `ignoredProjects`: The rules related to boundary-assertions will ignore any listed project. This is especially helpful for "metaprojects" like `all-files`, `all-typescript-files` etc.
@@ -91,12 +96,18 @@ import { something } from './some/illegal/file';
 
 The plugin can be invoked with the following parameters:
 
+**Main Options**:
+
+-   `--assert`: The default mode; will be used when no other main option is present. Runs all configured assertions.
 -   `--print-file-imports`: Will print file-import-maps as soon as they are available, without any yanice-project-related information.
 -   `--print-assertion-data`: Will print all data that is being generated to run assertions.
     The aforementioned file-import-map, which file belongs to which project, and which project imports which project.
--   `--skip-post-resolvers`: Skips the post-resolvers.
 -   `--generate`: Will print the project-dependencies based on the imports in the format that the yanice.json uses
--   `--assert`: The default-mode; will be used when `--print*` or `--generate` is not present. Runs the configured assertions.
+
+**Additional Options**:
+
+-   `--skip-post-resolvers`: Skips the post-resolvers.
+-   `--perf-log` (or `--performance-logging`): Adds some extra logs to show how much time was spent on which operation.
 
 ### Examples
 
