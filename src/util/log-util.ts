@@ -18,9 +18,13 @@ export class LogUtil {
      * the message might be logged only partially. Use `writeToStdoutAsync` for those cases.
      */
     public static log(shortMessage: string): void {
-        process.stdout.write(`${shortMessage}\n`);
+        LogUtil.consoleLog(shortMessage);
     }
 
+    /**
+     * @param shortMessage Can be any instead of just a string. Helpful if we want to use console.log's internal stringification of non-strings.
+     * Generally, calls to the properly typed "log" should be preferred.
+     */
     public static consoleLog(shortMessage: any): void {
         // eslint-disable-next-line no-console
         console.log(shortMessage);

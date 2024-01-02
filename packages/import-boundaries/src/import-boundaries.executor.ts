@@ -116,7 +116,8 @@ export class ImportBoundariesExecutor {
                 importBoundariesPluginConfig,
                 importBoundariesArgs
             );
-        await LogUtil.writeToStdoutAsync(JSON.stringify(fileToImportResolutionsMap, null, 4));
+        const output: string = `${JSON.stringify(fileToImportResolutionsMap, null, 4)}\n`;
+        await LogUtil.writeToStdoutAsync(output);
         ImportBoundariesExecutor.exitPlugin(0, null);
     }
 
@@ -138,7 +139,8 @@ export class ImportBoundariesExecutor {
             yaniceProjects,
             performanceLogger
         );
-        await LogUtil.writeToStdoutAsync(JSON.stringify(assertionData, null, 4));
+        const output: string = `${JSON.stringify(assertionData, null, 4)}\n`;
+        await LogUtil.writeToStdoutAsync(output);
         ImportBoundariesExecutor.exitPlugin(0, null);
     }
 
@@ -160,8 +162,8 @@ export class ImportBoundariesExecutor {
             yaniceProjects,
             performanceLogger
         );
-
-        await LogUtil.writeToStdoutAsync(JSON.stringify(assertionData.projectDependencyGraph, null, 4));
+        const output: string = `${JSON.stringify(assertionData.projectDependencyGraph, null, 4)}\n`;
+        await LogUtil.writeToStdoutAsync(output);
         ImportBoundariesExecutor.exitPlugin(0, null);
     }
 
@@ -196,8 +198,9 @@ export class ImportBoundariesExecutor {
         if (assertionViolations.length > 0) {
             AssertionLogger.logAssertionViolations(assertionViolations);
             ImportBoundariesExecutor.exitPlugin(1, null);
+        } else {
+            ImportBoundariesExecutor.exitPlugin(0, 'No import boundary violation found!');
         }
-        ImportBoundariesExecutor.exitPlugin(0, 'No import boundary violation found!');
     }
 
     private static async getImportBoundaryAssertionData(
