@@ -207,17 +207,17 @@ but in the end invoke the selected plugin and forward all data that has so far b
 
 ### Officially supported plugins
 
-| Name              | npm-package                 | Purpose                                                                                                                                                                                                                                                                               |
-| :---------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| import-boundaries | `@yanice/import-boundaries` | Helps to bridge the gap between the dependencies declared in the `yanice.json` and the _actual_ dependencies as per imports. Currently supports import-detection for javascript/typescript, but allows for custom import-resolvers which take a file and map it to the found imports. |
+| Name              | npm-package                                                                                  | source code                                                                                          | Purpose                                                                                                                                                                                                                                                                               |
+| :---------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| import-boundaries | [link](https://www.npmjs.com/package/@yanice/import-boundaries): `@yanice/import-boundaries` | [packages/import-boundaries](https://github.com/abuob/yanice/tree/master/packages/import-boundaries) | Helps to bridge the gap between the dependencies declared in the `yanice.json` and the _actual_ dependencies as per imports. Currently supports import-detection for javascript/typescript, but allows for custom import-resolvers which take a file and map it to the found imports. |
 
 ### Custom plugins
 
-Custom plugins are javascript-files which yanice can require. See [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json) for configuration, [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/dummy-plugin.js) for a custom plugin example.
+Custom plugins are javascript-files which yanice can require. See [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json) for configuration, [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-plugin.ts) for a custom (untranspiled) plugin example.
 
 ### Dependencies
 
-Yanice tries to work with as little dependencies as possible, currently relying only on the following transitive dependencies:
+Yanice tries to work with as few dependencies as possible, currently relying only on the following dependencies:
 
 | Name      | npm-package                                     | Purpose                                               |
 | :-------- | ----------------------------------------------- | ----------------------------------------------------- |
@@ -226,8 +226,6 @@ Yanice tries to work with as little dependencies as possible, currently relying 
 
 ### Roadmap:
 
--   Currently, maintenance/setup of the `yanice.json` can get cumbersome by an increasing/changing amount of projects
-    inside the repository.
 -   Built-in incremental change-detection: Currently, if you run the same yanice-command twice (e.g. test), yanice will
     execute all commands again, even if there are no changes
     compared to the previous run. Store metadata about the last execution so that yanice will not run obviously redundant
