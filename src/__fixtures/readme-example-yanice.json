@@ -33,7 +33,8 @@
     "projects": [
         {
             "projectName": "project-A",
-            "pathGlob": "project-A/**",
+            "projectFolder": "project-A",
+            "pathGlob": "**/*.ts",
             "commands": {
                 "build": {
                     "command": "npm run build",

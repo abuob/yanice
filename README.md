@@ -47,7 +47,8 @@ The example corresponds to the graph in the picture above. `project-A` for examp
 ```
 {
   "projectName": "project-A",
-  "pathGlob": "project-A/**",
+  "projectFolder": "project-A",
+  "pathGlob": "**/*.ts",
   "commands": {
     "build": {
       "command": "npm run build",
@@ -65,11 +66,10 @@ The example corresponds to the graph in the picture above. `project-A` for examp
 }
 ```
 
-Every file in the repository that matches the given `pathGlob` (you can also use `pathRegExp` if preferred, or both)
-will be part of the project.
-Note that this allows you to match any file or even no file at all: If you neither define the pathGlob nor the
-pathRegExp,
-all files in the repository will match. Projects such as "all-js-files" or "ci-relevant-files" can easily be modeled.
+Every file in the repository (and in the same directory as the `yanice.json` or a subdirectory thereof) is possibly part of a project.
+The files that are part of a project can be defined by using `projectFolder`, `pathGlob` or `pathRegExp`, or a combination of all (all need to be satisfied).
+Note that this allows you to match any file or even no file at all: If you do not define any of these properties,
+all files in the repository will match and be part of the project. Projects such as "all-js-files" or "ci-relevant-files" can easily be modelled.
 
 A Command will be executed in the given `cwd`. A command corresponds to a scope (here: build, test, lint), for which a
 dependency graph is defined in the `yanice.json`. E.g. for test, the dependencies
