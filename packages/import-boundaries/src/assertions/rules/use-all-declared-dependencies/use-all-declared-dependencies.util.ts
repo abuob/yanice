@@ -29,7 +29,7 @@ export class UseAllDeclaredDependenciesUtil {
                 const requiredDependencies: string[] = requiredDependenciesMap[projectName] ?? [];
                 const dependenciesInUse: string[] = projectDependencyGraph[projectName] ?? [];
                 requiredDependencies.forEach((requiredDependency: string): void => {
-                    if (ignoredProjects.includes(projectName)) {
+                    if (ignoredProjects.includes(requiredDependency)) {
                         return;
                     }
                     if (!dependenciesInUse.includes(requiredDependency)) {

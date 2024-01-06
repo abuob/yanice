@@ -69,5 +69,31 @@ describe('UseAllDeclaredDependenciesUtil', () => {
             };
             expect(actual).to.deep.equal([expectedViolation]);
         });
+
+        it('should consider ignoredProjects', () => {
+            const requiredDependenciesMap: Record<string, string[]> = {
+                A: ['B', 'C', 'IGNORED'],
+                B: ['C'],
+                C: [],
+                IGNORED: ['C']
+            };
+            const projectDependencyGraph: Record<string, string[]> = {
+                A: ['C'], // 'B' is declared but unused
+                B: ['C'],
+                C: []
+            };
+            const ignoredProjects: string[] = ['IGNORED'];
+            const actual: AssertionViolationConfiguredImportUnused[] = UseAllDeclaredDependenciesUtil.getRuleViolations(
+                requiredDependenciesMap,
+                projectDependencyGraph,
+                ignoredProjects
+            );
+            const expectedViolation: AssertionViolationConfiguredImportUnused = {
+                type: 'configured-import-unused',
+                unusedProject: 'B',
+                withinProject: 'A'
+            };
+            expect(actual).to.deep.equal([expectedViolation]);
+        });
     });
 });
