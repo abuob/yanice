@@ -7,6 +7,7 @@ export type YaniceImportBoundariesAssertionViolation =
     | AssertionViolationCustomAssertion
     | AssertionViolationImportNotConfigured
     | AssertionViolationInvalidEntrypoint
+    | AssertionViolationInvalidEntrypointFromWithinSameProject
     | AssertionViolationSkippedImportOptionsNotConfigured
     | AssertionViolationSkippedImportsNotEqualsConfiguredAmount
     | AssertionViolationSkippedImportsTooMany
@@ -45,16 +46,25 @@ export interface AssertionViolationSkippedImportsNotEqualsConfiguredAmount {
     expectedAmount: number;
     actualAmount: number;
 }
+
 export interface AssertionViolationSkippedImportOptionsNotConfigured {
     type: 'skipped-imports:not-configured';
 }
+
 export interface AssertionViolationInvalidEntrypoint {
-    type: 'invalid-entrypoint';
+    type: 'invalid-entrypoint:from-outside';
     withinProject: string;
     filePath: string;
     importStatement: string;
     importedProject: string;
     expectedEntryPoints: string[];
+}
+
+export interface AssertionViolationInvalidEntrypointFromWithinSameProject {
+    type: 'invalid-entrypoint:from-same-project';
+    withinProject: string;
+    filePath: string;
+    importStatement: string;
 }
 
 export interface AssertionViolationCustomAssertion {

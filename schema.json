@@ -74,6 +74,16 @@
                                             "items": {
                                                 "type": "string"
                                             }
+                                        },
+                                        "accessViaEntryPoints": {
+                                            "type": "object",
+                                            "properties": {
+                                                "allowWithinSameProject": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": ["allowWithinSameProject"],
+                                            "additionalProperties": false
                                         }
                                     },
                                     "additionalProperties": false

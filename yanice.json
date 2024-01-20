@@ -7,10 +7,10 @@
                 "importResolvers": {
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
-                "assertions": ["only-direct-imports"],
+                "assertions": ["only-direct-imports", "max-skipped-imports"],
                 "assertionOptions": {
                     "skippedImports": {
-                        "amount": 0,
+                        "amount": 4,
                         "mode": "exact"
                     },
                     "ignoredProjects": ["ALL-FILES"]

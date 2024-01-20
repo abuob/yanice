@@ -2,7 +2,11 @@ import path from 'node:path';
 
 import { YaniceProject } from 'yanice';
 
-import { AssertionViolationInvalidEntrypoint } from '../../../api/assertion.interface';
+import {
+    AssertionViolationInvalidEntrypoint,
+    AssertionViolationInvalidEntrypointFromWithinSameProject,
+    YaniceImportBoundariesAssertionViolation
+} from '../../../api/assertion.interface';
 import { FileToImportResolutionsMap, ImportResolution, ImportResolutionResolvedImport } from '../../../api/import-resolver.interface';
 
 export class AccessViaEntrypointsUtil {
@@ -11,9 +15,10 @@ export class AccessViaEntrypointsUtil {
         projectToEntryPointsMap: Record<string, string[]>,
         fileToImportResolutionsMap: FileToImportResolutionsMap,
         fileToProjectsMap: Record<string, string[]>,
-        ignoredProjects: string[]
-    ): AssertionViolationInvalidEntrypoint[] {
-        const result: AssertionViolationInvalidEntrypoint[] = [];
+        ignoredProjects: string[],
+        allowWithinSameProject: boolean
+    ): YaniceImportBoundariesAssertionViolation[] {
+        const result: YaniceImportBoundariesAssertionViolation[] = [];
         Object.keys(fileToImportResolutionsMap).forEach((filePath: string): void => {
             const projectsOfFile: string[] = fileToProjectsMap[filePath] ?? [];
             projectsOfFile.forEach((projectName: string): void => {
@@ -30,6 +35,24 @@ export class AccessViaEntrypointsUtil {
                                 return;
                             }
                             if (importedProject === projectName) {
+                                if (allowWithinSameProject) {
+                                    return;
+                                }
+                                const entryPointsOfCurrentProject: string[] = projectToEntryPointsMap[projectName] ?? [];
+                                const isEntryPointFromWithinProject: boolean = entryPointsOfCurrentProject.some(
+                                    (entryPoint: string): boolean => {
+                                        return importedFilePath === entryPoint;
+                                    }
+                                );
+                                if (isEntryPointFromWithinProject) {
+                                    const violation: AssertionViolationInvalidEntrypointFromWithinSameProject = {
+                                        type: 'invalid-entrypoint:from-same-project',
+                                        filePath,
+                                        importStatement: resolvedImport.parsedImportStatement.raw,
+                                        withinProject: projectName
+                                    };
+                                    result.push(violation);
+                                }
                                 return;
                             }
                             const allowedEntryPointsOfImportedProject: string[] = projectToEntryPointsMap[importedProject] ?? [];
@@ -47,14 +70,15 @@ export class AccessViaEntrypointsUtil {
                                         return path.relative(yaniceJsonDirectoryPath, entryPoint);
                                     }
                                 );
-                                result.push({
-                                    type: 'invalid-entrypoint',
+                                const violation: AssertionViolationInvalidEntrypoint = {
+                                    type: 'invalid-entrypoint:from-outside',
                                     importedProject,
                                     importStatement: resolvedImport.parsedImportStatement.raw,
                                     expectedEntryPoints: entryPointsRelativeToYaniceJson,
                                     filePath,
                                     withinProject: projectName
-                                });
+                                };
+                                result.push(violation);
                             }
                         });
                     });

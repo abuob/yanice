@@ -17,12 +17,14 @@ export const accessViaEntryPoints: YaniceImportBoundariesAssertion = {
             yaniceJsonDirectoryPath
         );
         const ignoredProjects: string[] = config.assertionOptions?.ignoredProjects ?? [];
+        const allowWithinSameProject: boolean = config.assertionOptions?.accessViaEntryPoints?.allowWithinSameProject ?? false;
         return AccessViaEntrypointsUtil.getRuleViolations(
             yaniceJsonDirectoryPath,
             projectToEntryPointsMap,
             assertionData.fileToImportResolutionsMap,
             assertionData.fileToProjectsMap,
-            ignoredProjects
+            ignoredProjects,
+            allowWithinSameProject
         );
     }
 };

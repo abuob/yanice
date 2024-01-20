@@ -3,6 +3,10 @@ export interface YanicePluginImportBoundariesSkippedImportsOptions {
     amount: number;
 }
 
+export interface YanicePluginImportBoundariesAccessViaEntryPointsOptions {
+    allowWithinSameProject: boolean;
+}
+
 export type importBoundaryAssertionIdentifierType =
     | 'access-via-entrypoints'
     | 'max-skipped-imports'
@@ -16,6 +20,7 @@ export interface YanicePluginImportBoundariesOptions {
     assertionOptions?: {
         skippedImports?: YanicePluginImportBoundariesSkippedImportsOptions;
         ignoredProjects?: string[];
+        accessViaEntryPoints?: YanicePluginImportBoundariesAccessViaEntryPointsOptions;
     };
     assertions?: importBoundaryAssertionIdentifierType[];
     customAssertions?: string[];

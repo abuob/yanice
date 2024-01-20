@@ -47,12 +47,19 @@ export class AssertionLogger {
                 LogUtil.log(`    ${expectedAmountWarning}`);
                 LogUtil.log(`    Did you add or remove an import-exclusion without changing the configured amount in the yanice.json?\n`);
                 return null;
-            case 'invalid-entrypoint':
+            case 'invalid-entrypoint:from-outside':
                 LogUtil.log(`${violation.filePath}:`);
                 LogUtil.log(
                     `    Invalid entrypoint for project "${violation.importedProject}" when imported to project "${violation.withinProject}":`
                 );
                 LogUtil.log(`    Expected entrypoints:  ${violation.expectedEntryPoints.join(', ')}`);
+                LogUtil.log(`    Import statement:      ${violation.importStatement}`);
+                return null;
+            case 'invalid-entrypoint:from-same-project':
+                LogUtil.log(`${violation.filePath}:`);
+                LogUtil.log(
+                    `    Import via entrypoint is not allowed from within same project, as this is often a source of cyclic dependencies.`
+                );
                 LogUtil.log(`    Import statement:      ${violation.importStatement}`);
                 return null;
             case 'custom-assertion-violation':
