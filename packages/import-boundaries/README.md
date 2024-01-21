@@ -88,8 +88,11 @@ the original untranspiled assertion-source-code can be found here: [link to dumm
 
 ### assertionOptions
 
--   `skippedImports`: Only relevant when using `max-skipped-imports`. Define the amount of allowed skipped imports. The `mode`-property defines how the number is interpreted.
 -   `ignoredProjects`: The rules related to boundary-assertions will ignore any listed project. This is especially helpful for "metaprojects" like `all-files`, `all-typescript-files` etc.
+-   `skippedImports`: Only relevant when using `max-skipped-imports`. Define the amount of allowed skipped imports. The `mode`-property defines how the number is interpreted.
+-   `accessViaEntryPoints`: Only relevant when using `access-via-entrypoints`. The `allowWithinSameProject`-flag controls whether entrypoint-access from within the same project is allowed.
+    E.g., if the `index.js` is an entrypoint of `project-A`, whether any other file within `project-A` is allowed to import from the `index.js`.
+    By default, this is not the case, as this often leads to undesired import-circles.
 
 #### Ignoring a particular import
 
