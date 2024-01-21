@@ -60,6 +60,7 @@ export class AssertionLogger {
                 LogUtil.log(
                     `    Import via entrypoint is not allowed from within same project, as this is often a source of cyclic dependencies.`
                 );
+                LogUtil.log(`    Project:               ${violation.withinProject}`);
                 LogUtil.log(`    Import statement:      ${violation.importStatement}`);
                 return null;
             case 'custom-assertion-violation':
