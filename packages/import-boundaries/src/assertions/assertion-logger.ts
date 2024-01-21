@@ -53,7 +53,7 @@ export class AssertionLogger {
                     `    Invalid entrypoint for project "${violation.importedProject}" when imported to project "${violation.withinProject}":`
                 );
                 LogUtil.log(`    Expected entrypoints:  ${violation.expectedEntryPoints.join(', ')}`);
-                LogUtil.log(`    Import statement:      ${violation.importStatement}`);
+                LogUtil.log(`    Import statement:      ${violation.importStatement}\n`);
                 return null;
             case 'invalid-entrypoint:from-same-project':
                 LogUtil.log(`${violation.filePath}:`);
@@ -61,7 +61,7 @@ export class AssertionLogger {
                     `    Import via entrypoint is not allowed from within same project, as this is often a source of cyclic dependencies.`
                 );
                 LogUtil.log(`    Project:               ${violation.withinProject}`);
-                LogUtil.log(`    Import statement:      ${violation.importStatement}`);
+                LogUtil.log(`    Import statement:      ${violation.importStatement}\n`);
                 return null;
             case 'custom-assertion-violation':
                 LogUtil.log(violation.message);
