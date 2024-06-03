@@ -13,6 +13,11 @@ For example, a repository with two projects and two libraries might be modeled a
   <img alt="yanice-visualization-example" src="https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png">
 </p>
 
+In this example, we look at the graph comparing the working tree to `HEAD`. Something in `lib-2` changed.
+If we now run `yanice run test --rev=HEAD`, the test-command of `project-A` would be executed: `lib-2` changed, `project-A`
+depends on `lib-2`, but `lib-2` itself nor `project-B` have a test-command defined (dashed border), therefore only one command is run.
+See below for how to define the project-structure.
+
 ## Assumptions & Caveats:
 
 -   The dependencies between the projects inside the repository can be modeled as
@@ -25,7 +30,7 @@ For example, a repository with two projects and two libraries might be modeled a
 -   Due to the design philosophy of not reading/touching any files inside the repository, yanice can technically be used for any kind of repository, no matter the technology/languages used (node/git must be
     available)
 -   In its current form, yanice only detects changes between the current working tree (w/o uncommitted changes) and a
-    given git-ref (commitSHA, HEAD, branch...). Metadata about last command executions are _not_ stored or considered in any other way. To achieve incremental builds
+    given commit-ish (commitSHA, branch, tag, HEAD...). Metadata about last command executions are _not_ stored or considered in any other way. To achieve incremental builds
     for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare
     to that
 
