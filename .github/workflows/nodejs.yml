@@ -8,10 +8,11 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [16.x, 18.x, 20.x]
+                node-version: [16.x, 18.x, 20.x, 22.x]
 
         steps:
-            - uses: actions/checkout@v3
+            - name: checkout
+              uses: actions/checkout@v3
               with:
                   fetch-depth: 0
             - name: Use Node.js ${{ matrix.node-version }}
@@ -20,10 +21,13 @@ jobs:
                   node-version: ${{ matrix.node-version }}
             - name: npm ci
               run: npm ci
-            - name: format & linting
-              run: |
-                  npm run format:check
-                  npm run lint
+            - name: npm ci
+              run: npm ci
+            - name: formatting
+              if: ${{ matrix.node-version == '22.x'}}
+              run: npm run format:check
+            - name: lint
+              run: npm run lint
             - name: test
               run: npm test
             - name: build yanice & packages
