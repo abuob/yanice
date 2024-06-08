@@ -1,6 +1,6 @@
 import { ImportResolution, ParsedImportStatement, YaniceImportBoundariesImportResolver } from '../../api/import-resolver.interface';
 import { ResolveImportLocationUtil } from '../util/resolve-import-location.util';
-import { Es6DeclarativeImportResolverUtil } from './es6-declarative-import-resolver.util';
+import { Es6DeclarativeImportResolverUtil } from './es6-declarative-import.resolver.util';
 
 const ES6_DECLARATIVE_IMPORT_RESOLVER_NAME: string = 'es6-declarative-import-resolver';
 

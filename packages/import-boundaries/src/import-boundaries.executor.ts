@@ -263,7 +263,7 @@ export class ImportBoundariesExecutor {
                 importBoundariesPluginConfig.importResolvers
             );
 
-        const fileToImportResolutionsMap: FileToImportResolutionsMap = await ImportBoundariesExecutor.postResolveIfNecessaryV2(
+        const fileToImportResolutionsMap: FileToImportResolutionsMap = await ImportBoundariesExecutor.postResolveIfNecessary(
             fileToImportResolutionsMapRaw,
             yaniceJsonDirectoryPath,
             importBoundariesPluginConfig.postResolve,
@@ -273,7 +273,7 @@ export class ImportBoundariesExecutor {
         return fileToImportResolutionsMap;
     }
 
-    private static async postResolveIfNecessaryV2(
+    private static async postResolveIfNecessary(
         fileToResolvedImportsMap: FileToImportResolutionsMap,
         yaniceJsonDirectoryPath: string,
         postResolverLocations: string[] | undefined,

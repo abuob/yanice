@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { ParsedImportStatement } from '../../../api/import-resolver.interface';
-import { Es6DeclarativeImportResolverUtil } from '../es6-declarative-import-resolver.util';
+import { Es6DeclarativeImportResolverUtil } from '../es6-declarative-import.resolver.util';
 
 describe('Es6DeclarativeImportResolverUtil', () => {
     describe('parseImportStatement', () => {
@@ -51,6 +51,11 @@ describe('Es6DeclarativeImportResolverUtil', () => {
                     type: 'relative',
                     fromClause: '../../somewhere',
                     raw: "import a from '../../somewhere'"
+                },
+                "export * from '../../somewhere'": {
+                    type: 'relative',
+                    fromClause: '../../somewhere',
+                    raw: "export * from '../../somewhere'"
                 }
             };
             Object.keys(inputOutputMap).forEach((input: string) => {
@@ -68,6 +73,8 @@ describe('Es6DeclarativeImportResolverUtil', () => {
                 'default-export'
             );
             expect(Es6DeclarativeImportResolverUtil.extractFromClause('import a from "b"')).to.equal('b');
+            expect(Es6DeclarativeImportResolverUtil.extractFromClause("export * from '../../somewhere'")).to.equal('../../somewhere');
+            expect(Es6DeclarativeImportResolverUtil.extractFromClause("export {something} from 'something'")).to.equal('something');
         });
     });
 
@@ -104,13 +111,25 @@ describe('Es6DeclarativeImportResolverUtil', () => {
             importfromsomewhere();
             import_from();
             import a\t from "b";
+            export {blah} from './file';
+            export \tconst someNumber = 1;
+            export default \tfunction myFunc() {};
+            import * from './a';
+            export * from './b';
+            export *  \tfrom './c';
+            export some_const from './c';
             `;
             const actual2: string[] = Es6DeclarativeImportResolverUtil.extractImportStatements(input2);
             const expected2: string[] = [
                 "import {something} from 'somewhere'",
                 "import * as t from 'barrel'",
                 "import def from 'default-export'",
-                'import a from "b"'
+                'import a from "b"',
+                "import * from './a'",
+                "export {blah} from './file'",
+                "export * from './b'",
+                "export * from './c'",
+                "export some_const from './c'"
             ];
             expect(actual2).to.have.same.members(expected2);
             expect(actual2).to.have.length(expected2.length);
