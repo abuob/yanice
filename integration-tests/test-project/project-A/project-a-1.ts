@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import * as ts from 'typescript';
+
 import { dummyB } from '../project-B/project-b';
 // @yanice:import-boundaries ignore-next-line
 import { dummyC } from '../project-C/project-c';

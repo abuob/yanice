@@ -49,6 +49,7 @@ describe('ResolveImportLocationUtil', () => {
                 resolvedPackageImports: [
                     {
                         package: 'chai',
+                        importStatement: "import { expect } from 'chai';",
                         resolvedAbsoluteFilePath: require.resolve('chai')
                     }
                 ],

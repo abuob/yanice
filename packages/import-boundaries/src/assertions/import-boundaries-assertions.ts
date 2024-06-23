@@ -8,6 +8,7 @@ import { accessViaEntryPoints } from './rules/access-via-entrypoints/access-via-
 import { maxSkippedImports } from './rules/max-skipped-imports/max-skipped-imports';
 import { onlyDirectImports } from './rules/only-direct-dependencies/only-direct-imports';
 import { onlyTransitiveImports } from './rules/only-transitive-dependencies/only-transitive-imports';
+import { restrictPackageImports } from './rules/restrict-package-imports/restrict-package-imports';
 import { useAllDeclaredDependencies } from './rules/use-all-declared-dependencies/use-all-declared-dependencies';
 
 export class ImportBoundariesAssertions {
@@ -54,6 +55,8 @@ export class ImportBoundariesAssertions {
                 return maxSkippedImports;
             case 'access-via-entrypoints':
                 return accessViaEntryPoints;
+            case 'restrict-package-imports':
+                return restrictPackageImports;
         }
     }
 

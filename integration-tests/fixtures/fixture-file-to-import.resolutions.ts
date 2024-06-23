@@ -11,6 +11,7 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
                 resolvedPackageImports: [
                     {
                         package: 'yanice',
+                        importStatement: "import type { Phase3Result, YanicePlugin } from 'yanice'",
                         resolvedAbsoluteFilePath: require.resolve('yanice')
                     }
                 ],
@@ -27,10 +28,13 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
                 resolvedPackageImports: [
                     {
                         package: '@yanice/import-boundaries',
+                        importStatement:
+                            "import type { ImportBoundaryAssertionData, YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolation } from '@yanice/import-boundaries'",
                         resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
                     },
                     {
                         package: 'yanice',
+                        importStatement: "import type { Phase3Result, YaniceCliArgs, YanicePluginImportBoundariesOptions } from 'yanice'",
                         resolvedAbsoluteFilePath: require.resolve('yanice')
                     }
                 ],
@@ -47,10 +51,13 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
                 resolvedPackageImports: [
                     {
                         package: 'node:path',
+                        importStatement: "import path from 'node:path'",
                         resolvedAbsoluteFilePath: 'node:path'
                     },
                     {
                         package: '@yanice/import-boundaries',
+                        importStatement:
+                            "import type { ImportResolution, YaniceImportBoundariesImportResolver } from '@yanice/import-boundaries'",
                         resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
                     }
                 ],
@@ -67,6 +74,8 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
                 resolvedPackageImports: [
                     {
                         package: '@yanice/import-boundaries',
+                        importStatement:
+                            "import type { FileToImportResolutions, ImportResolution, YaniceImportBoundariesPostResolver } from '@yanice/import-boundaries'",
                         resolvedAbsoluteFilePath: require.resolve('@yanice/import-boundaries')
                     }
                 ],
@@ -123,7 +132,15 @@ export const fixtureFileToImportResolutions: FileToImportResolutionsMap = {
                         resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFilePathInTestProject('project-A/project-a-2.ts')
                     }
                 ],
-                resolvedPackageImports: [],
+                resolvedPackageImports: [
+                    {
+                        importStatement: "import * as ts from 'typescript'",
+                        package: 'typescript',
+                        resolvedAbsoluteFilePath: IntegrationTestUtil.getAbsoluteFileFromRepoRoot(
+                            'node_modules/typescript/lib/typescript.js'
+                        )
+                    }
+                ],
                 unknownImports: []
             }
         ]

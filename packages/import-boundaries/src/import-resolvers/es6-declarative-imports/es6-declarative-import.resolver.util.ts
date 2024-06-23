@@ -20,7 +20,7 @@ export class Es6DeclarativeImportResolverUtil {
         while ((match = aggregatedExportStatementRegExp.exec(preparedFileContent)) !== null) {
             importStatements.push(match[0]);
         }
-        return importStatements.map((importStatement: string) =>
+        return importStatements.map((importStatement: string): string =>
             Es6DeclarativeImportResolverUtil.normalizeImportStatement(importStatement)
         );
     }

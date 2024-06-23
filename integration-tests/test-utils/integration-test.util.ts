@@ -83,8 +83,12 @@ export class IntegrationTestUtil {
         return testLog[project] ?? [];
     }
 
-    public static getAbsoluteFilePathInTestProject(filePath: string): string {
-        return path.join(__dirname, '../test-project', filePath);
+    public static getAbsoluteFilePathInTestProject(relativePathToTestProject: string): string {
+        return path.join(__dirname, '../test-project', relativePathToTestProject);
+    }
+
+    public static getAbsoluteFileFromRepoRoot(relativePathToRepoRoot: string): string {
+        return path.join(IntegrationTestUtil.repoRoot, relativePathToRepoRoot);
     }
 
     public static mapProjectNameToEmptyTxt(project: allProjectsType): string {

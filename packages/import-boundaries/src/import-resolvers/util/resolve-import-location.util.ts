@@ -46,6 +46,7 @@ export class ResolveImportLocationUtil {
                     ResolveImportLocationUtil.resolvePackageLikeImport(parsedImportStatement);
                 if (resolvedPackageImportOrNull) {
                     fileImportMap.resolvedPackageImports.push({
+                        importStatement: parsedImportStatement.raw,
                         package: parsedImportStatement.fromClause,
                         resolvedAbsoluteFilePath: resolvedPackageImportOrNull
                     });

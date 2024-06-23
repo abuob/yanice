@@ -21,7 +21,22 @@
                         "amount": 0,
                         "mode": "exact"
                     },
-                    "ignoredProjects": ["ALL-FILES"]
+                    "ignoredProjects": ["ALL-FILES"],
+                    "restrictPackageImports": {
+                        "allPackagesMustBeListed": true,
+                        "allowConfiguration": {
+                            "allowByDefault": [],
+                            "exceptions": {
+                                "B": []
+                            }
+                        },
+                        "blockConfiguration": {
+                            "blockByDefault": [],
+                            "exceptions": {
+                                "B": []
+                            }
+                        }
+                    }
                 }
             }
         }

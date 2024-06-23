@@ -8,6 +8,10 @@ export type YaniceImportBoundariesAssertionViolation =
     | AssertionViolationImportNotConfigured
     | AssertionViolationInvalidEntrypoint
     | AssertionViolationInvalidEntrypointFromWithinSameProject
+    | AssertionViolationRestrictPackageImportAllPackagesMustBeListed
+    | AssertionViolationRestrictPackageImportBlockedPackage
+    | AssertionViolationRestrictPackageImportInvalidConfigurationKeys
+    | AssertionViolationRestrictPackageImportMissingConfig
     | AssertionViolationSkippedImportOptionsNotConfigured
     | AssertionViolationSkippedImportsNotEqualsConfiguredAmount
     | AssertionViolationSkippedImportsTooMany
@@ -65,6 +69,30 @@ export interface AssertionViolationInvalidEntrypointFromWithinSameProject {
     withinProject: string;
     filePath: string;
     importStatement: string;
+}
+
+export interface AssertionViolationRestrictPackageImportMissingConfig {
+    type: 'restrict-package-import::missing-config';
+}
+
+export interface AssertionViolationRestrictPackageImportInvalidConfigurationKeys {
+    type: 'restrict-package-import::invalid-configuration-keys';
+    list: 'allowlist' | 'blocklist';
+    notAProjectName: string;
+}
+
+export interface AssertionViolationRestrictPackageImportBlockedPackage {
+    type: 'restrict-package-import::blocked-package';
+    importStatement: string;
+    filePath: string;
+    withinProject: string;
+}
+
+export interface AssertionViolationRestrictPackageImportAllPackagesMustBeListed {
+    type: 'restrict-package-import::all-packages-must-be-listed';
+    importStatement: string;
+    filePath: string;
+    withinProject: string;
 }
 
 export interface AssertionViolationCustomAssertion {

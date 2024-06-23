@@ -63,6 +63,29 @@ export class AssertionLogger {
                 LogUtil.log(`    Project:               ${violation.withinProject}`);
                 LogUtil.log(`    Import statement:      ${violation.importStatement}\n`);
                 return null;
+            case 'restrict-package-import::missing-config':
+                LogUtil.log('restrict-package-import:');
+                LogUtil.log(
+                    '    This rule requires its assertionOptions to be configured, to know which package-imports are allowed and which not.\n'
+                );
+                return null;
+            case 'restrict-package-import::invalid-configuration-keys':
+                LogUtil.log('restrict-package-import:');
+                LogUtil.log(`    For the exceptions of ${violation.list}, found key: "${violation.notAProjectName}"`);
+                LogUtil.log('    All keys must be project-names, which does not seem to be the case here. Was this a typo?\n');
+                return null;
+            case 'restrict-package-import::all-packages-must-be-listed':
+                LogUtil.log(`${violation.filePath}:`);
+                LogUtil.log(
+                    `    The option "allPackagesMustBeListed" for 'restrict-package-imports' is enabled, all package-imports must be allowed or blocked.`
+                );
+                LogUtil.log(`    The import "${violation.importStatement}" is neither allowed nor blocked.\n`);
+                return null;
+            case 'restrict-package-import::blocked-package':
+                LogUtil.log(`${violation.filePath}:`);
+                LogUtil.log(`    Within project:        ${violation.withinProject}`);
+                LogUtil.log(`    Found blocked import:  ${violation.importStatement}\n`);
+                return null;
             case 'custom-assertion-violation':
                 LogUtil.log(violation.message);
                 return null;

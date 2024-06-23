@@ -84,6 +84,65 @@
                                             },
                                             "required": ["allowWithinSameProject"],
                                             "additionalProperties": false
+                                        },
+                                        "restrictPackageImports": {
+                                            "type": "object",
+                                            "properties": {
+                                                "allPackagesMustBeListed": {
+                                                    "type": "boolean"
+                                                },
+                                                "allowConfiguration": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "allowByDefault": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "exceptions": {
+                                                            "type": "object",
+                                                            "patternProperties": {
+                                                                "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "additionalProperties": false
+                                                        }
+                                                    },
+                                                    "required": ["allowByDefault"],
+                                                    "additionalProperties": false
+                                                },
+                                                "blockConfiguration": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "blockByDefault": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "exceptions": {
+                                                            "type": "object",
+                                                            "patternProperties": {
+                                                                "^[a-zA-Z][0-9a-zA-Z-]*$": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "additionalProperties": false
+                                                        }
+                                                    },
+                                                    "required": ["blockByDefault"],
+                                                    "additionalProperties": false
+                                                }
+                                            },
+                                            "additionalProperties": false
                                         }
                                     },
                                     "additionalProperties": false

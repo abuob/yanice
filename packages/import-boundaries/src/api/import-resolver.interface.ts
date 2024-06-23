@@ -19,13 +19,16 @@ export interface ImportResolutionResolvedImport {
     resolvedAbsoluteFilePath: string;
 }
 
+export interface ImportResolutionResolvedPackageImport {
+    importStatement: string;
+    package: string;
+    resolvedAbsoluteFilePath: string;
+}
+
 export interface ImportResolution {
     createdBy: string;
     resolvedImports: ImportResolutionResolvedImport[];
-    resolvedPackageImports: {
-        package: string;
-        resolvedAbsoluteFilePath: string;
-    }[];
+    resolvedPackageImports: ImportResolutionResolvedPackageImport[];
     unknownImports: ParsedImportStatement[];
 }
 

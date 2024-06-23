@@ -80,6 +80,8 @@ Array of officially provided assertions. Currently supported:
 -   `max-skipped-imports`: See also how to ignore imports below. The rule allows to check/enforce only a certain amount of skipped imports.
 -   `access-via-entrypoints`: It is sometimes desirable to access a project from other projects only via defined entrypoints, such as e.g. an `index.ts`, `public_api.ts` or some such, and disallow "deep" imports to arbitrary files.
     This rule helps with that. Define one or multiple entry-points via the `entrypoints`-property for each project. This rule will then ensure that every import from another project accesses the project via a defined entrypoint.
+-   `restrict-package-imports`: Restrict which project is allowed to import from which package (where a "package"-import is any import that is not a relative import).
+    The configuration supports both allowlists and blocklists.
 
 ### customAssertions
 
