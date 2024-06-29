@@ -92,7 +92,7 @@ describe('RestrictPackageImportsUtil', (): void => {
     });
 
     describe('getRuleViolations', (): void => {
-        describe('simple cases with 1:1 file-to-project relationships', () => {
+        describe('simple cases (1:1 file-to-project relationships)', () => {
             const projectNames: string[] = ['a', 'b', 'c'];
             const fileToProjectsMap: Record<string, string[]> = {
                 'file-a': ['a'],
@@ -110,91 +110,233 @@ describe('RestrictPackageImportsUtil', (): void => {
                 projectDependencyGraph: {}
             };
 
-            it('should not return any violation if all package-imports are allowed', (): void => {
-                const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
-                    allPackagesMustBeListed: true,
-                    allowConfiguration: {
-                        allowByDefault: []
-                    },
-                    blockConfiguration: {
-                        blockByDefault: ['package-A1', 'package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
-                        exceptions: {
-                            a: ['package-A1', 'package-A2'],
-                            b: ['package-B1', 'package-B2'],
-                            c: ['package-C1', 'package-C2']
+            describe('blocklist', (): void => {
+                it('should not return any violation if all package-imports are allowed', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        allPackagesMustBeListed: true,
+                        allowConfiguration: {
+                            allowByDefault: []
+                        },
+                        blockConfiguration: {
+                            blockByDefault: ['package-A1', 'package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                            exceptions: {
+                                a: ['package-A1', 'package-A2'],
+                                b: ['package-B1', 'package-B2'],
+                                c: ['package-C1', 'package-C2']
+                            }
                         }
-                    }
-                };
+                    };
 
-                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
-                    projectNames,
-                    assertionData,
-                    options,
-                    []
-                );
-                expect(result).to.deep.equal([]);
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    expect(result).to.deep.equal([]);
+                });
+
+                it('should not return an "all packages must be listed" error if a package is not handled but the corresponding flag is set to false', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        // flag is set to false
+                        allPackagesMustBeListed: false,
+                        allowConfiguration: {
+                            allowByDefault: []
+                        },
+                        blockConfiguration: {
+                            // "package-A1" is not explicitly listed
+                            blockByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                            exceptions: {
+                                a: ['package-A2'],
+                                b: ['package-B1', 'package-B2'],
+                                c: ['package-C1', 'package-C2']
+                            }
+                        }
+                    };
+
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    expect(result).to.deep.equal([]);
+                });
+
+                it('should return an "all packages must be listed" error if a package is not handled and the corresponding flag is set to true', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        // flag is set to true
+                        allPackagesMustBeListed: true,
+                        allowConfiguration: {
+                            allowByDefault: []
+                        },
+                        blockConfiguration: {
+                            // "package-A1" is not explicitly listed
+                            blockByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                            exceptions: {
+                                a: ['package-A2'],
+                                b: ['package-B1', 'package-B2'],
+                                c: ['package-C1', 'package-C2']
+                            }
+                        }
+                    };
+
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    const expected: YaniceImportBoundariesAssertionViolation[] = [
+                        {
+                            filePath: 'file-a',
+                            importStatement: "import { something } from 'package-A1'",
+                            type: 'restrict-package-import::all-packages-must-be-listed',
+                            withinProject: 'a'
+                        }
+                    ];
+                    expect(result).to.deep.equal(expected);
+                });
+
+                it('should return an import-violation if a blocked package is imported', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        allPackagesMustBeListed: true,
+                        allowConfiguration: {
+                            allowByDefault: []
+                        },
+                        blockConfiguration: {
+                            blockByDefault: ['package-A1', 'package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                            exceptions: {
+                                // "package-A1" is not allowed
+                                a: ['package-A2'],
+                                b: ['package-B1', 'package-B2'],
+                                c: ['package-C1', 'package-C2']
+                            }
+                        }
+                    };
+
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    const expected: YaniceImportBoundariesAssertionViolation[] = [
+                        {
+                            filePath: 'file-a',
+                            importStatement: "import { something } from 'package-A1'",
+                            type: 'restrict-package-import::blocked-package',
+                            withinProject: 'a'
+                        }
+                    ];
+                    expect(result).to.deep.equal(expected);
+                });
             });
 
-            it('should not return an "all packages must be listed" error if a package is not handled but the corresponding flag is set to false', (): void => {
-                const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
-                    // flag is set to false
-                    allPackagesMustBeListed: false,
-                    allowConfiguration: {
-                        allowByDefault: []
-                    },
-                    blockConfiguration: {
-                        // "package-A1" is not explicitly listed
-                        blockByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
-                        exceptions: {
-                            a: ['package-A2'],
-                            b: ['package-B1', 'package-B2'],
-                            c: ['package-C1', 'package-C2']
+            describe('allowlist', (): void => {
+                it('should not return any violation if all package-imports are allowed', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        allPackagesMustBeListed: true,
+                        allowConfiguration: {
+                            allowByDefault: ['package-A1', 'package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2']
+                        },
+                        blockConfiguration: {
+                            blockByDefault: []
                         }
-                    }
-                };
+                    };
 
-                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
-                    projectNames,
-                    assertionData,
-                    options,
-                    []
-                );
-                expect(result).to.deep.equal([]);
-            });
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    expect(result).to.deep.equal([]);
+                });
 
-            it('should return an "all packages must be listed" error if a package is not handled and the corresponding flag is set to true', (): void => {
-                const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
-                    // flag is set to true
-                    allPackagesMustBeListed: true,
-                    allowConfiguration: {
-                        allowByDefault: []
-                    },
-                    blockConfiguration: {
-                        // "package-A1" is not explicitly listed
-                        blockByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
-                        exceptions: {
-                            a: ['package-A2'],
-                            b: ['package-B1', 'package-B2'],
-                            c: ['package-C1', 'package-C2']
+                it('should not return an "all packages must be listed" error if a package is not handled but the corresponding flag is set to false', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        // flag is set to false
+                        allPackagesMustBeListed: false,
+                        allowConfiguration: {
+                            // "package-A1" is not explicitly listed
+                            allowByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2']
+                        },
+                        blockConfiguration: {
+                            blockByDefault: []
                         }
-                    }
-                };
+                    };
 
-                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
-                    projectNames,
-                    assertionData,
-                    options,
-                    []
-                );
-                const expected: YaniceImportBoundariesAssertionViolation[] = [
-                    {
-                        filePath: 'file-a',
-                        importStatement: "import { something } from 'package-A1'",
-                        type: 'restrict-package-import::all-packages-must-be-listed',
-                        withinProject: 'a'
-                    }
-                ];
-                expect(result).to.deep.equal(expected);
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    expect(result).to.deep.equal([]);
+                });
+
+                it('should return an "all packages must be listed" error if a package is not handled and the corresponding flag is set to true', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        // flag is set to true
+                        allPackagesMustBeListed: true,
+                        allowConfiguration: {
+                            // "package-A1" is not explicitly listed
+                            allowByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2']
+                        },
+                        blockConfiguration: {
+                            blockByDefault: []
+                        }
+                    };
+
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    const expected: YaniceImportBoundariesAssertionViolation[] = [
+                        {
+                            filePath: 'file-a',
+                            importStatement: "import { something } from 'package-A1'",
+                            type: 'restrict-package-import::all-packages-must-be-listed',
+                            withinProject: 'a'
+                        }
+                    ];
+                    expect(result).to.deep.equal(expected);
+                });
+
+                it('should return an import-violation if an allowed package is imported in a project which has it listed as exception', (): void => {
+                    const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                        allPackagesMustBeListed: true,
+                        allowConfiguration: {
+                            allowByDefault: ['package-A1', 'package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                            exceptions: {
+                                // "package-A1" is not allowed
+                                a: ['package-A1']
+                            }
+                        },
+                        blockConfiguration: {
+                            blockByDefault: []
+                        }
+                    };
+
+                    const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                        projectNames,
+                        assertionData,
+                        options,
+                        []
+                    );
+                    const expected: YaniceImportBoundariesAssertionViolation[] = [
+                        {
+                            filePath: 'file-a',
+                            importStatement: "import { something } from 'package-A1'",
+                            type: 'restrict-package-import::blocked-package',
+                            withinProject: 'a'
+                        }
+                    ];
+                    expect(result).to.deep.equal(expected);
+                });
             });
         });
     });
