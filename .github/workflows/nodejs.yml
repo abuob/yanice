@@ -21,8 +21,6 @@ jobs:
                   node-version: ${{ matrix.node-version }}
             - name: npm ci
               run: npm ci
-            - name: npm ci
-              run: npm ci
             - name: formatting
               if: ${{ matrix.node-version == '22.x'}}
               run: npm run format:check
