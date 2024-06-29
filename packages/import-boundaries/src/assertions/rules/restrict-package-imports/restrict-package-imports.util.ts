@@ -1,4 +1,4 @@
-import { YanicePluginImportBoundariesOptions, YanicePluginImportBoundariesRestrictPackageImportsOptions } from 'yanice';
+import { YanicePluginImportBoundariesRestrictPackageImportsOptions } from 'yanice';
 
 import {
     AssertionViolationRestrictPackageImportAllPackagesMustBeListed,
@@ -14,14 +14,9 @@ export class RestrictPackageImportsUtil {
     public static getRuleViolations(
         projectNames: string[],
         assertionData: ImportBoundaryAssertionData,
-        config: YanicePluginImportBoundariesOptions
+        restrictPackageImportOptions: YanicePluginImportBoundariesRestrictPackageImportsOptions,
+        ignoredProjects: string[]
     ): YaniceImportBoundariesAssertionViolation[] {
-        const restrictPackageImportOptions: YanicePluginImportBoundariesRestrictPackageImportsOptions | undefined =
-            config.assertionOptions?.restrictPackageImports;
-        const ignoredProjects: string[] = config.assertionOptions?.ignoredProjects ?? [];
-        if (!restrictPackageImportOptions) {
-            return [];
-        }
         const allowedByDefault: string[] = restrictPackageImportOptions.allowConfiguration.allowByDefault;
         const blockedByDefault: string[] = restrictPackageImportOptions.blockConfiguration.blockByDefault;
         const allPackagesMustBeListed: boolean = restrictPackageImportOptions.allPackagesMustBeListed ?? false;

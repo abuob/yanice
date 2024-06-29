@@ -24,9 +24,11 @@
         "lint:fix": "eslint . --fix",
         "test": "mocha -r ts-node/register \"+(src|packages)/**/*.spec.ts\"",
         "assert-boundaries": "node dist/bin.js plugin:import-boundaries relative-import-boundaries --assert",
-        "integration-tests": "npm run build && mocha -r ts-node/register \"integration-tests/**/*.spec.ts\" --timeout 10000",
-        "prepublishOnly": "npm run format:check && npm run lint && npm test && npm run integration-tests && npm run assert-boundaries",
-        "prep-pr": "npm run format && npm run lint:fix && npm run test && npm run integration-tests && npm run assert-boundaries",
+        "integration-tests": "npm run build && npm run integration-tests:run",
+        "integration-tests:run": "mocha -r ts-node/register \"integration-tests/**/*.spec.ts\" --timeout 10000",
+        "build-and-test": "npm run build && npm test && npm run integration-tests:run && npm run assert-boundaries",
+        "prepublishOnly": "npm run format:check && npm run lint && npm run build-and-test",
+        "prep-pr": "npm run format && npm run lint:fix && npm run build-and-test",
         "test-log": "node integration-tests/test-utils/test-log-execution.js"
     },
     "keywords": [

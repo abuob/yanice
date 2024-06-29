@@ -2,6 +2,12 @@ import { expect } from 'chai';
 import type { YanicePluginImportBoundariesRestrictPackageImportsOptions } from 'yanice';
 
 import type { YaniceImportBoundariesAssertionViolation } from '../../../../api/assertion.interface';
+import type { ImportBoundaryAssertionData } from '../../../../api/import-boundary-assertion-data';
+import type {
+    FileToImportResolutionsMap,
+    ImportResolution,
+    ImportResolutionResolvedPackageImport
+} from '../../../../api/import-resolver.interface';
 import { RestrictPackageImportsUtil } from '../restrict-package-imports.util';
 
 describe('RestrictPackageImportsUtil', (): void => {
@@ -84,4 +90,145 @@ describe('RestrictPackageImportsUtil', (): void => {
             expect(result).to.deep.equal(expected);
         });
     });
+
+    describe('getRuleViolations', (): void => {
+        describe('simple cases with 1:1 file-to-project relationships', () => {
+            const projectNames: string[] = ['a', 'b', 'c'];
+            const fileToProjectsMap: Record<string, string[]> = {
+                'file-a': ['a'],
+                'file-b': ['b'],
+                'file-c': ['c']
+            };
+            const fileToImportResolutionsMap: FileToImportResolutionsMap = createFileToImportResolutionsMap({
+                'file-a': ['package-A1', 'package-A2'],
+                'file-b': ['package-B1', 'package-B2'],
+                'file-c': ['package-C1', 'package-C2']
+            });
+            const assertionData: ImportBoundaryAssertionData = {
+                fileToProjectsMap,
+                fileToImportResolutionsMap,
+                projectDependencyGraph: {}
+            };
+
+            it('should not return any violation if all package-imports are allowed', (): void => {
+                const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                    allPackagesMustBeListed: true,
+                    allowConfiguration: {
+                        allowByDefault: []
+                    },
+                    blockConfiguration: {
+                        blockByDefault: ['package-A1', 'package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                        exceptions: {
+                            a: ['package-A1', 'package-A2'],
+                            b: ['package-B1', 'package-B2'],
+                            c: ['package-C1', 'package-C2']
+                        }
+                    }
+                };
+
+                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                    projectNames,
+                    assertionData,
+                    options,
+                    []
+                );
+                expect(result).to.deep.equal([]);
+            });
+
+            it('should not return an "all packages must be listed" error if a package is not handled but the corresponding flag is set to false', (): void => {
+                const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                    // flag is set to false
+                    allPackagesMustBeListed: false,
+                    allowConfiguration: {
+                        allowByDefault: []
+                    },
+                    blockConfiguration: {
+                        // "package-A1" is not explicitly listed
+                        blockByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                        exceptions: {
+                            a: ['package-A2'],
+                            b: ['package-B1', 'package-B2'],
+                            c: ['package-C1', 'package-C2']
+                        }
+                    }
+                };
+
+                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                    projectNames,
+                    assertionData,
+                    options,
+                    []
+                );
+                expect(result).to.deep.equal([]);
+            });
+
+            it('should return an "all packages must be listed" error if a package is not handled and the corresponding flag is set to true', (): void => {
+                const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                    // flag is set to true
+                    allPackagesMustBeListed: true,
+                    allowConfiguration: {
+                        allowByDefault: []
+                    },
+                    blockConfiguration: {
+                        // "package-A1" is not explicitly listed
+                        blockByDefault: ['package-A2', 'package-B1', 'package-B2', 'package-C1', 'package-C2'],
+                        exceptions: {
+                            a: ['package-A2'],
+                            b: ['package-B1', 'package-B2'],
+                            c: ['package-C1', 'package-C2']
+                        }
+                    }
+                };
+
+                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                    projectNames,
+                    assertionData,
+                    options,
+                    []
+                );
+                const expected: YaniceImportBoundariesAssertionViolation[] = [
+                    {
+                        filePath: 'file-a',
+                        importStatement: "import { something } from 'package-A1'",
+                        type: 'restrict-package-import::all-packages-must-be-listed',
+                        withinProject: 'a'
+                    }
+                ];
+                expect(result).to.deep.equal(expected);
+            });
+        });
+    });
 });
+
+function createFileToImportResolutionsMap(fileToPackageImportsMap: Record<string, string[]>): FileToImportResolutionsMap {
+    const emptyImportResolution: ImportResolution = {
+        createdBy: 'irrelevant-for-test',
+        unknownImports: [],
+        resolvedPackageImports: [],
+        resolvedImports: []
+    };
+    return Object.keys(fileToPackageImportsMap).reduce((prev: FileToImportResolutionsMap, curr: string): FileToImportResolutionsMap => {
+        const resolvedPackageImports: ImportResolutionResolvedPackageImport[] | undefined = fileToPackageImportsMap[curr]?.map(
+            (packageName: string): ImportResolutionResolvedPackageImport => {
+                return {
+                    package: packageName,
+                    resolvedAbsoluteFilePath: 'irrelevant-for-test',
+                    importStatement: `import { something } from '${packageName}'`
+                };
+            }
+        );
+
+        return {
+            ...prev,
+            [curr]: {
+                importResolutions: [
+                    {
+                        ...emptyImportResolution,
+                        resolvedPackageImports: resolvedPackageImports ?? []
+                    }
+                ],
+                skippedImports: []
+            }
+        };
+    }, {});
+}

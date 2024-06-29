@@ -27,6 +27,10 @@ export const restrictPackageImports: YaniceImportBoundariesAssertion = {
         if (configurationViolations.length > 0) {
             return configurationViolations;
         }
-        return RestrictPackageImportsUtil.getRuleViolations(projectNames, assertionData, config);
+        if (!options) {
+            return [];
+        }
+        const ignoredProjects: string[] = config.assertionOptions?.ignoredProjects ?? [];
+        return RestrictPackageImportsUtil.getRuleViolations(projectNames, assertionData, options, ignoredProjects);
     }
 };
