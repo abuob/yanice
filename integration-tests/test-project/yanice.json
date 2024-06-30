@@ -14,7 +14,7 @@
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
                 "postResolve": ["./custom-scripts/dist/dummy-post-resolve.js"],
-                "assertions": ["only-direct-imports", "max-skipped-imports", "use-all-declared-dependencies"],
+                "assertions": ["only-direct-imports", "max-skipped-imports", "use-all-declared-dependencies", "restrict-package-imports"],
                 "customAssertions": ["./custom-scripts/dist/dummy-assertion.js"],
                 "assertionOptions": {
                     "skippedImports": {
@@ -25,15 +25,12 @@
                     "restrictPackageImports": {
                         "allPackagesMustBeListed": true,
                         "allowConfiguration": {
-                            "allowByDefault": [],
-                            "exceptions": {
-                                "B": []
-                            }
+                            "allowByDefault": []
                         },
                         "blockConfiguration": {
-                            "blockByDefault": [],
+                            "blockByDefault": ["typescript"],
                             "exceptions": {
-                                "B": []
+                                "A": ["typescript"]
                             }
                         }
                     }

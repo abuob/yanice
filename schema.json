@@ -42,7 +42,8 @@
                                             "only-transitive-dependencies",
                                             "use-all-declared-dependencies",
                                             "max-skipped-imports",
-                                            "access-via-entrypoints"
+                                            "access-via-entrypoints",
+                                            "restrict-package-imports"
                                         ]
                                     }
                                 },
