@@ -95,6 +95,9 @@ the original untranspiled assertion-source-code can be found here: [link to dumm
 -   `accessViaEntryPoints`: Only relevant when using `access-via-entrypoints`. The `allowWithinSameProject`-flag controls whether entrypoint-access from within the same project is allowed.
     E.g., if the `index.js` is an entrypoint of `project-A`, whether any other file within `project-A` is allowed to import from the `index.js`.
     By default, this is not the case, as this often leads to undesired import-circles.
+-   `restrictPackageImports`: Only relevant when using the `restrict-package-imports`-rule. When `allPackagesMustBeListed` is set to `true`,
+    all imported packages must either be explicitly allowed or blocked. The `allowList` and `blockList` allow or block packages by default,
+    with the possibility to list exceptions to the rule on a per-project-basis.
 
 #### Ignoring a particular import
 
