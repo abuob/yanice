@@ -339,6 +339,117 @@ describe('RestrictPackageImportsUtil', (): void => {
                 });
             });
         });
+
+        describe('file belonging to multiple projects', (): void => {
+            const projectNames: string[] = ['a', 'b', 'c'];
+            const fileToProjectsMap: Record<string, string[]> = {
+                'file-a': ['a'],
+                'file-b': ['b'],
+                'file-c': ['c'],
+                'file-ab': ['a', 'b']
+            };
+            const fileToImportResolutionsMap: FileToImportResolutionsMap = createFileToImportResolutionsMap({
+                'file-a': ['package-A1', 'package-A2'],
+                'file-b': ['package-B1', 'package-B2'],
+                'file-c': ['package-C1', 'package-C2'],
+                'file-ab': ['package-A1', 'package-B2']
+            });
+            const assertionData: ImportBoundaryAssertionData = {
+                fileToProjectsMap,
+                fileToImportResolutionsMap,
+                projectDependencyGraph: {}
+            };
+
+            const options: YanicePluginImportBoundariesRestrictPackageImportsOptions = {
+                allPackagesMustBeListed: true,
+                allowConfiguration: {
+                    // all "1"-packages are allowed, "2" are forbidden. For C, it's inverse due to exceptions
+                    allowByDefault: ['package-A1', 'package-B1', 'package-C1'],
+                    exceptions: {
+                        c: ['package-C1']
+                    }
+                },
+                blockConfiguration: {
+                    blockByDefault: ['package-A2', 'package-B2', 'package-C2'],
+                    exceptions: {
+                        c: ['package-C2']
+                    }
+                }
+            };
+
+            it('should handle files belonging to multiple projects correctly; all violations for every project need to be listed', (): void => {
+                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                    projectNames,
+                    assertionData,
+                    options,
+                    []
+                );
+                const expected: YaniceImportBoundariesAssertionViolation[] = [
+                    {
+                        filePath: 'file-a',
+                        importStatement: "import { something } from 'package-A2'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'a'
+                    },
+                    {
+                        filePath: 'file-ab',
+                        importStatement: "import { something } from 'package-B2'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'a'
+                    },
+                    {
+                        filePath: 'file-b',
+                        importStatement: "import { something } from 'package-B2'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'b'
+                    },
+                    {
+                        filePath: 'file-ab',
+                        importStatement: "import { something } from 'package-B2'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'b'
+                    },
+                    {
+                        filePath: 'file-c',
+                        importStatement: "import { something } from 'package-C1'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'c'
+                    }
+                ];
+                expect(result).to.deep.equal(expected);
+            });
+
+            it('should respect the ignoredProjects properly', (): void => {
+                const result: YaniceImportBoundariesAssertionViolation[] = RestrictPackageImportsUtil.getRuleViolations(
+                    projectNames,
+                    assertionData,
+                    options,
+                    ['a']
+                );
+                // 'a' is ignored, no violation is therefore reported
+                const expected: YaniceImportBoundariesAssertionViolation[] = [
+                    {
+                        filePath: 'file-b',
+                        importStatement: "import { something } from 'package-B2'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'b'
+                    },
+                    {
+                        filePath: 'file-ab',
+                        importStatement: "import { something } from 'package-B2'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'b'
+                    },
+                    {
+                        filePath: 'file-c',
+                        importStatement: "import { something } from 'package-C1'",
+                        type: 'restrict-package-import::blocked-package',
+                        withinProject: 'c'
+                    }
+                ];
+                expect(result).to.deep.equal(expected);
+            });
+        });
     });
 });
 
