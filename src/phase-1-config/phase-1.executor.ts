@@ -1,3 +1,4 @@
+import { LogUtil } from '../util/log-util';
 import { PhaseExecutor } from '../util/phase-executor';
 import { YaniceCliArgs, YaniceModeType } from './args-parser/cli-args.interface';
 import { YaniceCliArgsParser } from './args-parser/cli-args-parser';
@@ -131,7 +132,15 @@ export class Phase1Executor extends PhaseExecutor {
             this.exitYanice(1, 'dep-graph cannot be constructed!');
         }
         if (DirectedGraphUtil.hasCycle(this.depGraph)) {
-            this.exitYanice(1, 'dependency graph must not contain a cycle!');
+            const allCycles: string[][] = DirectedGraphUtil.findCycles(this.depGraph);
+            LogUtil.log('Found the following cycles:\n');
+            allCycles.forEach((cycle: string[], index: number) => {
+                LogUtil.log(`cycle #${index} (length: ${cycle.length}):`);
+                const firstElement: string | undefined = cycle[0];
+                const cycleWithFirstElementRepeatedAtEnd: string[] = firstElement ? cycle.concat(firstElement) : cycle;
+                LogUtil.consoleLog(cycleWithFirstElementRepeatedAtEnd.join(' -> '));
+            });
+            this.exitYanice(1, '\nDependency Graph must not contain a cycle!');
         }
         return this;
     }

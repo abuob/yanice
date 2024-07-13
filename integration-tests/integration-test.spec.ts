@@ -26,6 +26,15 @@ describe('yanice', (): void => {
             const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
             expect(output).to.deep.equal(IntegrationTestUtil.getTextFixtureContent('fixture-bad-input.txt'));
         });
+
+        it('should exit non-zero and print the cycle if a dependency-scope is invalid due to a cycle', async (): Promise<void> => {
+            const commandResult = await IntegrationTestUtil.executeYaniceWithArgsAsync('output-only illegal-cycle --all --rev=HEAD');
+            expect(commandResult.statusCode).to.equal(1);
+            expect(commandResult.stderr).to.equal(null);
+
+            const output: string = IntegrationTestUtil.normalizeTextOutput(commandResult.stdout);
+            expect(output).to.deep.equal(IntegrationTestUtil.getTextFixtureContent('fixture-bad-config-graph-contains-cycles.txt'));
+        });
     });
 
     describe('output-only', (): void => {

@@ -88,6 +88,14 @@
         }
     ],
     "dependencyScopes": {
+        "illegal-cycle": {
+            "dependencies": {
+                "ALL-FILES": [],
+                "A": ["B"],
+                "B": ["C"],
+                "C": ["A"]
+            }
+        },
         "flat-all-projects-have-commands": {
             "dependencies": {
                 "ALL-FILES": [],

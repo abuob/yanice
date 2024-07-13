@@ -1,0 +1,6 @@
+Found the following cycles:
+
+cycle #0 (length: 3):
+A -> B -> C -> A
+
+Dependency Graph must not contain a cycle!
