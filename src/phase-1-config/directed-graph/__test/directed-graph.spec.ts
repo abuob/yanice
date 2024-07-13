@@ -2,57 +2,72 @@ import { expect } from 'chai';
 
 import { DirectedGraphUtil } from '../directed-graph';
 
-const graph0 = DirectedGraphUtil.directedGraphBuilder.build();
-const graph1 = DirectedGraphUtil.directedGraphBuilder.addNode('A').addNode('B').createDirectedEdge('A', 'B').build();
-const graph2 = DirectedGraphUtil.directedGraphBuilder
-    .addNode('A')
-    .addNode('B')
-    .addNode('C')
-    .createDirectedEdge('A', 'B')
-    .createDirectedEdge('B', 'C')
-    .build();
-const graph3 = DirectedGraphUtil.directedGraphBuilder
-    .addNode('A')
-    .addNode('B')
-    .addNode('C')
-    .addNode('D')
-    .addNode('E')
-    .createDirectedEdge('A', 'B')
-    .createDirectedEdge('A', 'C')
-    .createDirectedEdge('B', 'D')
-    .createDirectedEdge('C', 'D')
-    .createDirectedEdge('D', 'E')
-    .build();
-
 describe('DirectedGraphUtil', () => {
+    const graph0 = DirectedGraphUtil.directedGraphBuilder.build();
+    const graph1 = DirectedGraphUtil.directedGraphBuilder.addNode('A').addNode('B').createDirectedEdge('A', 'B').build();
+    const graph2 = DirectedGraphUtil.directedGraphBuilder
+        .addNode('A')
+        .addNode('B')
+        .addNode('C')
+        .createDirectedEdge('A', 'B')
+        .createDirectedEdge('B', 'C')
+        .build();
+    const graph3 = DirectedGraphUtil.directedGraphBuilder
+        .addNode('A')
+        .addNode('B')
+        .addNode('C')
+        .addNode('D')
+        .addNode('E')
+        .createDirectedEdge('A', 'B')
+        .createDirectedEdge('A', 'C')
+        .createDirectedEdge('B', 'D')
+        .createDirectedEdge('C', 'D')
+        .createDirectedEdge('D', 'E')
+        .build();
+
+    const cyclicGraph0 = DirectedGraphUtil.directedGraphBuilder.addNode('A').createDirectedEdge('A', 'A').build();
+    const cyclicGraph1 = DirectedGraphUtil.directedGraphBuilder
+        .addNode('A')
+        .addNode('B')
+        .createDirectedEdge('A', 'B')
+        .createDirectedEdge('B', 'A')
+        .build();
+    const cyclicGraph2 = DirectedGraphUtil.directedGraphBuilder
+        .addNode('A')
+        .addNode('B')
+        .addNode('C')
+        .createDirectedEdge('A', 'B')
+        .createDirectedEdge('B', 'C')
+        .createDirectedEdge('C', 'A')
+        .build();
+    const cyclicGraph3 = DirectedGraphUtil.directedGraphBuilder
+        .addNode('A')
+        .addNode('B')
+        .addNode('C')
+        .addNode('D')
+        .createDirectedEdge('A', 'B')
+        .createDirectedEdge('A', 'C')
+        .createDirectedEdge('B', 'D')
+        .createDirectedEdge('C', 'D')
+        .createDirectedEdge('D', 'A')
+        .build();
+    const cyclicGraph4 = DirectedGraphUtil.directedGraphBuilder
+        .addNode('A')
+        .addNode('B')
+        .addNode('C')
+        .addNode('D')
+        .addNode('E')
+        .addNode('F')
+        .createDirectedEdge('A', 'B')
+        .createDirectedEdge('B', 'C')
+        .createDirectedEdge('C', 'A')
+        .createDirectedEdge('D', 'E')
+        .createDirectedEdge('E', 'F')
+        .createDirectedEdge('F', 'D')
+        .build();
+
     describe('hasCycle', () => {
         it('should return true if there is a cycle in a given graph', () => {
-            const cyclicGraph0 = DirectedGraphUtil.directedGraphBuilder.addNode('A').createDirectedEdge('A', 'A').build();
-            const cyclicGraph1 = DirectedGraphUtil.directedGraphBuilder
-                .addNode('A')
-                .addNode('B')
-                .createDirectedEdge('A', 'B')
-                .createDirectedEdge('B', 'A')
-                .build();
-            const cyclicGraph2 = DirectedGraphUtil.directedGraphBuilder
-                .addNode('A')
-                .addNode('B')
-                .addNode('C')
-                .createDirectedEdge('A', 'B')
-                .createDirectedEdge('B', 'C')
-                .createDirectedEdge('C', 'A')
-                .build();
-            const cyclicGraph3 = DirectedGraphUtil.directedGraphBuilder
-                .addNode('A')
-                .addNode('B')
-                .addNode('C')
-                .addNode('D')
-                .createDirectedEdge('A', 'B')
-                .createDirectedEdge('A', 'C')
-                .createDirectedEdge('B', 'D')
-                .createDirectedEdge('C', 'D')
-                .createDirectedEdge('D', 'A')
-                .build();
             expect(DirectedGraphUtil.hasCycle(cyclicGraph0)).to.equal(true);
             expect(DirectedGraphUtil.hasCycle(cyclicGraph1)).to.equal(true);
             expect(DirectedGraphUtil.hasCycle(cyclicGraph2)).to.equal(true);
@@ -64,6 +79,43 @@ describe('DirectedGraphUtil', () => {
             expect(DirectedGraphUtil.hasCycle(graph1)).to.equal(false);
             expect(DirectedGraphUtil.hasCycle(graph2)).to.equal(false);
             expect(DirectedGraphUtil.hasCycle(graph3)).to.equal(false);
+        });
+    });
+
+    describe('findCycles', () => {
+        it('should return empty array when there are no cycles', () => {
+            expect(DirectedGraphUtil.findCycles(graph0)).to.deep.equal([]);
+            expect(DirectedGraphUtil.findCycles(graph1)).to.deep.equal([]);
+            expect(DirectedGraphUtil.findCycles(graph2)).to.deep.equal([]);
+            expect(DirectedGraphUtil.findCycles(graph3)).to.deep.equal([]);
+        });
+
+        it('should find cycles when there are some', () => {
+            const cyclesInCyclicGraph0: string[][] = DirectedGraphUtil.findCycles(cyclicGraph0);
+            expect(cyclesInCyclicGraph0).to.have.length(1);
+            expect(cyclesInCyclicGraph0).to.deep.equal([['A']]);
+
+            const cyclesInCyclicGraph1: string[][] = DirectedGraphUtil.findCycles(cyclicGraph1);
+            expect(cyclesInCyclicGraph1).to.have.length(1);
+            expect(cyclesInCyclicGraph1).to.deep.equal([['A', 'B']]);
+
+            const cyclesInCyclicGraph2: string[][] = DirectedGraphUtil.findCycles(cyclicGraph2);
+            expect(cyclesInCyclicGraph2).to.have.length(1);
+            expect(cyclesInCyclicGraph2).to.deep.equal([['A', 'B', 'C']]);
+
+            const cyclesInCyclicGraph3: string[][] = DirectedGraphUtil.findCycles(cyclicGraph3);
+            expect(cyclesInCyclicGraph3).to.have.length(2);
+            expect(cyclesInCyclicGraph3).to.deep.equal([
+                ['A', 'B', 'D'],
+                ['A', 'C', 'D']
+            ]);
+
+            const cyclesInCyclicGraph4: string[][] = DirectedGraphUtil.findCycles(cyclicGraph4);
+            expect(cyclesInCyclicGraph4).to.have.length(2);
+            expect(cyclesInCyclicGraph4).to.deep.equal([
+                ['A', 'B', 'C'],
+                ['D', 'E', 'F']
+            ]);
         });
     });
 

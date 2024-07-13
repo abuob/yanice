@@ -40,15 +40,27 @@ export class DirectedGraphUtil {
     }
 
     public static hasCycle(graph: DirectedGraph): boolean {
-        let visitedAlready: DirectedGraphNode[] = [];
-        let result = false;
-        graph.nodes.forEach((node) => {
+        const visitedAlready: DirectedGraphNode[] = [];
+        for (const node of graph.nodes) {
             if (DirectedGraphUtil.hasCycleRecursive(node, visitedAlready, [])) {
-                result = true;
+                return true;
             }
-            visitedAlready = visitedAlready.concat(node);
-        });
-        return result;
+            visitedAlready.push(node);
+        }
+        return false;
+    }
+
+    public static findCycles(graph: DirectedGraph): string[][] {
+        const visitedAlready: DirectedGraphNode[] = [];
+        const allCycles: string[][] = [];
+        for (const node of graph.nodes) {
+            const cyclesOfCurrentNode: string[][] = DirectedGraphUtil.findCycleRecursively(node, visitedAlready, []);
+            if (cyclesOfCurrentNode.length > 0) {
+                allCycles.push(...cyclesOfCurrentNode);
+            }
+            visitedAlready.push(node);
+        }
+        return allCycles;
     }
 
     public static getAncestorsOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
@@ -202,6 +214,32 @@ export class DirectedGraphUtil {
             .reduce((prev, curr) => prev || curr, false);
     }
 
+    private static findCycleRecursively(
+        currentNode: DirectedGraphNode,
+        visitedAlready: DirectedGraphNode[],
+        nodesInDfsTraversal: DirectedGraphNode[]
+    ): string[][] {
+        if (visitedAlready.includes(currentNode)) {
+            return [];
+        }
+        if (nodesInDfsTraversal.includes(currentNode)) {
+            const nodesInCycle: DirectedGraphNode[] = nodesInDfsTraversal.slice(nodesInDfsTraversal.indexOf(currentNode));
+            return [nodesInCycle.map((node: DirectedGraphNode) => node.name)];
+        }
+        const children: DirectedGraphNode[] = currentNode.getChildren();
+        return children.reduce((allCycles: string[][], currentChild: DirectedGraphNode): string[][] => {
+            const cyclesOfChild: string[][] = DirectedGraphUtil.findCycleRecursively(
+                currentChild,
+                visitedAlready,
+                nodesInDfsTraversal.concat(currentNode)
+            );
+            if (cyclesOfChild.length > 0) {
+                return allCycles.concat(cyclesOfChild);
+            }
+            return allCycles;
+        }, []);
+    }
+
     private static getNodeByName(graph: DirectedGraph, name: string): DirectedGraphNode | null {
         return graph.nodes.find((n) => n.name === name) || null;
     }
@@ -239,3 +277,4 @@ class DirectedGraphBuilder {
         return this.graph;
     }
 }
+export type { DirectedGraphBuilder };
