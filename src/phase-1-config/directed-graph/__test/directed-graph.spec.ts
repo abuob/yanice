@@ -117,6 +117,27 @@ describe('DirectedGraphUtil', () => {
                 ['D', 'E', 'F']
             ]);
         });
+
+        it('should not report cycles multiple times', () => {
+            const cyclicGraph = DirectedGraphUtil.directedGraphBuilder
+                .addNode('A')
+                .addNode('B')
+                .addNode('C')
+                .addNode('D')
+                .createDirectedEdge('A', 'B')
+                .createDirectedEdge('B', 'C')
+                .createDirectedEdge('B', 'D')
+                .createDirectedEdge('C', 'B')
+                .createDirectedEdge('D', 'A')
+                .build();
+
+            const cyclesInCyclicGraph: string[][] = DirectedGraphUtil.findCycles(cyclicGraph);
+            expect(cyclesInCyclicGraph).to.have.length(2);
+            expect(cyclesInCyclicGraph).to.deep.equal([
+                ['B', 'C'],
+                ['A', 'B', 'D']
+            ]);
+        });
     });
 
     describe('getAncestorsAndSelfForSingleNode', () => {
