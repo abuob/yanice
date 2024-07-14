@@ -1,6 +1,6 @@
 {
     "$schema": "../../schema.json",
-    "schemaVersion": 2,
+    "schemaVersion": 3,
     "plugins": {
         "custom": {
             "dummy-plugin": {

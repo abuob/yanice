@@ -10,7 +10,7 @@ import { YaniceJsonType } from './config.interface';
  * They are kept separate to improve testability, and to make it easier to refactor.
  */
 export class ConfigVerifier {
-    private static readonly SUPPORTED_VERSIONS: number[] = [2];
+    private static readonly SUPPORTED_VERSIONS: number[] = [3];
 
     // ========= verifyYaniceJsonWithSchema
 
@@ -45,11 +45,11 @@ export class ConfigVerifier {
 
     public static printErrorOnVerifySchemaVersionFailure(yaniceJson: YaniceJsonType): void {
         const versionNumber: number = yaniceJson.schemaVersion;
+        const supportedVersions: string = ConfigVerifier.SUPPORTED_VERSIONS.join(', ');
         LogUtil.log(
-            `schemaVersion ${versionNumber} is not or no longer supported! This version of yanice currently supports the following versions: ${ConfigVerifier.SUPPORTED_VERSIONS.join(
-                ', '
-            )}`
+            `schemaVersion ${versionNumber} is not or no longer supported! This version of yanice currently supports the following versions: ${supportedVersions}`
         );
+        LogUtil.log('Please make sure sure that the installed version of yanice supports this schema-version.');
     }
 
     // ========= verifyDependencyScopeProjectNames
