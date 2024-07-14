@@ -8,13 +8,7 @@ import { Phase3Result } from '../phase-3-project-changes/phase-3.result.type';
 import { LogUtil } from '../util/log-util';
 import { PromiseCreator, PromiseQueue, PromiseQueueEntry } from '../util/promise-queue';
 import { AbstractPhase4Executor } from './phase-4.executor';
-
-export interface CommandExecutionResult {
-    stdout: string;
-    stderr: string;
-    exitCode: number;
-    executionDurationInMs: number;
-}
+import { CommandExecutionResult } from './types/command-execution-result.type';
 
 export class Phase4CommandExecutor extends AbstractPhase4Executor {
     private commandExecutionResults: CommandExecutionResult[] = [];

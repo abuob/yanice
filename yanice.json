@@ -7,7 +7,7 @@
                 "importResolvers": {
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
-                "assertions": ["only-direct-imports", "max-skipped-imports"],
+                "assertions": ["only-direct-imports", "max-skipped-imports", "no-circular-imports"],
                 "assertionOptions": {
                     "skippedImports": {
                         "amount": 4,

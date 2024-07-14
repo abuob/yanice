@@ -1,5 +1,5 @@
 import { YaniceConfig } from '../phase-1-config/config/config.interface';
-import { CommandExecutionResult } from '../phase-4-execution/phase-4-command.executor';
+import { CommandExecutionResult } from '../phase-4-execution/types/command-execution-result.type';
 import { commandOutputFilterType, OutputFilter } from './output-filter';
 import { KarmaProgressSuccessFilter } from './output-filters/karma-progress-success-filter';
 import { NpmErrorFilter } from './output-filters/npm-error-filter';
