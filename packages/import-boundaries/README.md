@@ -82,6 +82,7 @@ Array of officially provided assertions. Currently supported:
     This rule helps with that. Define one or multiple entry-points via the `entrypoints`-property for each project. This rule will then ensure that every import from another project accesses the project via a defined entrypoint.
 -   `restrict-package-imports`: Restrict which project is allowed to import from which package (where a "package"-import is any import that is not a relative import).
     The configuration supports both allowlists and blocklists.
+-   `no-circular-imports`: Do not allow circular imports. This is entirely independent of project-setup and just disallows any circular import.
 
 ### customAssertions
 

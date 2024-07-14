@@ -1,6 +1,6 @@
 import { LogUtil } from 'yanice';
 
-import { YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
+import { CycleViolationNode, YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
 
 export class AssertionLogger {
     public static logAssertionViolations(violations: YaniceImportBoundariesAssertionViolation[]): void {
@@ -85,6 +85,17 @@ export class AssertionLogger {
                 LogUtil.log(`${violation.filePath}:`);
                 LogUtil.log(`    Within project:        ${violation.withinProject}`);
                 LogUtil.log(`    Found blocked import:  ${violation.importStatement}\n`);
+                return null;
+            case 'no-circular-imports::cycle-violation':
+                LogUtil.log(`Found illegal import cycle (length: ${violation.cycle.length}):`);
+                violation.cycle.forEach((cycleNode: CycleViolationNode): void => {
+                    LogUtil.log(`   ${cycleNode.absoluteFilePath}:`);
+                    LogUtil.log(`      ${cycleNode.importStatement}`);
+                });
+                const firstElement: CycleViolationNode | undefined = violation.cycle[0];
+                if (firstElement) {
+                    LogUtil.log(`   ${firstElement.absoluteFilePath}\n`);
+                }
                 return null;
             case 'custom-assertion-violation':
                 LogUtil.log(violation.message);

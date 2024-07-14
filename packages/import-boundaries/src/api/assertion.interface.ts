@@ -8,6 +8,7 @@ export type YaniceImportBoundariesAssertionViolation =
     | AssertionViolationImportNotConfigured
     | AssertionViolationInvalidEntrypoint
     | AssertionViolationInvalidEntrypointFromWithinSameProject
+    | AssertionViolationNoCircularImportsCycleViolation
     | AssertionViolationRestrictPackageImportAllPackagesMustBeListed
     | AssertionViolationRestrictPackageImportBlockedPackage
     | AssertionViolationRestrictPackageImportInvalidConfigurationKeys
@@ -93,6 +94,16 @@ export interface AssertionViolationRestrictPackageImportAllPackagesMustBeListed 
     importStatement: string;
     filePath: string;
     withinProject: string;
+}
+
+export interface CycleViolationNode {
+    absoluteFilePath: string;
+    importStatement: string;
+}
+
+export interface AssertionViolationNoCircularImportsCycleViolation {
+    type: 'no-circular-imports::cycle-violation';
+    cycle: CycleViolationNode[];
 }
 
 export interface AssertionViolationCustomAssertion {

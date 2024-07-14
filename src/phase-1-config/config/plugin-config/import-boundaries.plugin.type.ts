@@ -22,6 +22,7 @@ export interface YanicePluginImportBoundariesRestrictPackageImportsOptions {
 export type importBoundaryAssertionIdentifierType =
     | 'access-via-entrypoints'
     | 'max-skipped-imports'
+    | 'no-circular-imports'
     | 'only-direct-imports'
     | 'only-transitive-dependencies'
     | 'restrict-package-imports'

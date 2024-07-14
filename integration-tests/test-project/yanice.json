@@ -14,7 +14,13 @@
                     "**/*.ts": ["es6-declarative-import-resolver"]
                 },
                 "postResolve": ["./custom-scripts/dist/dummy-post-resolve.js"],
-                "assertions": ["only-direct-imports", "max-skipped-imports", "use-all-declared-dependencies", "restrict-package-imports"],
+                "assertions": [
+                    "only-direct-imports",
+                    "max-skipped-imports",
+                    "use-all-declared-dependencies",
+                    "restrict-package-imports",
+                    "no-circular-imports"
+                ],
                 "customAssertions": ["./custom-scripts/dist/dummy-assertion.js"],
                 "assertionOptions": {
                     "skippedImports": {

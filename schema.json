@@ -43,7 +43,8 @@
                                             "use-all-declared-dependencies",
                                             "max-skipped-imports",
                                             "access-via-entrypoints",
-                                            "restrict-package-imports"
+                                            "restrict-package-imports",
+                                            "no-circular-imports"
                                         ]
                                     }
                                 },

@@ -6,6 +6,7 @@ import { YaniceImportBoundariesAssertion, YaniceImportBoundariesAssertionViolati
 import { ImportBoundaryAssertionData } from '../api/import-boundary-assertion-data';
 import { accessViaEntryPoints } from './rules/access-via-entrypoints/access-via-entrypoints';
 import { maxSkippedImports } from './rules/max-skipped-imports/max-skipped-imports';
+import { noCircularImports } from './rules/no-circular-imports/no-circular-imports';
 import { onlyDirectImports } from './rules/only-direct-dependencies/only-direct-imports';
 import { onlyTransitiveImports } from './rules/only-transitive-dependencies/only-transitive-imports';
 import { restrictPackageImports } from './rules/restrict-package-imports/restrict-package-imports';
@@ -57,6 +58,8 @@ export class ImportBoundariesAssertions {
                 return accessViaEntryPoints;
             case 'restrict-package-imports':
                 return restrictPackageImports;
+            case 'no-circular-imports':
+                return noCircularImports;
         }
     }
 
