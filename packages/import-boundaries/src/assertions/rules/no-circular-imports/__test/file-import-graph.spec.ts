@@ -24,6 +24,16 @@ describe('FileImportGraph', () => {
                 const actual = FileImportGraph.createFileImportGraph(fileToImportResolutionsMap).getCycles();
                 expect(actual).to.deep.equal([]);
             });
+
+            it('it should not throw when an unknown file is imported somewhere', () => {
+                const fileToImportResolutionsMap = createFileToImportResolutionsMap({
+                    'file-A': ['file-B'],
+                    'file-B': ['file-C'],
+                    'file-C': ['file-NOT-KNOWN']
+                });
+                const actual = FileImportGraph.createFileImportGraph(fileToImportResolutionsMap).getCycles();
+                expect(actual).to.deep.equal([]);
+            });
         });
 
         describe('with cycles', () => {

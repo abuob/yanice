@@ -9,7 +9,7 @@ import {
 } from '../../../api/import-resolver.interface';
 
 export class FileImportGraph {
-    private directedGraph: DirectedGraph;
+    private readonly directedGraph: DirectedGraph;
 
     private filePathToIdentifierMap: Map<string, string> = new Map();
     private identifierToFilePathMap: Map<string, string> = new Map();
@@ -38,7 +38,10 @@ export class FileImportGraph {
                         resolvedImport.resolvedAbsoluteFilePath
                     );
                     if (!importedFileIdentifier) {
-                        throw new Error(`Cannot find filePath (import) of ${importedFileIdentifier}`);
+                        // This is a legitimate case: Any file which is imported but not part of the parsed files
+                        // will go into this condition.
+                        // E.g.: git-ignored files, JSON-imports in *.ts-files
+                        return;
                     }
                     graphBuilder.createDirectedEdge(currentFileIdentifier, importedFileIdentifier);
                     const relationshipKey: string = this.getImportRelationshipMapKey(currentFileIdentifier, importedFileIdentifier);
