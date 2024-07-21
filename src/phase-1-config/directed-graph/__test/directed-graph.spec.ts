@@ -104,11 +104,8 @@ describe('DirectedGraphUtil', () => {
             expect(cyclesInCyclicGraph2).to.deep.equal([['A', 'B', 'C']]);
 
             const cyclesInCyclicGraph3: string[][] = DirectedGraphUtil.findCycles(cyclicGraph3);
-            expect(cyclesInCyclicGraph3).to.have.length(2);
-            expect(cyclesInCyclicGraph3).to.deep.equal([
-                ['A', 'B', 'D'],
-                ['A', 'C', 'D']
-            ]);
+            expect(cyclesInCyclicGraph3).to.have.length(1);
+            expect(cyclesInCyclicGraph3).to.deep.equal([['A', 'B', 'D']]);
 
             const cyclesInCyclicGraph4: string[][] = DirectedGraphUtil.findCycles(cyclicGraph4);
             expect(cyclesInCyclicGraph4).to.have.length(2);

@@ -32,7 +32,7 @@ export interface DirectedGraph {
 
 interface CycleSearchIntermediateResult {
     cycles: string[][];
-    visitedAlready: DirectedGraphNode[];
+    visitedAlready: Set<DirectedGraphNode>;
 }
 
 /**
@@ -58,7 +58,7 @@ export class DirectedGraphUtil {
     public static findCycles(graph: DirectedGraph): string[][] {
         const start: CycleSearchIntermediateResult = {
             cycles: [],
-            visitedAlready: []
+            visitedAlready: new Set()
         };
         const result: CycleSearchIntermediateResult = graph.nodes.reduce(
             (prev: CycleSearchIntermediateResult, curr: DirectedGraphNode): CycleSearchIntermediateResult => {
@@ -228,14 +228,16 @@ export class DirectedGraphUtil {
         if (nodesInDfsTraversal.includes(currentNode)) {
             const nodesInCycle: DirectedGraphNode[] = nodesInDfsTraversal.slice(nodesInDfsTraversal.indexOf(currentNode));
             const nodesInCycleNames: string[] = nodesInCycle.map((node: DirectedGraphNode) => node.name);
+            cycleSearchIntermediateResult.visitedAlready.add(currentNode);
             return {
                 cycles: [...cycleSearchIntermediateResult.cycles, nodesInCycleNames],
-                visitedAlready: cycleSearchIntermediateResult.visitedAlready.concat(currentNode)
+                visitedAlready: cycleSearchIntermediateResult.visitedAlready
             };
         }
-        if (cycleSearchIntermediateResult.visitedAlready.includes(currentNode)) {
+        if (cycleSearchIntermediateResult.visitedAlready.has(currentNode)) {
             return cycleSearchIntermediateResult;
         }
+        cycleSearchIntermediateResult.visitedAlready.add(currentNode);
         const children: DirectedGraphNode[] = currentNode.getChildren();
         return children.reduce((prev: CycleSearchIntermediateResult, currentChild: DirectedGraphNode): CycleSearchIntermediateResult => {
             return DirectedGraphUtil.findCycleRecursively(currentChild, prev, nodesInDfsTraversal.concat(currentNode));
