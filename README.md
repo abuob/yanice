@@ -42,6 +42,12 @@ Install e.g. via npm as follows:
 npm install --save-dev yanice
 ```
 
+Yanice can be used programmatically, but its primary intended usage is via CLI.
+The CLI-commands further below usually follow this pattern: `yanice <args>`.
+These commands can be added as a script to the `package.json` in your project.
+Alternatively, to avoid cluttering the `package.json` with various commands, add a single script-entry like so:
+`"yanice": "yanice"`, and then invoke the command directly in the CLI like so: `npm run yanice -- <args>`.
+
 ## Configuration
 
 The complete version of the `yanice.json` used for this example can be found
