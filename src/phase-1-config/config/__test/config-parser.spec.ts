@@ -164,7 +164,8 @@ describe('ConfigParser', () => {
             const actualGraph = ConfigParser.getDepGraphFromConfig(
                 ConfigParser.getYaniceConfig(yaniceJson2, createYaniceCliArgsWithScope(yaniceCliArgs, 'lint'))
             );
-            expect(actualGraph?.nodes.map((n) => n.name)).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
+            const actualNodeNames: string[] = Array.from(actualGraph?.nodes ?? []).map((n) => n.name);
+            expect(actualNodeNames).to.have.same.members(['A', 'B', 'C', 'D', 'E']);
         });
 
         it('should properly create a directed graph with some dependencies', () => {
@@ -229,14 +230,14 @@ describe('ConfigParser', () => {
 });
 
 function getAllNodeNames(graph: DirectedGraph | null): string[] {
-    return graph ? graph.nodes.map((n) => n.name) : [];
+    return graph ? Array.from(graph.nodes).map((n) => n.name) : [];
 }
 
 function getParentsOf(graph: DirectedGraph | null, projectName: string): string[] {
     if (!graph) {
         return [];
     }
-    const node = graph.nodes.find((n) => n.name === projectName);
+    const node = Array.from(graph.nodes).find((n) => n.name === projectName);
     return node ? node.getParents().map((n) => n.name) : [];
 }
 
@@ -244,7 +245,7 @@ function getChildrenOf(graph: DirectedGraph | null, projectName: string): string
     if (!graph) {
         return [];
     }
-    const node = graph.nodes.find((n) => n.name === projectName);
+    const node = Array.from(graph.nodes).find((n) => n.name === projectName);
     return node ? node.getChildren().map((n) => n.name) : [];
 }
 

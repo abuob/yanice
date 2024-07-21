@@ -27,7 +27,7 @@ export class GraphDagreRenderer {
         affectedProjects: string[],
         changedFiles: string[]
     ): YaniceGraphNodeInfo[] {
-        return depGraph.nodes
+        return Array.from(depGraph.nodes)
             .map((node: DirectedGraphNode): YaniceGraphNodeInfo | null => {
                 const projectOrUndefined = yaniceConfig.projects.find((project: YaniceProject) => project.projectName === node.name);
                 const scope: string | null = yaniceVisualizeArgs.defaultArgs.scope;

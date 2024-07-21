@@ -8,22 +8,21 @@ export class GraphDotRenderer {
     }
 
     private static getAllNodeDeclarations(directedGraph: DirectedGraph): string {
-        return directedGraph.nodes.map((node) => `${GraphDotRenderer.getDotConformNodeName(node.name)} [label="${node.name}"];`).join('');
+        return Array.from(directedGraph.nodes)
+            .map((node) => `${GraphDotRenderer.getDotConformNodeName(node.name)} [label="${node.name}"];`)
+            .join('');
     }
 
     private static getAllEdgeDeclarations(directedGraph: DirectedGraph): string {
-        return directedGraph.nodes
-            .map((ancestor) =>
-                ancestor
-                    .getChildren()
-                    .map(
-                        (child) =>
-                            `${GraphDotRenderer.getDotConformNodeName(ancestor.name)} -> ${GraphDotRenderer.getDotConformNodeName(
-                                child.name
-                            )};`
-                    )
-                    .join('')
-            )
+        return Array.from(directedGraph.nodes)
+            .map((ancestor): string => {
+                const definitionPerChild: string[] = ancestor.getChildren().map((child): string => {
+                    const nodeNameDot: string = GraphDotRenderer.getDotConformNodeName(ancestor.name);
+                    const childNameDot: string = GraphDotRenderer.getDotConformNodeName(child.name);
+                    return `${nodeNameDot} -> ${childNameDot};`;
+                });
+                return definitionPerChild.join('');
+            })
             .join('');
     }
 

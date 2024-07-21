@@ -1,7 +1,7 @@
 export class DirectedGraphNode {
     public readonly name: string;
-    private children: DirectedGraphNode[];
-    private parents: DirectedGraphNode[];
+    private readonly children: DirectedGraphNode[];
+    private readonly parents: DirectedGraphNode[];
 
     constructor(name: string) {
         this.name = name;
@@ -27,7 +27,8 @@ export class DirectedGraphNode {
 }
 
 export interface DirectedGraph {
-    nodes: DirectedGraphNode[];
+    nodes: Set<DirectedGraphNode>;
+    nodeNameToNodeMap: Map<string, DirectedGraphNode>;
 }
 
 interface CycleSearchIntermediateResult {
@@ -56,23 +57,20 @@ export class DirectedGraphUtil {
     }
 
     public static findCycles(graph: DirectedGraph): string[][] {
-        const start: CycleSearchIntermediateResult = {
+        let result: CycleSearchIntermediateResult = {
             cycles: [],
             visitedAlready: new Set()
         };
-        const result: CycleSearchIntermediateResult = graph.nodes.reduce(
-            (prev: CycleSearchIntermediateResult, curr: DirectedGraphNode): CycleSearchIntermediateResult => {
-                return DirectedGraphUtil.findCycleRecursively(curr, prev, []);
-            },
-            start
-        );
+        for (const currentNode of graph.nodes) {
+            result = DirectedGraphUtil.findCycleRecursively(currentNode, result, []);
+        }
         return result.cycles;
     }
 
     public static getAncestorsOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
         return nodeNames
             .map<string[]>((nodeName) => {
-                const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
+                const givenNode: DirectedGraphNode | undefined = graph.nodeNameToNodeMap.get(nodeName);
                 if (!givenNode) {
                     return [];
                 }
@@ -87,7 +85,7 @@ export class DirectedGraphUtil {
     public static getDescendantsOfMultipleNodes(graph: DirectedGraph, nodeNames: string[]): string[] {
         return nodeNames
             .map<string[]>((nodeName) => {
-                const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
+                const givenNode: DirectedGraphNode | undefined = graph.nodeNameToNodeMap.get(nodeName);
                 if (!givenNode) {
                     return [];
                 }
@@ -112,7 +110,7 @@ export class DirectedGraphUtil {
     }
 
     public static getAncestorsAndSelfForSingleNode(graph: DirectedGraph, nodeName: string): string[] {
-        const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
+        const givenNode: DirectedGraphNode | undefined = graph.nodeNameToNodeMap.get(nodeName);
         if (!givenNode) {
             return [];
         }
@@ -120,11 +118,11 @@ export class DirectedGraphUtil {
     }
 
     public static getDescendantsAndSelfForSingleNode(graph: DirectedGraph, nodeName: string): string[] {
-        const givenNode = DirectedGraphUtil.getNodeByName(graph, nodeName);
+        const givenNode: DirectedGraphNode | undefined = graph.nodeNameToNodeMap.get(nodeName);
         if (!givenNode) {
             return [];
         }
-        return DirectedGraphUtil.getDescendantsAndSelfOfSingleNodeRecursively(givenNode).map((n) => n.name);
+        return DirectedGraphUtil.getDescendantsAndSelfOfSingleNodeRecursively(givenNode).map((n: DirectedGraphNode) => n.name);
     }
 
     /**
@@ -132,17 +130,20 @@ export class DirectedGraphUtil {
      */
     public static getTopologicallySorted(graph: DirectedGraph, nodeNames: string[]): string[] {
         const alreadySorted: string[] = [];
-        const tmpMarked = new Set<string>();
-        const permanentMarked = new Set<string>();
-        while (graph.nodes.length !== permanentMarked.size) {
-            const unmarkedNode = graph.nodes.find((node) => !permanentMarked.has(node.name));
+        const tmpMarked: Set<string> = new Set<string>();
+        const permanentMarked: Set<string> = new Set<string>();
+        while (graph.nodes.size !== permanentMarked.size) {
+            const unmarkedNode: DirectedGraphNode | undefined = DirectedGraphUtil.findViaIterator(
+                graph.nodes.values(),
+                (node: DirectedGraphNode) => !permanentMarked.has(node.name)
+            );
             if (unmarkedNode) {
                 DirectedGraphUtil.getTopologicallySortedVisit(graph, unmarkedNode, tmpMarked, permanentMarked, alreadySorted);
             } else {
                 throw new Error('Cannot establish topological ordering; is your graph indeed a DAG?');
             }
         }
-        return alreadySorted.filter((n) => nodeNames.includes(n));
+        return alreadySorted.filter((n: string) => nodeNames.includes(n));
     }
 
     public static getTopologicallySortedReverse(graph: DirectedGraph, nodeNames: string[]): string[] {
@@ -244,31 +245,39 @@ export class DirectedGraphUtil {
         }, cycleSearchIntermediateResult);
     }
 
-    private static getNodeByName(graph: DirectedGraph, name: string): DirectedGraphNode | null {
-        return graph.nodes.find((n) => n.name === name) || null;
-    }
-
     private static noDuplicatesAccumulate<T>(prev: T[], curr: T): T[] {
         return prev.includes(curr) ? prev : prev.concat([curr]);
+    }
+
+    private static findViaIterator<T>(input: IterableIterator<T>, findCallback: (item: T) => boolean): T | undefined {
+        for (const item of input) {
+            if (findCallback(item)) {
+                return item;
+            }
+        }
+        return undefined;
     }
 }
 
 class DirectedGraphBuilder {
     private graph: DirectedGraph = {
-        nodes: []
+        nodes: new Set(),
+        nodeNameToNodeMap: new Map()
     };
 
     public addNode(name: string): DirectedGraphBuilder {
-        if (this.graph.nodes.map((n) => n.name).includes(name)) {
+        if (this.graph.nodeNameToNodeMap.has(name)) {
             throw Error(`Cannot add a node with name "${name}" to the graph, such a node already exists!`);
         }
-        this.graph.nodes = this.graph.nodes.concat(new DirectedGraphNode(name));
+        const newNode: DirectedGraphNode = new DirectedGraphNode(name);
+        this.graph.nodes.add(newNode);
+        this.graph.nodeNameToNodeMap.set(name, newNode);
         return this;
     }
 
     public createDirectedEdge(parentName: string, childName: string): DirectedGraphBuilder {
-        const parentNode = this.graph.nodes.find((node) => node.name === parentName);
-        const childNode = this.graph.nodes.find((node) => node.name === childName);
+        const parentNode: DirectedGraphNode | undefined = this.graph.nodeNameToNodeMap.get(parentName);
+        const childNode: DirectedGraphNode | undefined = this.graph.nodeNameToNodeMap.get(childName);
         if (!parentNode || !childNode) {
             return this;
         }

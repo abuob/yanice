@@ -251,20 +251,20 @@ describe('DirectedGraphUtil', () => {
                 .createDirectedEdge('A', 'C')
                 .createDirectedEdge('B', 'C')
                 .build();
-            expect(createdGraph0.nodes.map((n) => n.name)).to.have.same.members(['A', 'B', 'C']);
-            expect(createdGraph1.nodes.map((n) => n.name)).to.have.same.members(['A', 'B', 'C']);
-            expect(
-                createdGraph1.nodes
-                    .find((n) => n.name === 'A')!
-                    .getChildren()
-                    .map((n) => n.name)
-            ).to.have.same.members(['B', 'C']);
-            expect(
-                createdGraph1.nodes
-                    .find((n) => n.name === 'B')!
-                    .getChildren()
-                    .map((n) => n.name)
-            ).to.have.same.members(['C']);
+            expect(Array.from(createdGraph0.nodes).map((n) => n.name)).to.have.same.members(['A', 'B', 'C']);
+            expect(Array.from(createdGraph1.nodes).map((n) => n.name)).to.have.same.members(['A', 'B', 'C']);
+
+            const childrenOfA: string[] | undefined = createdGraph1.nodeNameToNodeMap
+                .get('A')
+                ?.getChildren()
+                .map((n) => n.name);
+            expect(childrenOfA).to.have.same.members(['B', 'C']);
+
+            const childrenOfB: string[] | undefined = createdGraph1.nodeNameToNodeMap
+                .get('B')
+                ?.getChildren()
+                .map((n) => n.name);
+            expect(childrenOfB).to.have.same.members(['C']);
         });
 
         it('should throw an error when trying to add another node with the same name', () => {
