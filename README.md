@@ -34,6 +34,15 @@ See below for how to define the project-structure.
     for e.g. CI-purposes, retrieve the commit of the last successful build or e.g. the target-branch of a PR, and compare
     to that
 
+In case you're considering using Yanice: If you happen to use a typescript-codebase, make sure to check out the `@yanice/import-boundaries`-plugin ([link](https://www.npmjs.com/package/@yanice/import-boundaries)),
+which offers various functionality based on the import-graph of your project:
+
+-   Automatically generate dependency-graphs for the `yanice.json` based on imports
+-   Assert boundaries between projects
+-   Control which project can use which 3rd-party-dependency (`node_modules`)
+-   Ensure that projects are only accessed via their entry-points (`index.ts`, `public_api.ts` etc.); no deep imports
+-   Disallow cyclic imports
+
 ## Installation
 
 Install e.g. via npm as follows:
