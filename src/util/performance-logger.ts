@@ -2,10 +2,18 @@ import { LogUtil } from './log-util';
 
 export class YanicePerformanceLogger<stopWatchIdentifier extends string> {
     private startTimes: Partial<Record<stopWatchIdentifier, number>> = {};
+    private isEnabled: boolean = false;
+
     constructor(
         private context: string,
-        private isEnabled: boolean
-    ) {}
+        isEnabled: boolean
+    ) {
+        this.isEnabled = isEnabled;
+    }
+
+    public setEnabled(isEnabled: boolean): void {
+        this.isEnabled = isEnabled;
+    }
 
     public startStopwatch(identifier: stopWatchIdentifier): void {
         if (!this.isEnabled) {
