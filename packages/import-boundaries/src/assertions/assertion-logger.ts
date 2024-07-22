@@ -1,13 +1,17 @@
+import path from 'node:path';
+
 import { LogUtil } from 'yanice';
 
 import { CycleViolationNode, YaniceImportBoundariesAssertionViolation } from '../api/assertion.interface';
 
 export class AssertionLogger {
-    public static logAssertionViolations(violations: YaniceImportBoundariesAssertionViolation[]): void {
-        violations.forEach((violation: YaniceImportBoundariesAssertionViolation) => AssertionLogger.logAssertionViolation(violation));
+    public static logAssertionViolations(violations: YaniceImportBoundariesAssertionViolation[], yaniceJsonDirectoryPath: string): void {
+        violations.forEach((violation: YaniceImportBoundariesAssertionViolation) =>
+            AssertionLogger.logAssertionViolation(violation, yaniceJsonDirectoryPath)
+        );
     }
 
-    private static logAssertionViolation(violation: YaniceImportBoundariesAssertionViolation): null {
+    private static logAssertionViolation(violation: YaniceImportBoundariesAssertionViolation, yaniceJsonDirectoryPath: string): null {
         // the "return null" makes the compiler handle us all different violation.types here
         switch (violation.type) {
             case 'unknown-import':
@@ -89,12 +93,14 @@ export class AssertionLogger {
             case 'no-circular-imports::cycle-violation':
                 LogUtil.log(`Found illegal import cycle (length: ${violation.cycle.length}):`);
                 violation.cycle.forEach((cycleNode: CycleViolationNode): void => {
-                    LogUtil.log(`   ${cycleNode.absoluteFilePath}:`);
+                    const relativePath: string = path.relative(yaniceJsonDirectoryPath, cycleNode.absoluteFilePath);
+                    LogUtil.log(`   ${relativePath}:`);
                     LogUtil.log(`      ${cycleNode.importStatement}`);
                 });
                 const firstElement: CycleViolationNode | undefined = violation.cycle[0];
                 if (firstElement) {
-                    LogUtil.log(`   ${firstElement.absoluteFilePath}\n`);
+                    const relativePath: string = path.relative(yaniceJsonDirectoryPath, firstElement.absoluteFilePath);
+                    LogUtil.log(`   ${relativePath}\n`);
                 }
                 return null;
             case 'custom-assertion-violation':

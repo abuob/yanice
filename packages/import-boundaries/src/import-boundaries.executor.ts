@@ -196,7 +196,7 @@ export class ImportBoundariesExecutor {
             importBoundariesPluginConfig
         );
         if (assertionViolations.length > 0) {
-            AssertionLogger.logAssertionViolations(assertionViolations);
+            AssertionLogger.logAssertionViolations(assertionViolations, yaniceJsonDirectoryPath);
             ImportBoundariesExecutor.exitPlugin(1, null);
         } else {
             ImportBoundariesExecutor.exitPlugin(0, 'No import boundary violation found!');
