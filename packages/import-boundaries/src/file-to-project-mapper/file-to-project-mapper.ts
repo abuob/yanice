@@ -3,6 +3,7 @@ import path from 'node:path';
 import { GlobTester, YaniceProject } from 'yanice';
 
 import { GitLsFilesUtil } from './git-ls-files.util';
+import { ProjectFolderTreeNode, ProjectFolderTreeUtil } from './project-folder-tree.util';
 
 export class FileToProjectMapper {
     public static async getFileToProjectsMap(
@@ -28,50 +29,40 @@ export class FileToProjectMapper {
             fileToProjectsMap[absoluteFilePath] = [];
         });
 
-        // loop over projects to populate the file-to-project-map
-        for (const yaniceProject of yaniceProjects) {
-            const projectFilesRelativeToYaniceRoot: string[] =
-                await FileToProjectMapper.getFilesRelevantForYaniceProjectRelativeToYaniceRoot(
-                    yaniceProject,
-                    allFilesInYaniceRootRelativeToYaniceRoot,
-                    gitRepoRootPath,
-                    yaniceJsonDirectoryPath
-                );
-            projectFilesRelativeToYaniceRoot.forEach((projectFileRelativeToYaniceRoot: string): void => {
-                const absoluteFilePath: string = path.join(yaniceJsonDirectoryPath, projectFileRelativeToYaniceRoot);
-                const existingEntryOrNull: string[] | undefined = fileToProjectsMap[absoluteFilePath];
-                if (!existingEntryOrNull) {
-                    fileToProjectsMap[absoluteFilePath] = [yaniceProject.projectName];
-                } else {
-                    existingEntryOrNull.push(yaniceProject.projectName);
-                }
-            });
-        }
-        return fileToProjectsMap;
-    }
+        // create projectFolderDecisionTree
+        const projectNameToProjectFolderMap: Record<string, string | undefined> =
+            FileToProjectMapper.createProjectNameToProjectFolderMap(yaniceProjects);
+        const projectFolderDecisionTree: ProjectFolderTreeNode =
+            ProjectFolderTreeUtil.createProjectFolderDecisionTree(projectNameToProjectFolderMap);
 
-    private static async getFilesRelevantForYaniceProjectRelativeToYaniceRoot(
-        yaniceProject: YaniceProject,
-        allFilesInYaniceRootRelativeToYaniceRoot: string[],
-        gitRepoRootPath: string,
-        yaniceJsonDirectoryPath: string
-    ): Promise<string[]> {
-        if (!yaniceProject.projectFolder) {
-            return FileToProjectMapper.getFilesFiltered(
-                allFilesInYaniceRootRelativeToYaniceRoot,
+        // create projectToFiles-map for projects which have projectFolder defined using projectFolderDecisionTree
+        const projectNamesWithDefinedProjectPath: string[] = yaniceProjects
+            .filter((yaniceProject: YaniceProject) => !!yaniceProject.projectFolder)
+            .map((yaniceProject: YaniceProject): string => yaniceProject.projectName);
+        const projectToFilePathsMap: Record<string, string[] | undefined> = ProjectFolderTreeUtil.getProjectToFilePathsMap(
+            allFilesInYaniceRootRelativeToYaniceRoot,
+            projectNamesWithDefinedProjectPath,
+            projectFolderDecisionTree
+        );
+
+        // loop over projects to populate the file-to-project-map
+        yaniceProjects.forEach((yaniceProject: YaniceProject): void => {
+            const filePathCandidates: string[] = !!yaniceProject.projectFolder
+                ? projectToFilePathsMap[yaniceProject.projectName] ?? allFilesInYaniceRootRelativeToYaniceRoot
+                : allFilesInYaniceRootRelativeToYaniceRoot;
+
+            const allFilesInProject: string[] = FileToProjectMapper.getFilesFiltered(
+                filePathCandidates,
                 yaniceProject.pathGlob,
                 yaniceProject.pathRegExp
             );
-        }
-        const relativePathFromGitRootToYaniceRoot: string = path.relative(gitRepoRootPath, yaniceJsonDirectoryPath);
-        const projectFolderRelativeToGitRoot: string = path.join(relativePathFromGitRootToYaniceRoot, yaniceProject.projectFolder);
-        const filesInProjectRelativeToGitRoot: string[] = await GitLsFilesUtil.gitLsFiles(gitRepoRootPath, projectFolderRelativeToGitRoot);
-        const filesInProjectRelativeToYaniceRoot: string[] = filesInProjectRelativeToGitRoot.map(
-            (fileRelativeToGitRoot: string): string => {
-                return FileToProjectMapper.getFilePathRelativeToYaniceRoot(gitRepoRootPath, yaniceJsonDirectoryPath, fileRelativeToGitRoot);
-            }
-        );
-        return FileToProjectMapper.getFilesFiltered(filesInProjectRelativeToYaniceRoot, yaniceProject.pathGlob, yaniceProject.pathRegExp);
+
+            allFilesInProject.forEach((relativeFilePath: string): void => {
+                const absoluteFilePath: string = path.join(yaniceJsonDirectoryPath, relativeFilePath);
+                fileToProjectsMap[absoluteFilePath]?.push(yaniceProject.projectName);
+            });
+        });
+        return fileToProjectsMap;
     }
 
     private static getFilesFiltered(
@@ -96,5 +87,18 @@ export class FileToProjectMapper {
     ): string {
         const absoluteFilePath: string = path.join(gitRepoRootPath, filePathRelativeToGitRoot);
         return path.relative(yaniceJsonDirectoryPath, absoluteFilePath);
+    }
+
+    private static createProjectNameToProjectFolderMap(yaniceProjects: YaniceProject[]): Record<string, string | undefined> {
+        return yaniceProjects.reduce(
+            (prev: Record<string, string | undefined>, curr: YaniceProject): Record<string, string | undefined> => {
+                if (!curr.projectFolder) {
+                    return prev;
+                }
+                prev[curr.projectName] = curr.projectFolder;
+                return prev;
+            },
+            {}
+        );
     }
 }
