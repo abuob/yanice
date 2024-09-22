@@ -1,5 +1,1 @@
-# Enable EOL normalization:
-*         text=auto
-
-# typescript files must be checked out in lf (otherwise linting issues will arise)
-*.ts      eol=lf
+* text=auto eol=lf
