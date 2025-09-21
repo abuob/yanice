@@ -60,7 +60,7 @@ Alternatively, to avoid cluttering the `package.json` with various commands, add
 ## Configuration
 
 The complete version of the `yanice.json` used for this example can be found
-here: [example-yanice.json](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json)
+here: [example-yanice.json](https://github.com/abuob/yanice/blob/main/resources/yanice-visualize-example.png)
 
 The example corresponds to the graph in the picture above. `project-A` for example is defined as follows:
 
