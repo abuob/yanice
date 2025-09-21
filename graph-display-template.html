@@ -2,11 +2,15 @@
 <meta charset="utf-8" />
 <body>
     <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://dagrejs.github.io/project/dagre/v0.7.5/dagre.min.js"></script>
-    <script src="https://dagrejs.github.io/project/graphlib-dot/v0.6.3/graphlib-dot.min.js"></script>
-    <script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.min.js"></script>
+    <script src="https://dagrejs.github.io/project/dagre/v1.0.4/dagre.js"></script>
+    <script src="https://dagrejs.github.io/project/graphlib/v2.1.2/graphlib.min.js"></script>
+    <script src="https://dagrejs.github.io/project/dagre-d3/latest/dagre-d3.js"></script>
 
     <style>
+        body {
+            font-family: monospace;
+        }
+
         .node {
             white-space: nowrap;
         }
@@ -189,174 +193,168 @@
     </div>
     <script>
         /**
-         * graphData corresponds to YaniceGraphNodeInfo[] (see graph-dagre-renderer.ts), an array of:
-         * {
-         *   projectName: string;
-         *   scope: string;
-         *   parents: string[];
-         *   children: string[];
-         *   ancestors: string[];
-         *   descendants: string[];
-         *   responsibles: string[];
-         *   changedFiles: string[];
-         *   isAffected: boolean;
-         *   command: YaniceCommand | null;
-         *   pathGlob: string;
-         *   pathRegExp: string;
-         * }
+         * This corresponds to "YaniceGraphNodeInfo" (see graph-dagre-renderer.ts):
+         *
+         * @typedef {Object} YaniceGraphNodeInfo
+         * @property {string} projectName
+         * @property {string} scope
+         * @property {string[]} parents
+         * @property {string[]} children
+         * @property {string[]} ancestors
+         * @property {string[]} descendants
+         * @property {string[]} responsibles
+         * @property {string[]} changedFiles
+         * @property {boolean} isAffected
+         * @property {YaniceCommand|null} command
+         * @property {string} pathGlob
+         * @property {string} pathRegExp
+         *
          */
-        const graphData = INSERT_GRAPH_DATA_OBJECT_HERE;
+
+        /**
+         * @typedef {Object} RenderOptions
+         * @property {"TB"|"BT"|"LR"|"RL"} graphRenderDirection
+         * @property {"A_IS_DEPENDENCY_OF_B"|"A_IMPORTS_B"} graphEdgeDirection
+         * @property {string} graphFocus
+         * @property {"DESCENDANTS_ONLY"|"ANCESTORS_ONLY"|"ANCESTORS_AND_DESCENDANTS"|"IMMEDIATE_CONNECTIONS"} graphFocusOptions
+         */
 
         const GRAPH_FOCUS_DEFAULT = '-----';
+        const YANICE_RENDER_OPTIONS_SESSION_STORAGE_KEY = 'yanice-render-options';
 
-        const DEFAULT_DISPLAY_OPTIONS = {
+        /**
+         * @type {RenderOptions}
+         */
+        const DEFAULT_RENDER_OPTIONS = {
             graphRenderDirection: 'BT', // TB | BT | LR | RL
-            graphEdgeDirection: 'A_IMPORTS_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B,
+            graphEdgeDirection: 'A_IMPORTS_B', // A_IS_DEPENDENCY_OF_B | A_IMPORTS_B
             graphFocus: GRAPH_FOCUS_DEFAULT, // ----- is nothing focused, otherwise name of the project,
-            graphFocusOptions: 'DESCENDANTS_ONLY' // See GRAPH_FOCUS_OPTIONS
+            graphFocusOptions: 'DESCENDANTS_ONLY' // see method setFocusOptionsSelectDefaultValue
         };
 
-        const RENDER_OPTIONS = getOptionsFromSessionStorageOrDefault();
-        const RENDERED_PROJECTS = getProjectsThatNeedRendering(graphData, RENDER_OPTIONS.graphFocus, RENDER_OPTIONS.graphFocusOptions);
+        // Allow the browser to already render the static parts
+        setTimeout(() => main());
 
-        const GRAPH_FOCUS_OPTIONS = [
-            { value: 'DESCENDANTS_ONLY', label: 'All transitive dependencies' },
-            { value: 'ANCESTORS_ONLY', label: 'All transitive dependants' },
-            { value: 'ANCESTORS_AND_DESCENDANTS', label: 'All transitive dependencies and dependants' },
-            { value: 'IMMEDIATE_CONNECTIONS', label: 'Only direct dependencies and dependants' }
-        ];
+        function main() {
+            console.time('main.setup');
 
-        // Set selects
-        document.querySelector('#graphEdgeDirectionSelect').options[
-            RENDER_OPTIONS.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 1 : 0
-        ].selected = true;
-        document.querySelector('#graphRenderOrientationSelect').options[
-            RENDER_OPTIONS.graphRenderDirection === 'TB'
-                ? 0
-                : RENDER_OPTIONS.graphRenderDirection === 'BT'
-                  ? 1
-                  : RENDER_OPTIONS.graphRenderDirection === 'LR'
-                    ? 2
-                    : RENDER_OPTIONS.graphRenderDirection === 'RL'
-                      ? 3
-                      : 0
-        ].selected = true;
-        graphData.forEach((data) => {
-            const select = document.querySelector('#graphFocusSelect');
-            select.options[select.options.length] = new Option(
-                data.projectName,
-                data.projectName,
-                RENDER_OPTIONS.graphFocus === data.projectName,
-                RENDER_OPTIONS.graphFocus === data.projectName
-            );
-        });
-        initFocusOptionsSelect(GRAPH_FOCUS_OPTIONS, RENDER_OPTIONS, GRAPH_FOCUS_DEFAULT);
+            /**
+             * These values will be filled in graph-dagre-renderer.ts:
+             * @type {YaniceGraphNodeInfo[]}
+             */
+            const yaniceGraphNodeInfos = INSERT_GRAPH_DATA_OBJECT_HERE;
 
-        // Initialize an empty graph
-        const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
+            /**
+             *
+             * @type {Map<string, YaniceGraphNodeInfo>}
+             */
+            const projectNameToGraphNodeInfoMap = new Map();
 
-        // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
-        // is available: See e.g. "dagreGraph.node(d)"-usages below
-        graphData
-            .filter((data) => RENDERED_PROJECTS.includes(data.projectName))
-            .forEach((data) => {
-                data.label = data.projectName;
-                data.style = getNodeStyle(data);
-
-                dagreGraph.setNode(data.projectName, data);
-                switch (RENDER_OPTIONS.graphEdgeDirection) {
-                    case 'A_IS_DEPENDENCY_OF_B':
-                        data.parents
-                            .filter((e) => RENDERED_PROJECTS.includes(e))
-                            .forEach((e) =>
-                                dagreGraph.setEdge(data.projectName, e, {
-                                    curve: d3.curveBasis,
-                                    style: getEdgeStyle(
-                                        data,
-                                        graphData.find((n) => n.projectName === e)
-                                    )
-                                })
-                            );
-                        break;
-                    case 'A_IMPORTS_B':
-                        data.parents
-                            .filter((e) => RENDERED_PROJECTS.includes(e))
-                            .forEach((e) =>
-                                dagreGraph.setEdge(e, data.projectName, {
-                                    curve: d3.curveBasis,
-                                    style: getEdgeStyle(
-                                        data,
-                                        graphData.find((n) => n.projectName === e)
-                                    )
-                                })
-                            );
-                        break;
-                }
+            yaniceGraphNodeInfos.forEach((entry) => {
+                projectNameToGraphNodeInfoMap.set(entry.projectName, entry);
             });
 
-        // Enable zoom
-        const svg = d3.select('svg'),
-            inner = d3.select('svg g'),
-            zoom = d3.zoom().on('zoom', function () {
-                inner.attr('transform', d3.event.transform);
-            });
-        svg.call(zoom);
+            /**
+             * @type {RenderOptions}
+             */
+            const renderOptions = getRenderOptionsFromSessionStorageOrDefault();
 
-        // Add some margins (otherwise the graph looks a bit cut-off at the borders)
-        if (!dagreGraph.graph().hasOwnProperty('marginx') && !dagreGraph.graph().hasOwnProperty('marginy')) {
-            dagreGraph.graph().marginx = 20;
-            dagreGraph.graph().marginy = 20;
+            /**
+             * @type {Set<string>}
+             */
+            const renderedProjects = getProjectsThatNeedRendering(yaniceGraphNodeInfos, renderOptions);
+
+            setDefaultValuesInSelects(yaniceGraphNodeInfos, renderOptions);
+
+            const dagreGraph = createDagreGraph(yaniceGraphNodeInfos, renderedProjects, projectNameToGraphNodeInfoMap, renderOptions);
+
+            enableZoom();
+
+            console.timeEnd('main.setup');
+
+            console.time('dagre.layout');
+            dagre.layout(dagreGraph);
+            console.timeEnd('dagre.layout');
+
+            console.time('dagreD3.render');
+            renderGraph(dagreGraph);
+            console.timeEnd('dagreD3.render');
+
+            const svgHeight = dagreGraph.graph().height * 1.2;
+            const svgWidth = dagreGraph.graph().width * 1.2;
+            document.getElementById('svg-id').setAttribute('height', svgHeight + 'px');
+            document.getElementById('svg-id').setAttribute('width', svgWidth + 'px');
+
+            setupTooltipOnHover(dagreGraph, projectNameToGraphNodeInfoMap);
         }
-        // Graph direction
-        dagreGraph.graph().rankdir = RENDER_OPTIONS.graphRenderDirection;
 
-        dagreGraph.graph().transition = function (selection) {
-            return selection.transition().duration(500);
-        };
+        // =========== GRAPH ===========
 
-        dagre.layout(dagreGraph);
+        /**
+         * @param yaniceGraphNodeInfos {YaniceGraphNodeInfo[]}
+         * @param renderedProjects {Set<string>}
+         * @param projectNameToGraphNodeInfoMap {Map<string, YaniceGraphNodeInfo>}
+         * @param renderOptions {RenderOptions}
+         * @return dagreGraph
+         */
+        function createDagreGraph(yaniceGraphNodeInfos, renderedProjects, projectNameToGraphNodeInfoMap, renderOptions) {
+            // Initialize an empty graph
+            const dagreGraph = new dagreD3.graphlib.Graph().setGraph({});
 
-        const render = dagreD3.render();
-        render(d3.select('svg g'), dagreGraph);
+            // Set up all nodes/edges. Note that when iterating over nodes with d3, the data that is given here
+            // is available: See e.g. "dagreGraph.node(d)"-usages below
+            yaniceGraphNodeInfos
+                .filter((nodeInfo) => renderedProjects.has(nodeInfo.projectName))
+                .forEach((nodeInfo) => {
+                    const d3NodeData = {
+                        label: nodeInfo.projectName,
+                        style: getNodeStyle(nodeInfo)
+                    };
 
-        const svgHeight = dagreGraph.graph().height * 1.2;
-        const svgWidth = dagreGraph.graph().width * 1.2;
-        document.getElementById('svg-id').setAttribute('height', svgHeight + 'px');
-        document.getElementById('svg-id').setAttribute('width', svgWidth + 'px');
+                    dagreGraph.setNode(nodeInfo.projectName, d3NodeData);
+                    switch (renderOptions.graphEdgeDirection) {
+                        case 'A_IS_DEPENDENCY_OF_B':
+                            nodeInfo.parents
+                                .filter((e) => renderedProjects.has(e))
+                                .forEach((e) =>
+                                    dagreGraph.setEdge(nodeInfo.projectName, e, {
+                                        curve: d3.curveBasis,
+                                        style: getEdgeStyle(nodeInfo, projectNameToGraphNodeInfoMap.get(e))
+                                    })
+                                );
+                            break;
+                        case 'A_IMPORTS_B':
+                            nodeInfo.parents
+                                .filter((e) => renderedProjects.has(e))
+                                .forEach((e) =>
+                                    dagreGraph.setEdge(e, nodeInfo.projectName, {
+                                        curve: d3.curveBasis,
+                                        style: getEdgeStyle(nodeInfo, projectNameToGraphNodeInfoMap.get(e))
+                                    })
+                                );
+                            break;
+                    }
+                });
 
-        // Attach tooltip-div. Note that there is only one such div, which will be rendered depending on which
-        // graph-node (project) is currently being hovered. If none is hovered, the tooltip-div is hidden
-        const tooltip = d3
-            .select('.svg-container')
-            .append('div')
-            .attr('class', 'tooltip-content')
-            .style('visibility', 'hidden')
-            .style('border', 'solid')
-            .style('min-width', '600px')
-            .style('border-width', '2px')
-            .style('border-radius', '5px')
-            .style('padding', '5px')
-            .style('background-color', 'white');
+            // Add some margins (otherwise the graph looks a bit cut-off at the borders)
+            if (!dagreGraph.graph().hasOwnProperty('marginx') && !dagreGraph.graph().hasOwnProperty('marginy')) {
+                dagreGraph.graph().marginx = 20;
+                dagreGraph.graph().marginy = 20;
+            }
+            // Graph direction
+            dagreGraph.graph().rankdir = renderOptions.graphRenderDirection;
+            return dagreGraph;
+        }
 
-        const mouseover = function (d) {
-            const nodeData = dagreGraph.node(d);
-            tooltip
-                .style('visibility', 'visible')
-                .html(getProjectInfoTable(nodeData))
-                .style('left', nodeData.x + 'px')
-                .style('top', nodeData.y + 50 + 'px'); // the +50 takes makes the tooltip appear below the node
-            // TODO: Take zoom into account - zooming currently breaks tooltip-positioning
-        };
-        const mouseout = function (d) {
-            tooltip.style('visibility', 'hidden');
-        };
-
-        d3.selectAll('g.node').on('mouseover', mouseover).on('mouseout', mouseout);
+        function renderGraph(dagreGraph) {
+            const render = dagreD3.render();
+            render(d3.select('svg g'), dagreGraph);
+        }
 
         // =========== SELECT-CALLBACKS ===========
 
         function graphEdgeDirectionSelectCallback(selectElement) {
-            const options = getOptionsFromSessionStorageOrDefault();
+            const options = getRenderOptionsFromSessionStorageOrDefault();
             const newOptions = {
                 ...options,
                 graphEdgeDirection: selectElement.value
@@ -365,7 +363,7 @@
         }
 
         function graphRenderOrientationSelectCallback(selectElement) {
-            const options = getOptionsFromSessionStorageOrDefault();
+            const options = getRenderOptionsFromSessionStorageOrDefault();
             const newOptions = {
                 ...options,
                 graphRenderDirection: selectElement.value
@@ -374,7 +372,7 @@
         }
 
         function graphFocusSelectCallback(selectElement) {
-            const options = getOptionsFromSessionStorageOrDefault();
+            const options = getRenderOptionsFromSessionStorageOrDefault();
             const newOptions = {
                 ...options,
                 graphFocus: selectElement.value
@@ -383,7 +381,7 @@
         }
 
         function graphFocusOptionsSelectCallback(selectElement) {
-            const options = getOptionsFromSessionStorageOrDefault();
+            const options = getRenderOptionsFromSessionStorageOrDefault();
             const newOptions = {
                 ...options,
                 graphFocusOptions: selectElement.value
@@ -393,7 +391,65 @@
 
         // =========== SELECT-SETUP ==============
 
-        function initFocusOptionsSelect(graphFocusOptions, renderOptions, graphFocusDefault) {
+        /**
+         * @param yaniceGraphNodeInfos {YaniceGraphNodeInfo[]}
+         * @param renderOptions {RenderOptions}
+         */
+        function setDefaultValuesInSelects(yaniceGraphNodeInfos, renderOptions) {
+            setEdgeDirectionSelectDefaultValue(renderOptions);
+            setRenderOrientationSelectDefaultValue(renderOptions);
+            setFocusProjectOptions(yaniceGraphNodeInfos, renderOptions);
+            setFocusOptionsSelectDefaultValue(renderOptions);
+        }
+
+        /**
+         * @param renderOptions {RenderOptions}
+         */
+        function setEdgeDirectionSelectDefaultValue(renderOptions) {
+            const selectedEdgeDirectionIndex = renderOptions.graphEdgeDirection === 'A_IS_DEPENDENCY_OF_B' ? 1 : 0;
+            document.querySelector('#graphEdgeDirectionSelect').options[selectedEdgeDirectionIndex].selected = true;
+        }
+
+        /**
+         @param renderOptions {RenderOptions}
+         */
+        function setRenderOrientationSelectDefaultValue(renderOptions) {
+            const renderDirectionToIndexMap = {
+                TB: 0,
+                BT: 1,
+                LR: 2,
+                RL: 3
+            };
+            const selectedRenderOrientationOptionIndex = renderDirectionToIndexMap[renderOptions.graphRenderDirection] ?? 0;
+            document.querySelector('#graphRenderOrientationSelect').options[selectedRenderOrientationOptionIndex].selected = true;
+        }
+
+        /**
+         * @param yaniceGraphNodeInfos {YaniceGraphNodeInfo[]}
+         * @param renderOptions {RenderOptions}
+         */
+        function setFocusProjectOptions(yaniceGraphNodeInfos, renderOptions) {
+            yaniceGraphNodeInfos.forEach((nodeInfo) => {
+                const select = document.querySelector('#graphFocusSelect');
+                select.options[select.options.length] = new Option(
+                    nodeInfo.projectName,
+                    nodeInfo.projectName,
+                    renderOptions.graphFocus === nodeInfo.projectName,
+                    renderOptions.graphFocus === nodeInfo.projectName
+                );
+            });
+        }
+
+        /**
+         * @param renderOptions {RenderOptions}
+         */
+        function setFocusOptionsSelectDefaultValue(renderOptions) {
+            const graphFocusOptions = [
+                { value: 'DESCENDANTS_ONLY', label: 'All transitive dependencies' },
+                { value: 'ANCESTORS_ONLY', label: 'All transitive dependants' },
+                { value: 'ANCESTORS_AND_DESCENDANTS', label: 'All transitive dependencies and dependants' },
+                { value: 'IMMEDIATE_CONNECTIONS', label: 'Only direct dependencies and dependants' }
+            ];
             const selectElement = document.querySelector('#graphFocusOptionsSelect');
             graphFocusOptions.forEach((option) => {
                 selectElement.options[selectElement.options.length] = new Option(
@@ -403,68 +459,133 @@
                     renderOptions.graphFocusOptions === option.value
                 );
             });
-            if (renderOptions.graphFocus === graphFocusDefault) {
+            if (renderOptions.graphFocus === GRAPH_FOCUS_DEFAULT) {
                 selectElement.disabled = true;
             }
         }
 
         // =========== UTILITIES ==============
 
-        function getOptionsFromSessionStorageOrDefault() {
-            const optionsFromSessionStorage = sessionStorage.getItem('graphDisplayOptions');
-            return optionsFromSessionStorage ? JSON.parse(optionsFromSessionStorage) : DEFAULT_DISPLAY_OPTIONS;
+        function enableZoom() {
+            const svg = d3.select('svg'),
+                inner = d3.select('svg g'),
+                zoom = d3.zoom().on('zoom', function () {
+                    inner.attr('transform', d3.event.transform);
+                });
+            svg.call(zoom);
         }
 
+        /**
+         * @param dagreGraph
+         * @param projectNameToGraphNodeInfoMap {Map<string, YaniceGraphNodeInfo>}
+         */
+        function setupTooltipOnHover(dagreGraph, projectNameToGraphNodeInfoMap) {
+            // Attach tooltip-div. Note that there is only one such div, which will be rendered depending on which
+            // graph-node (project) is currently being hovered. If none is hovered, the tooltip-div is hidden
+            const tooltip = d3
+                .select('.svg-container')
+                .append('div')
+                .attr('class', 'tooltip-content')
+                .style('visibility', 'hidden')
+                .style('border', 'solid')
+                .style('min-width', '600px')
+                .style('border-width', '2px')
+                .style('border-radius', '5px')
+                .style('padding', '5px')
+                .style('background-color', 'white');
+
+            const mouseover = function (d) {
+                const d3Node = dagreGraph.node(d);
+                tooltip
+                    .style('visibility', 'visible')
+                    .html(getProjectInfoTable(projectNameToGraphNodeInfoMap.get(d3Node.label)))
+                    .style('left', d3Node.x + 'px')
+                    .style('top', d3Node.y + 50 + 'px'); // the +50 takes makes the tooltip appear below the node
+                // TODO: Take zoom into account - zooming currently breaks tooltip-positioning
+            };
+            const mouseout = function (d) {
+                tooltip.style('visibility', 'hidden');
+            };
+
+            d3.selectAll('g.node').on('mouseover', mouseover).on('mouseout', mouseout);
+        }
+
+        /**
+         *
+         * @returns {RenderOptions}
+         */
+        function getRenderOptionsFromSessionStorageOrDefault() {
+            const optionsFromSessionStorage = sessionStorage.getItem(YANICE_RENDER_OPTIONS_SESSION_STORAGE_KEY);
+            return optionsFromSessionStorage ? JSON.parse(optionsFromSessionStorage) : DEFAULT_RENDER_OPTIONS;
+        }
+
+        /**
+         * @param graphDisplayOptions {RenderOptions}
+         */
         function writeOptionsToSessionStorageAndReload(graphDisplayOptions) {
-            sessionStorage.setItem('graphDisplayOptions', JSON.stringify(graphDisplayOptions));
+            sessionStorage.setItem(YANICE_RENDER_OPTIONS_SESSION_STORAGE_KEY, JSON.stringify(graphDisplayOptions));
             window.location.reload();
         }
 
-        function getProjectsThatNeedRendering(pGraphData, graphFocusSelection, graphFocusOption) {
-            const allProjects = pGraphData.map((d) => d.projectName);
-            if (graphFocusSelection === GRAPH_FOCUS_DEFAULT) {
-                return allProjects;
+        /**
+         * @param yaniceGraphNodeInfos {YaniceGraphNodeInfo[]}
+         * @param renderOptions {RenderOptions}
+         * @returns {Set<string>}
+         */
+        function getProjectsThatNeedRendering(yaniceGraphNodeInfos, renderOptions) {
+            const allProjects = yaniceGraphNodeInfos.map((d) => d.projectName);
+            if (renderOptions.graphFocus === GRAPH_FOCUS_DEFAULT) {
+                return new Set(allProjects);
             }
 
-            const focusProjectGraphData = pGraphData.find((d) => d.projectName === graphFocusSelection);
+            const focusProjectGraphData = yaniceGraphNodeInfos.find((d) => d.projectName === renderOptions.graphFocus);
             console.log('focusProjectGraphData', focusProjectGraphData);
-            switch (graphFocusOption) {
+            switch (renderOptions.graphFocusOptions) {
                 case 'ANCESTORS_ONLY':
-                    return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.ancestors]));
+                    return new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.ancestors]);
                 case 'DESCENDANTS_ONLY':
-                    return Array.from(new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants]));
+                    return new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.descendants]);
                 case 'ANCESTORS_AND_DESCENDANTS':
-                    return Array.from(
-                        new Set([
-                            focusProjectGraphData.projectName,
-                            ...focusProjectGraphData.descendants,
-                            ...focusProjectGraphData.ancestors
-                        ])
-                    );
+                    return new Set([
+                        focusProjectGraphData.projectName,
+                        ...focusProjectGraphData.descendants,
+                        ...focusProjectGraphData.ancestors
+                    ]);
                 case 'IMMEDIATE_CONNECTIONS':
-                    return Array.from(
-                        new Set([focusProjectGraphData.projectName, ...focusProjectGraphData.parents, ...focusProjectGraphData.children])
-                    );
+                    return new Set([
+                        focusProjectGraphData.projectName,
+                        ...focusProjectGraphData.parents,
+                        ...focusProjectGraphData.children
+                    ]);
             }
         }
 
-        function getNodeStyle(data) {
+        /**
+         * @param yaniceGraphNodeInfo {YaniceGraphNodeInfo}
+         * @returns {string}
+         */
+        function getNodeStyle(yaniceGraphNodeInfo) {
             let styleStr = 'stroke-width: 2px;';
             // If there is no command, the graph-node has dashed borders
-            if (!data.command) {
+            if (!yaniceGraphNodeInfo.command) {
                 styleStr = styleStr.concat('stroke-dasharray: 5, 5;');
             }
-            // If a project itself or one of its dependencies changed, outline is red
-            if (data.isAffected) {
+            // If a project itself or one of its dependencies changed, the outline is red
+            if (yaniceGraphNodeInfo.isAffected) {
                 styleStr = styleStr.concat('stroke: #ff0000;');
             }
-            // If the project changed directly (changed files), color entire node red
-            if (data.changedFiles.length > 0) {
+            // If the project itself changed, color the entire node red
+            if (yaniceGraphNodeInfo.changedFiles.length > 0) {
                 styleStr = styleStr.concat('fill: #ff0000;');
             }
             return styleStr;
         }
 
+        /**
+         * @param importerNode {YaniceGraphNodeInfo}
+         * @param dependencyNode {YaniceGraphNodeInfo}
+         * @returns {string}
+         */
         function getEdgeStyle(importerNode, dependencyNode) {
             let styleStr = '';
             if (importerNode.changedFiles.length > 0 && dependencyNode.isAffected) {
@@ -473,56 +594,62 @@
             return styleStr;
         }
 
-        function getProjectInfoTable(nodeData) {
+        /**
+         * @param yaniceGraphNodeInfo {YaniceGraphNodeInfo}
+         * @returns {string}
+         */
+        function getProjectInfoTable(yaniceGraphNodeInfo) {
             let table = ' <table style="width:100%">';
 
             // Add basic info: Caption (project-name), pathGlob, pathRegExp
             table = table.concat(
                 '<caption><strong>' +
-                    nodeData.projectName +
+                    yaniceGraphNodeInfo.projectName +
                     '<strong></strong></caption>' +
                     '<tr>' +
                     '  <td>pathGlob:</td>' +
-                    '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' +
-                    nodeData.pathGlob +
+                    '  <td style="font-size: small;white-space:nowrap;">' +
+                    yaniceGraphNodeInfo.pathGlob +
                     '</td>' +
                     '</tr>' +
                     '<tr>' +
                     '  <td>pathRegExp:</td>' +
-                    '  <td style="font-family: courier; font-size: small;white-space:nowrap;">' +
-                    nodeData.pathRegExp +
+                    '  <td style="font-size: small;white-space:nowrap;">' +
+                    yaniceGraphNodeInfo.pathRegExp +
                     '</td>' +
                     '</tr>'
             );
 
             // Add responsibles, if there are any
-            if (nodeData.responsibles.length > 0) {
-                table = table.concat('<tr>' + '  <td>responsibles:</td>' + '  <td>' + nodeData.responsibles.join(', ') + '</td>' + '</tr>');
+            if (yaniceGraphNodeInfo.responsibles.length > 0) {
+                table = table.concat(
+                    '<tr>' + '  <td>responsibles:</td>' + '  <td>' + yaniceGraphNodeInfo.responsibles.join(', ') + '</td>' + '</tr>'
+                );
             }
 
             // Add commands if defined, add commands-cwd if it's not the root directory
-            if (nodeData.command) {
-                const commands = nodeData.command.commands;
+            if (yaniceGraphNodeInfo.command) {
+                const commands = yaniceGraphNodeInfo.command.commands;
                 const commandDisplayString = commands.length === 1 ? commands[0] : `${commands.join(', ')}`;
                 const singularOrPluralCommand = commands.length === 1 ? 'command' : 'commands';
                 table = table.concat(
                     '<tr>' +
-                        '  <td><span style="font-family: courier; font-size: small;white-space: nowrap">' +
-                        nodeData.scope +
+                        '  <td><span style="font-size: small;white-space: nowrap">' +
+                        yaniceGraphNodeInfo.scope +
                         '</span> ' +
                         singularOrPluralCommand +
                         ':</td>' +
-                        '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' +
+                        '  <td style="font-size: small;white-space:nowrap";>' +
                         commandDisplayString +
                         '</td>' +
                         '</tr>'
                 );
-                if (nodeData.command.cwd && nodeData.command.cwd !== './') {
+                if (yaniceGraphNodeInfo.command.cwd && yaniceGraphNodeInfo.command.cwd !== './') {
                     table = table.concat(
                         '<tr>' +
                             '  <td style="white-space:nowrap">command directory:</td>' +
-                            '  <td style="font-family: courier; font-size: small;white-space:nowrap";>' +
-                            nodeData.command.cwd +
+                            '  <td style="font-size: small;white-space:nowrap";>' +
+                            yaniceGraphNodeInfo.command.cwd +
                             '</td>' +
                             '</tr>'
                     );
@@ -530,17 +657,19 @@
             }
 
             // Add dependents if there are any
-            if (nodeData.parents.length > 0) {
-                table = table.concat('<tr>' + '  <td>Dependents:</td>' + '  <td>' + nodeData.parents.join(', ') + '</td>' + '</tr>');
+            if (yaniceGraphNodeInfo.parents.length > 0) {
+                table = table.concat(
+                    '<tr>' + '  <td>Dependents:</td>' + '  <td>' + yaniceGraphNodeInfo.parents.join(', ') + '</td>' + '</tr>'
+                );
             }
 
             // If there are changed files, list them
-            if (nodeData.changedFiles.length > 0) {
+            if (yaniceGraphNodeInfo.changedFiles.length > 0) {
                 table = table.concat(
                     '  <tr>' +
                         '    <td style="white-space:nowrap">Changed files:</td>' +
-                        '    <td><ul style="font-family: courier; font-size: x-small;white-space:nowrap;list-style:none;padding:0;margin:0";>' +
-                        nodeData.changedFiles.map((f) => '<li>' + f + '</li>').join('') +
+                        '    <td><ul style="font-size: x-small;white-space:nowrap;list-style:none;padding:0;margin:0";>' +
+                        yaniceGraphNodeInfo.changedFiles.map((f) => '<li>' + f + '</li>').join('') +
                         '</ul></td>' +
                         '  </tr>'
                 );
