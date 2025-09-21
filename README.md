@@ -10,7 +10,7 @@ those changes and the dependency graphs you defined.
 For example, a repository with two projects and two libraries might be modeled as follows:
 
 <p align="center">
-  <img alt="yanice-visualization-example" src="https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png">
+  <img alt="yanice-visualization-example" src="https://raw.githubusercontent.com/abuob/yanice/main/resources/yanice-visualize-example.png">
 </p>
 
 In this example, we look at the graph comparing the working tree to `HEAD`. Something in `lib-2` changed.
@@ -133,12 +133,12 @@ changed files using git,
 calculating changed projects, and so on. These steps are always the same, except for the last one, which determines
 what to do with all the results from the previous steps. This is determined by the first argument:
 
-| First parameter        | Effect                                                                                                                                                                                                         |
-| :--------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run`                  | Runs the commands                                                                                                                                                                                              |
-| `output-only`          | Same as `run`, but instead of running the commands, print related information.                                                                                                                                 |
-| `visualize`            | Starts a small server which serves a visualization of the graph and all the changes; see e.g. [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png). |
-| `plugin:<plugin-name>` | Invokes a plugin with all available data. There are some officially provided plugins, however, you an also provide the location of a custom script that yanice will invoke. See below for details.             |
+| First parameter        | Effect                                                                                                                                                                                                       |
+| :--------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `run`                  | Runs the commands                                                                                                                                                                                            |
+| `output-only`          | Same as `run`, but instead of running the commands, print related information.                                                                                                                               |
+| `visualize`            | Starts a small server which serves a visualization of the graph and all the changes; see e.g. [depiction above](https://raw.githubusercontent.com/abuob/yanice/main/resources/yanice-visualize-example.png). |
+| `plugin:<plugin-name>` | Invokes a plugin with all available data. There are some officially provided plugins, however, you an also provide the location of a custom script that yanice will invoke. See below for details.           |
 
 ### Second parameter
 
@@ -161,17 +161,17 @@ The order of the remaining parameters generally does not matter (except when ove
 | `--renderer=dagre/vizjs`                                                | `visualize`    | `dagre`  | Will choose the renderer, available are [dagre](https://github.com/dagrejs/dagre) and [vizjs](https://github.com/mdaines/viz.js).                                                                                                                                                                                                                                                                                                                       |
 
 With
-the [configuration from above](https://github.com/abuob/yanice/blob/master/src/__fixtures/readme-example-yanice.json),
+the [configuration from above](https://github.com/abuob/yanice/blob/main/src/__fixtures/readme-example-yanice.json),
 we could run the following commands:
 
 -   `yanice visualize test --rev=HEAD`: Will create a visualization of the graph like in
-    the [depiction above](https://raw.githubusercontent.com/abuob/yanice/master/resources/yanice-visualize-example.png).
--   `yanice run lint --branch=master --concurrency=3`: Run all lint-commands of all projects that have changed compared to
-    the master branch,
+    the [depiction above](https://raw.githubusercontent.com/abuob/yanice/main/resources/yanice-visualize-example.png).
+-   `yanice run lint --branch=main --concurrency=3`: Run all lint-commands of all projects that have changed compared to
+    the main branch,
     include uncommitted changes (default), run 3 commands in parallel (default: 1).
--   `yanice output-only lint --branch=master`: Same as above, but instead of running the commands, the projects
+-   `yanice output-only lint --branch=main`: Same as above, but instead of running the commands, the projects
     on which lint-commands would be executed are printed to the console.
--   `yanice output-only test --branch=master --responsibles`: Print all responsibles. Note that we have to provide a
+-   `yanice output-only test --branch=main --responsibles`: Print all responsibles. Note that we have to provide a
     scope (here: test)
     in order to create the dependency graph.
     Yanice will collect all responsibles of the projects that are either directly changed or affected by changes, and log
@@ -227,13 +227,13 @@ but in the end invoke the selected plugin and forward all data that has so far b
 
 ### Officially supported plugins
 
-| Name              | npm-package                                                                                  | source code                                                                                          | Purpose                                                                                                                                                                                                                                                                               |
-| :---------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| import-boundaries | [link](https://www.npmjs.com/package/@yanice/import-boundaries): `@yanice/import-boundaries` | [packages/import-boundaries](https://github.com/abuob/yanice/tree/master/packages/import-boundaries) | Helps to bridge the gap between the dependencies declared in the `yanice.json` and the _actual_ dependencies as per imports. Currently supports import-detection for javascript/typescript, but allows for custom import-resolvers which take a file and map it to the found imports. |
+| Name              | npm-package                                                                                  | source code                                                                                        | Purpose                                                                                                                                                                                                                                                                               |
+| :---------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| import-boundaries | [link](https://www.npmjs.com/package/@yanice/import-boundaries): `@yanice/import-boundaries` | [packages/import-boundaries](https://github.com/abuob/yanice/tree/main/packages/import-boundaries) | Helps to bridge the gap between the dependencies declared in the `yanice.json` and the _actual_ dependencies as per imports. Currently supports import-detection for javascript/typescript, but allows for custom import-resolvers which take a file and map it to the found imports. |
 
 ### Custom plugins
 
-Custom plugins are javascript-files which yanice can require. See [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json) for configuration, [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-plugin.ts) for a custom (untranspiled) plugin example.
+Custom plugins are javascript-files which yanice can require. See [here](https://github.com/abuob/yanice/blob/main/integration-tests/test-project/yanice.json) for configuration, [here](https://github.com/abuob/yanice/blob/main/integration-tests/test-project/custom-scripts/dummy-plugin.ts) for a custom (untranspiled) plugin example.
 
 ### Dependencies
 

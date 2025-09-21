@@ -25,7 +25,7 @@ yanice plugin:import-boundaries <scope> --assert
 
 ## Configuration
 
-Configuration of the plugin is done in the `yanice.json`, see [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json) for an example:
+Configuration of the plugin is done in the `yanice.json`, see [here](https://github.com/abuob/yanice/blob/main/integration-tests/test-project/yanice.json) for an example:
 
 ```json
 {
@@ -52,7 +52,7 @@ Configuration of the plugin is done in the `yanice.json`, see [here](https://git
 
 A map that maps glob-expressions to an array of import-resolvers.
 An import-resolver accepts a file and its filepath and creates an "import-map".
-See here for an example how a custom import resolver can be written: [dummy-resolver.ts](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-resolver.ts).
+See here for an example how a custom import resolver can be written: [dummy-resolver.ts](https://github.com/abuob/yanice/blob/main/integration-tests/test-project/custom-scripts/dummy-resolver.ts).
 Note that we ultimately need to provide a JS-file, meaning, the aforementioned code would first need to be transpiled.
 
 Officially available resolvers:
@@ -86,8 +86,8 @@ Array of officially provided assertions. Currently supported:
 
 ### customAssertions
 
-Array of custom assertion scripts. See [here](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/yanice.json#L18) on how to provide a script;
-the original untranspiled assertion-source-code can be found here: [link to dummy-assertion](https://github.com/abuob/yanice/blob/master/integration-tests/test-project/custom-scripts/dummy-assertion.ts).
+Array of custom assertion scripts. See [here](https://github.com/abuob/yanice/blob/main/integration-tests/test-project/yanice.json#L18) on how to provide a script;
+the original untranspiled assertion-source-code can be found here: [link to dummy-assertion](https://github.com/abuob/yanice/blob/main/integration-tests/test-project/custom-scripts/dummy-assertion.ts).
 
 ### assertionOptions
 
