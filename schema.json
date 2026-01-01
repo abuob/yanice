@@ -19,6 +19,7 @@
                             "properties": {
                                 "importResolvers": {
                                     "type": "object",
+                                    "description": "A map of glob-expressions to an array of import resolvers. Matching files will have those resolvers applied.",
                                     "patternProperties": {
                                         "^.+$": {
                                             "type": "array",
@@ -29,6 +30,7 @@
                                     }
                                 },
                                 "postResolve": {
+                                    "description": "List of path to scripts (relative to yanice.json) that allow to resolve imports further; e.g. to resolve typescript-path-mappings that the built-in 'es6-declarative-import-resolver' cannot resolve itself. See documentation for expected format.",
                                     "type": "array",
                                     "items": {
                                         "type": "string"
@@ -72,6 +74,7 @@
                                             "additionalProperties": false
                                         },
                                         "ignoredProjects": {
+                                            "description": "These projects are not considered for the sake of boundary-assertions. This is especially useful for pseudo-projects like 'ALL-TYPESCRIPT-FILES' and such, as import-boundary-assertions would be meaningless for them.",
                                             "type": "array",
                                             "items": {
                                                 "type": "string"
@@ -88,21 +91,25 @@
                                             "additionalProperties": false
                                         },
                                         "restrictPackageImports": {
+                                            "description": "Any package can either be allowed (with exceptions) or blocked (with exceptions). A boolean flag controls whether this needs to be explicitly done for all packages.",
                                             "type": "object",
                                             "properties": {
                                                 "allPackagesMustBeListed": {
+                                                    "description": "If set to true, a package-import must either be allowed or blocked by default. If false, it is implicitly allowed.",
                                                     "type": "boolean"
                                                 },
                                                 "allowConfiguration": {
                                                     "type": "object",
                                                     "properties": {
                                                         "allowByDefault": {
+                                                            "description": "List of packages that are allowed by default.",
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
                                                         },
                                                         "exceptions": {
+                                                            "description": "Map of projects (keys) to arrays (values) to control where we want to block projects which are otherwise allowed by default.",
                                                             "type": "object",
                                                             "patternProperties": {
                                                                 "^[a-zA-Z][0-9a-zA-Z-]*$": {
@@ -122,12 +129,14 @@
                                                     "type": "object",
                                                     "properties": {
                                                         "blockByDefault": {
+                                                            "description": "List of packages that are blocked by default.",
                                                             "type": "array",
                                                             "items": {
                                                                 "type": "string"
                                                             }
                                                         },
                                                         "exceptions": {
+                                                            "description": "Map of projects (keys) to arrays (values) to control where we want to allow projects which are otherwise blocked by default.",
                                                             "type": "object",
                                                             "patternProperties": {
                                                                 "^[a-zA-Z][0-9a-zA-Z-]*$": {
@@ -142,6 +151,19 @@
                                                     },
                                                     "required": ["blockByDefault"],
                                                     "additionalProperties": false
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        "noCircularImports": {
+                                            "type": "object",
+                                            "properties": {
+                                                "excludedProjects": {
+                                                    "description": "Any file that is part of any of the listed projects will not be included in the circular import check.",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
                                                 }
                                             },
                                             "additionalProperties": false

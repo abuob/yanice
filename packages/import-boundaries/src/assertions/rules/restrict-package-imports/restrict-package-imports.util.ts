@@ -17,8 +17,8 @@ export class RestrictPackageImportsUtil {
         restrictPackageImportOptions: YanicePluginImportBoundariesRestrictPackageImportsOptions,
         ignoredProjects: string[]
     ): YaniceImportBoundariesAssertionViolation[] {
-        const allowedByDefault: string[] = restrictPackageImportOptions.allowConfiguration.allowByDefault;
-        const blockedByDefault: string[] = restrictPackageImportOptions.blockConfiguration.blockByDefault;
+        const allowedByDefault: string[] = restrictPackageImportOptions.allowConfiguration?.allowByDefault ?? [];
+        const blockedByDefault: string[] = restrictPackageImportOptions.blockConfiguration?.blockByDefault ?? [];
         const allPackagesMustBeListed: boolean = restrictPackageImportOptions.allPackagesMustBeListed ?? false;
 
         const allFilePaths: string[] = Object.keys(assertionData.fileToProjectsMap);
@@ -28,8 +28,8 @@ export class RestrictPackageImportsUtil {
                 if (ignoredProjects.includes(projectName)) {
                     return prev;
                 }
-                const allowExceptions: string[] = restrictPackageImportOptions.allowConfiguration.exceptions?.[projectName] ?? [];
-                const blockExceptions: string[] = restrictPackageImportOptions.blockConfiguration.exceptions?.[projectName] ?? [];
+                const allowExceptions: string[] = restrictPackageImportOptions.allowConfiguration?.exceptions?.[projectName] ?? [];
+                const blockExceptions: string[] = restrictPackageImportOptions.blockConfiguration?.exceptions?.[projectName] ?? [];
 
                 const allowedForProject: string[] = allowedByDefault
                     .filter((entry: string) => !allowExceptions.includes(entry))
@@ -94,8 +94,8 @@ export class RestrictPackageImportsUtil {
 
         const projectNameSet: Set<string> = new Set(projectNames);
 
-        const allowConfigExceptionKeys: string[] = Object.keys(restrictPackageImportOptions.allowConfiguration.exceptions ?? {});
-        const blockConfigExceptionKeys: string[] = Object.keys(restrictPackageImportOptions.blockConfiguration.exceptions ?? {});
+        const allowConfigExceptionKeys: string[] = Object.keys(restrictPackageImportOptions.allowConfiguration?.exceptions ?? {});
+        const blockConfigExceptionKeys: string[] = Object.keys(restrictPackageImportOptions.blockConfiguration?.exceptions ?? {});
 
         const allowViolations: AssertionViolationRestrictPackageImportInvalidConfigurationKeys[] =
             RestrictPackageImportsUtil.getInvalidKeysViolations(projectNameSet, allowConfigExceptionKeys, 'allowlist');

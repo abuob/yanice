@@ -9,14 +9,18 @@ export interface YanicePluginImportBoundariesAccessViaEntryPointsOptions {
 
 export interface YanicePluginImportBoundariesRestrictPackageImportsOptions {
     allPackagesMustBeListed?: boolean;
-    allowConfiguration: {
-        allowByDefault: string[];
+    allowConfiguration?: {
+        allowByDefault?: string[];
         exceptions?: Record<string, string[]>;
     };
-    blockConfiguration: {
-        blockByDefault: string[];
+    blockConfiguration?: {
+        blockByDefault?: string[];
         exceptions?: Record<string, string[]>;
     };
+}
+
+export interface YanicePluginImportBoundariesNoCircularImportsOptions {
+    excludedProjects?: string[];
 }
 
 export type importBoundaryAssertionIdentifierType =
@@ -36,6 +40,7 @@ export interface YanicePluginImportBoundariesOptions {
         ignoredProjects?: string[];
         accessViaEntryPoints?: YanicePluginImportBoundariesAccessViaEntryPointsOptions;
         restrictPackageImports?: YanicePluginImportBoundariesRestrictPackageImportsOptions;
+        noCircularImports?: YanicePluginImportBoundariesNoCircularImportsOptions;
     };
     assertions?: importBoundaryAssertionIdentifierType[];
     customAssertions?: string[];

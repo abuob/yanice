@@ -99,6 +99,7 @@ the original untranspiled assertion-source-code can be found here: [link to dumm
 -   `restrictPackageImports`: Only relevant when using the `restrict-package-imports`-rule. When `allPackagesMustBeListed` is set to `true`,
     all imported packages must either be explicitly allowed or blocked. The `allowList` and `blockList` allow or block packages by default,
     with the possibility to list exceptions to the rule on a per-project-basis.
+-   `noCircularImports`: Only relevant when using `no-circular-imports`. The `excludedProjects`-property allows excluding projects which allow import-cycles.
 
 #### Ignoring a particular import
 
