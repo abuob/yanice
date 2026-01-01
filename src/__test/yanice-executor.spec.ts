@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 
+import { FixtureLoader } from '../__fixtures/fixture-loader';
 import validReadmeYaniceJson from '../__fixtures/readme-example-yanice.json';
-import validYaniceJson1 from '../__fixtures/valid-1.yanice.json';
-import validYaniceJson4 from '../__fixtures/valid-4.yanice.json';
 import { YaniceJsonType } from '../phase-1-config/config/config.interface';
 import { YaniceExecutor } from '../yanice-executor';
 
@@ -10,8 +9,8 @@ describe('YaniceExecutor', () => {
     let yaniceExecutor: YaniceExecutor;
     const yaniceJsonDirectory = 'some/mock/path/to/yanice';
     const gitRepoRootPath: string = 'some/mock/path/to/git/repo';
-    const yaniceJson1: YaniceJsonType = validYaniceJson1 as any;
-    const yaniceJson4: YaniceJsonType = validYaniceJson4 as any;
+    const yaniceJson1: YaniceJsonType = FixtureLoader.getFixture('valid-1.yanice.json');
+    const yaniceJson4: YaniceJsonType = FixtureLoader.getFixture('valid-4.yanice.json');
     const readmeYaniceJson: YaniceJsonType = validReadmeYaniceJson as any;
 
     describe('some changed projects', () => {

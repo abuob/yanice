@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 
-import yaniceJson2 from '../../../__fixtures/valid-2.yanice.json';
-import yaniceJson3 from '../../../__fixtures/valid-3.yanice.json';
+import { FixtureLoader } from '../../../__fixtures/fixture-loader';
 import { YaniceCliArgs, YaniceCliArgsRun } from '../../args-parser/cli-args.interface';
 import { DirectedGraph, DirectedGraphUtil } from '../../directed-graph/directed-graph';
 import { ConfigParser } from '../config-parser';
@@ -19,6 +18,9 @@ describe('ConfigParser', () => {
             isPerformanceLoggingEnabled: false
         }
     };
+
+    const yaniceJson2: any = FixtureLoader.getFixture('valid-2.yanice.json');
+    const yaniceJson3: any = FixtureLoader.getFixture('valid-3.yanice.json');
 
     describe('getYaniceConfig', () => {
         it('should set the options to default values if none are specified', () => {

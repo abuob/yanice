@@ -1,18 +1,20 @@
 import { expect } from 'chai';
 
-import invalidChildYaniceJson from '../../../__fixtures/invalid/invalid-child-project-name.yanice.json';
-import invalidMultiExtension from '../../../__fixtures/invalid/invalid-multi-extension.yanice.json';
-import invalidParentYaniceJson from '../../../__fixtures/invalid/invalid-parent-project-name.yanice.json';
-import readmeYaniceJson from '../../../__fixtures/readme-example-yanice.json';
-import yaniceJson1 from '../../../__fixtures/valid-2.yanice.json';
-import yaniceJson2 from '../../../__fixtures/valid-3.yanice.json';
+import { FixtureLoader } from '../../../__fixtures/fixture-loader';
 import { ConfigVerifier } from '../config-verifier';
 
 describe('ConfigVerifier', () => {
+    const invalidChildYaniceJson = FixtureLoader.getFixture('invalid-child-project-name.yanice.json');
+    const invalidMultiExtension = FixtureLoader.getFixture('invalid-multi-extension.yanice.json');
+    const invalidParentYaniceJson = FixtureLoader.getFixture('invalid-parent-project-name.yanice.json');
+    const readmeYaniceJson = FixtureLoader.getFixture('readme-example-yanice.json');
+    const yaniceJson2 = FixtureLoader.getFixture('valid-2.yanice.json');
+    const yaniceJson3 = FixtureLoader.getFixture('valid-3.yanice.json');
+
     describe('verifyYaniceJsonWithSchema', () => {
         it('should return true for a yanice.json that conforms to the schema', () => {
-            expect(ConfigVerifier.verifyYaniceJsonWithSchema(yaniceJson1)).to.equal(true);
             expect(ConfigVerifier.verifyYaniceJsonWithSchema(yaniceJson2)).to.equal(true);
+            expect(ConfigVerifier.verifyYaniceJsonWithSchema(yaniceJson3)).to.equal(true);
             expect(ConfigVerifier.verifyYaniceJsonWithSchema(readmeYaniceJson)).to.equal(true);
         });
 
@@ -25,8 +27,8 @@ describe('ConfigVerifier', () => {
 
     describe('verifyDependencyScopeProjectNames', () => {
         it('should return true for a valid yanice.json', () => {
-            expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson1)).to.equal(true);
-            expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson2 as any)).to.equal(true);
+            expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson2)).to.equal(true);
+            expect(ConfigVerifier.verifyDependencyScopeProjectNames(yaniceJson3 as any)).to.equal(true);
             expect(ConfigVerifier.verifyDependencyScopeProjectNames(readmeYaniceJson as any)).to.equal(true);
         });
 
@@ -38,8 +40,8 @@ describe('ConfigVerifier', () => {
 
     describe('verifyMaxOneLevelGraphExtension', () => {
         it('should return true for a valid yanice.json', () => {
-            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceJson1)).to.equal(true);
-            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceJson2 as any)).to.equal(true);
+            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceJson2)).to.equal(true);
+            expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(yaniceJson3 as any)).to.equal(true);
             expect(ConfigVerifier.verifyMaxOneLevelGraphExtension(readmeYaniceJson as any)).to.equal(true);
         });
 
